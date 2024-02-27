@@ -1,19 +1,32 @@
 package app
 
 import (
+	"os"
+	"path/filepath"
 	"runtime"
+)
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+var (
+	Name = ""
+)
+
+const (
+	binaryNameEnv = "STAMUSCTL_NAME"
 )
 
 func CatchException() {
 	if err := recover(); err != nil {
 		switch err.(type) {
 		case *runtime.Error:
-			logging.Sugar.Errorf("critical error", err)
 			panic(err)
 		default:
-			logging.Sugar.Errorf("critical error", err)
 		}
+	}
+}
+
+func init() {
+	Name = filepath.Base(os.Args[0])
+	if val := os.Getenv(binaryNameEnv); val != "" {
+		Name = val
 	}
 }

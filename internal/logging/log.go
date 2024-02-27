@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"git.stamus-networks.com/lanath/stamus-ctl/internal/app"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -32,7 +33,7 @@ func SetLogger() {
 	if verbosity > 2 {
 		verbosity = 2
 	}
-	if envType == "prd" {
+	if envType == "prd" && app.Name == "stamusctl" {
 		encoder.TimeKey = zapcore.OmitKey
 		encoder.LevelKey = zapcore.OmitKey
 		encoder.CallerKey = zapcore.OmitKey

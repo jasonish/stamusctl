@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/app"
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"github.com/spf13/cobra"
 )
 
@@ -17,8 +16,6 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Version information",
 	Run: func(cmd *cobra.Command, args []string) {
-		logging.Sugar.Debug("starting process")
-
 		printVersion()
 	},
 }
