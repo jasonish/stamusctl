@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"git.stamus-networks.com/lanath/stamus-ctl/cmd/stamusctl/commands/compose"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/app"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"github.com/spf13/cobra"
@@ -31,6 +32,7 @@ func init() {
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(compose.NewCompose())
 }
 
 func initConfig() {

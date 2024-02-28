@@ -30,14 +30,21 @@ func SetLogger() {
 		EncodeDuration: zapcore.StringDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
-	if verbosity > 2 {
-		verbosity = 2
+
+	if verbosity >= len(levels) {
+		verbosity = len(levels) - 1
 	}
-	if envType == "prd" && app.Name == "stamusctl" {
-		encoder.TimeKey = zapcore.OmitKey
-		encoder.LevelKey = zapcore.OmitKey
-		encoder.CallerKey = zapcore.OmitKey
+
+	if envType == "prd" {
+		encoder.StacktraceKey = zapcore.OmitKey
+
+		if app.Name == "stamusctl" {
+			encoder.TimeKey = zapcore.OmitKey
+			encoder.LevelKey = zapcore.OmitKey
+			encoder.CallerKey = zapcore.OmitKey
+		}
 	}
+
 	config := zap.Config{
 		Level:            zap.NewAtomicLevelAt(levels[verbosity]),
 		Development:      true,
@@ -46,9 +53,10 @@ func SetLogger() {
 		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
-	dev, _ := config.Build()
-	defer dev.Sync()
-	Sugar = dev.Sugar()
+
+	log, _ := config.Build()
+	defer log.Sync()
+	Sugar = log.Sugar()
 }
 
 func init() {
