@@ -9,8 +9,8 @@ import (
 )
 
 const dockerFile = `
-# Copyright(C) 2021, Stamus Networks
-# Written by Raphaël Brogat <rbrogat@stamus-networks.com>
+# Copyright(C) 2024, Stamus Networks
+# Written by Raphaël Brogat <rbrogat@stamus-networks.com> and Valentin Vivier <vvivier@stamus-networks.com>
 #
 # This file comes with ABSOLUTELY NO WARRANTY!
 #
