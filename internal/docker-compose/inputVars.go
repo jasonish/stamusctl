@@ -47,7 +47,6 @@ func getInterface(netInterface *string) {
 
 	*netInterface = result
 	logging.Sugar.Debugw("selected interface.", "interface", netInterface)
-
 }
 
 func getRestart(restart *string) {
@@ -113,7 +112,23 @@ func getDataPath(elasticPath *string) {
 	logging.Sugar.Debugw("selected container data path.", "result", result)
 }
 
-func Ask(cmd *cobra.Command, netInterface, restart, elasticPath, dataPath *string) {
+func getRegistry(registry *string) {
+	prompt := promptui.Prompt{
+		Label:   "Image registry",
+		Default: "ghcr.io/stamusnetworks",
+	}
+
+	result, err := prompt.Run()
+
+	if err != nil {
+		logging.Sugar.Error("Prompt for container data path.", err)
+	}
+
+	*registry = result
+	logging.Sugar.Debugw("selected container data path.", "result", result)
+}
+
+func Ask(cmd *cobra.Command, netInterface, restart, elasticPath, dataPath, registry, token *string) {
 	if cmd.Flags().Changed("restart") == false {
 		getInterface(netInterface)
 	}
@@ -128,5 +143,14 @@ func Ask(cmd *cobra.Command, netInterface, restart, elasticPath, dataPath *strin
 
 	if cmd.Flags().Changed("container-datapath") == false {
 		getDataPath(dataPath)
+	}
+
+	if cmd.Flags().Changed("registry") == false {
+		getRegistry(registry)
+	}
+
+	if cmd.Flags().Changed("token") == false {
+		*token, _ = GenerateSciriusSecretToken()
+
 	}
 }

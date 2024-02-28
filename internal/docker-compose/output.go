@@ -43,7 +43,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: {{.VolumeDataPath | default "${PWD}/containers-data" }}/suricata/logrotate
+      device: {{.VolumeDataPath | default "./containers-data" }}/suricata/logrotate
   logstash-sincedb: #where logstash stores it's state so it doesn't re-ingest
   arkime-logs:
   arkime-pcap:
@@ -54,7 +54,7 @@ services:
 
   elasticsearch:
     container_name: elasticsearch
-    image: elastic/elasticsearch:${ELK_VERSION:-7.16.1}
+    image: elastic/elasticsearch:{{.ElkVersion | default "7.16.1"}}
     restart: {{.RestartMode | default "unless-stopped"}}
     healthcheck:
       test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
@@ -79,7 +79,7 @@ services:
 
   kibana:
     container_name: kibana
-    image:  elastic/kibana:${ELK_VERSION:-7.16.1}
+    image:  elastic/kibana:{{.ElkVersion | default "7.16.1"}}
     restart: {{.RestartMode | default "unless-stopped"}}
     healthcheck:
       test: ["CMD-SHELL", "curl --silent --fail localhost:5601 || exit 1"]
@@ -92,7 +92,7 @@ services:
 
   logstash:
     container_name: logstash
-    image:  elastic/logstash:${ELK_VERSION:-7.16.1}
+    image:  elastic/logstash:{{.ElkVersion | default "7.16.1"}}
     depends_on:
       scirius:
         condition: service_healthy #because we need to wait for scirius to populate ILM policy
@@ -106,9 +106,9 @@ services:
     mem_limit: ${LOGSTASH_MEMORY:-2G}
     volumes:
       - logstash-sincedb:/since.db
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/suricata/logs:/var/log/suricata:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/logstash/conf.d/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/logstash/templates/elasticsearch7-template.json:/usr/share/logstash/config/elasticsearch7-template.json
+      - {{.VolumeDataPath | default "./containers-data" }}/suricata/logs:/var/log/suricata:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/logstash/conf.d/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - {{.VolumeDataPath | default "./containers-data" }}/logstash/templates/elasticsearch7-template.json:/usr/share/logstash/config/elasticsearch7-template.json
     networks:
       network:
 
@@ -127,18 +127,18 @@ services:
       - SYS_NICE
     network_mode: host
     volumes:
-       - {{.VolumeDataPath | default "${PWD}/containers-data" }}/suricata/logs:/var/log/suricata
+       - {{.VolumeDataPath | default "./containers-data" }}/suricata/logs:/var/log/suricata
        - suricata-rules:/etc/suricata/rules
        - suricata-run:/var/run/suricata/
-       - {{.VolumeDataPath | default "${PWD}/containers-data" }}/suricata/etc:/etc/suricata
+       - {{.VolumeDataPath | default "./containers-data" }}/suricata/etc:/etc/suricata
        - suricata-logrotate:/etc/logrotate.d/
 
   scirius:
     container_name: scirius
-    image: ghcr.io/stamusnetworks/scirius:${SCIRIUS_VERSION:-selks}
+    image: {{.Registry | default "ghcr.io/stamusnetworks"}}/scirius:${SCIRIUS_VERSION:-selks}
     restart: {{.RestartMode | default "unless-stopped"}}
     environment:
-      - SECRET_KEY=${SCIRIUS_SECRET_KEY}
+      - SECRET_KEY={{.SciriusToken}}
       - DEBUG=${SCIRIUS_DEBUG:-False}
       - SCIRIUS_IN_SELKS=True
       - USE_ELASTICSEARCH=True
@@ -158,10 +158,10 @@ services:
     volumes:
       - scirius-static:/static/
       - scirius-data:/data/
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/scirius/logs/:/logs/
+      - {{.VolumeDataPath | default "./containers-data" }}/scirius/logs/:/logs/
       - suricata-rules:/rules
       - suricata-run:/var/run/suricata
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/suricata/logs:/var/log/suricata:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/suricata/logs:/var/log/suricata:ro
 
     networks:
       network:
@@ -184,9 +184,9 @@ services:
     restart: {{.RestartMode | default "unless-stopped"}}
     volumes:
       - scirius-static:/static/:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/nginx/conf.d/:/etc/nginx/conf.d/:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/nginx/ssl:/etc/nginx/ssl:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/nginx/conf.d/:/etc/nginx/conf.d/:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/nginx/ssl:/etc/nginx/ssl:ro
     ports:
       - 443:443
     networks:
@@ -203,20 +203,20 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock # This bind-mout allows using the hosts docker deamon instead of created one inside the container
 
       # Those volumes will contain the cron jobs
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/cron-jobs/1min:/etc/periodic/1min/:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/cron-jobs/15min:/etc/periodic/15min/:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/cron-jobs/daily:/etc/periodic/daily/:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/cron-jobs/hourly:/etc/periodic/hourly/:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/cron-jobs/monthly:/etc/periodic/monthly/:ro
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/cron-jobs/weekly:/etc/periodic/weekly/:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/cron-jobs/1min:/etc/periodic/1min/:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/cron-jobs/15min:/etc/periodic/15min/:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/cron-jobs/daily:/etc/periodic/daily/:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/cron-jobs/hourly:/etc/periodic/hourly/:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/cron-jobs/monthly:/etc/periodic/monthly/:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/cron-jobs/weekly:/etc/periodic/weekly/:ro
 
 
   arkime:
     container_name: arkime
-    image: ghcr.io/stamusnetworks/arkimeviewer:${ARKIMEVIEWER_VERSION:-master} ## Repo will need to be changed to stamusnetwork once image built
+    image: {{.Registry | default "ghcr.io/stamusnetworks"}}/arkimeviewer:${ARKIMEVIEWER_VERSION:-master} ## Repo will need to be changed to stamusnetwork once image built
     restart: {{.RestartMode | default "no"}}
     volumes:
-      - {{.VolumeDataPath | default "${PWD}/containers-data" }}/suricata/logs:/suricata-logs:ro
+      - {{.VolumeDataPath | default "./containers-data" }}/suricata/logs:/suricata-logs:ro
       - arkime-config:/data/config
       - arkime-pcap:/data/pcap
       - arkime-logs:/data/logs
@@ -229,15 +229,21 @@ type Parameters struct {
 	RestartMode    string
 	ElasticPath    string
 	VolumeDataPath string
+	Registry       string
+	SciriusToken   string
+	ElkVersion     string
 }
 
-func GenerateComposeFile(netInterface, restart, elasticPath, dataPath string) string {
+func GenerateComposeFile(netInterface, restart, elasticPath, dataPath, registry, token, elkVersion string) string {
 	var out bytes.Buffer
 	params := Parameters{
 		InterfacesList: netInterface,
 		RestartMode:    restart,
 		ElasticPath:    elasticPath,
 		VolumeDataPath: dataPath,
+		Registry:       registry,
+		SciriusToken:   token,
+		ElkVersion:     elkVersion,
 	}
 
 	tmpl, err := template.New("Dockerfile").Funcs(sprig.FuncMap()).Parse(dockerFile)

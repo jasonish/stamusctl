@@ -32,6 +32,8 @@ func NewTemplate() *cobra.Command {
 					&restart,
 					&elasticPath,
 					&dataPath,
+					&registry,
+					&token,
 				)
 			}
 
@@ -44,22 +46,15 @@ func NewTemplate() *cobra.Command {
 				restart,
 				elasticPath,
 				dataPath,
+				registry,
+				token,
+				elkVersion,
 			)
 
 			fmt.Print(manifest)
 		},
 	}
-	command.Flags().BoolVarP(&nonInteractive, "non-interactive", "n", false, "set interactive mode.")
-	command.Flags().StringVarP(&netInterface, "interface", "i", "", "Defines an interface on which SELKS should listen.")
-	command.Flags().StringVar(&elasticPath, "es-datapath", "/var/lib/docker", "Defines the path where Elasticsearch will store it's data.")
-	command.Flags().StringVar(&dataPath, "container-datapath", "", "Defines the path where SELKS will store it's data.")
-	command.Flags().StringVarP(&restart, "restart", "r", "unless-stopped",
-		`restart mode.
-'no': never restart automatically the containers
-'always': automatically restart the containers even if they have been manually stopped
-'on-failure': only restart the containers if they failed
-'unless-stopped': always restart the container except if it has been manually stopped`,
-	)
+
 	return command
 }
 

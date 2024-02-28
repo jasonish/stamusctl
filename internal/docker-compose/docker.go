@@ -66,6 +66,34 @@ func RetrieveValideInterfaceFromDockerContainer() ([]string, error) {
 	return strings.Split(output, "\n"), nil
 }
 
+func GenerateSciriusSecretToken() (string, error) {
+	images, _ := GetInstalledImages()
+	var alreadyHasPython = true
+	if images != nil {
+		alreadyHasPython = slices.Contains(images, "python:3.9.5-slim-buster")
+	}
+
+	cmd := exec.Command("docker", "run", "-it", "--rm", "python:3.9.5-slim-buster", "/bin/bash", "-c", "python -c \"import secrets; print(secrets.token_urlsafe())\"")
+
+	var stdout bytes.Buffer
+	cmd.Stdout = &stdout
+
+	if err := cmd.Run(); err != nil {
+		logging.Sugar.Infow("cannot fetch interfaces.", "error", err)
+		return "", err
+	}
+
+	output := stdout.String()
+	logging.Sugar.Debugw("detected interfaces.", "interfaces", output)
+
+	if alreadyHasPython == false {
+		logging.Sugar.Debug("python image was not previously installed, deleting.")
+		DeleteDockerImage("python:3.9.5-slim-buster")
+	}
+
+	return output, nil
+}
+
 func GetInstalledImages() ([]string, error) {
 	cmd := exec.Command("docker", "image", "ls", "--all")
 
