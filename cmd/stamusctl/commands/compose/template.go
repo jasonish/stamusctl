@@ -13,11 +13,11 @@ func NewTemplate() *cobra.Command {
 		Use:   "template",
 		Short: "create docker compose file and output it to stdout",
 		PreRun: func(cmd *cobra.Command, args []string) {
-			if restart != "no" &&
-				restart != "always" &&
-				restart != "on-failure" &&
-				restart != "unless-stopped" {
-				logging.Sugar.Fatalf("Please provid a valid value for --restart. %s is not valid", restart)
+			if params.RestartMode != "no" &&
+				params.RestartMode != "always" &&
+				params.RestartMode != "on-failure" &&
+				params.RestartMode != "unless-stopped" {
+				logging.Sugar.Fatalf("Please provid a valid value for --restart. %s is not valid", params.RestartMode)
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
@@ -29,7 +29,7 @@ func NewTemplate() *cobra.Command {
 				compose.Ask(cmd, &params)
 			}
 
-			if netInterface == "" {
+			if params.InterfacesList == "" {
 				logging.Sugar.Fatal("please provide a valid network interface.")
 			}
 

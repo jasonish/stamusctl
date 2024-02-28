@@ -69,7 +69,7 @@ services:
       - ingest.geoip.downloader.enabled=false
     volumes:
       - {{.ElasticPath | default "elastic-data"}}:/usr/share/elasticsearch/data
-    mem_limit: ${ELASTIC_MEMORY:-3G}
+    mem_limit: {{.ElasticMemory | default "3G"}}
     ulimits:
       memlock:
         soft: -1

@@ -12,14 +12,7 @@ var (
 	nonInteractive = false
 	outputFile     string
 
-	params       compose.Parameters
-	netInterface = ""
-	restart      = ""
-	elasticPath  = ""
-	dataPath     = ""
-	registry     = ""
-	token        = ""
-	elkVersion   = "7.16.1"
+	params compose.Parameters
 )
 
 func NewInit() *cobra.Command {
@@ -27,11 +20,11 @@ func NewInit() *cobra.Command {
 		Use:   "init",
 		Short: "create docker compose file",
 		PreRun: func(cmd *cobra.Command, args []string) {
-			if restart != "no" &&
-				restart != "always" &&
-				restart != "on-failure" &&
-				restart != "unless-stopped" {
-				logging.Sugar.Fatalf("Please provid a valid value for --restart. %s is not valid", restart)
+			if params.RestartMode != "no" &&
+				params.RestartMode != "always" &&
+				params.RestartMode != "on-failure" &&
+				params.RestartMode != "unless-stopped" {
+				logging.Sugar.Fatalf("Please provid a valid value for --restart. %s is not valid", params.RestartMode)
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
@@ -53,7 +46,7 @@ func NewInit() *cobra.Command {
 				)
 			}
 
-			if netInterface == "" {
+			if params.InterfacesList == "" {
 				logging.Sugar.Fatal("please provide a valid network interface.")
 			}
 
@@ -73,6 +66,7 @@ func NewInit() *cobra.Command {
 	command.PersistentFlags().StringVar(&params.Registry, "registry", "", "Defines the path where SELKS will store it's data.")
 
 	command.PersistentFlags().StringVar(&params.ElasticPath, "es-datapath", "ghcr.io/stamusnetworks", "Defines the path where Elasticsearch will store it's data.")
+	command.PersistentFlags().StringVar(&params.ElasticMemory, "es-memory", "3G", "Defines the path where Elasticsearch will store it's data.")
 	command.PersistentFlags().StringVar(&params.ElkVersion, "elk-version", "7.16.1", "Defines the version of the ELK stack to use.")
 
 	command.PersistentFlags().StringVarP(&params.RestartMode, "restart", "r", "unless-stopped",
