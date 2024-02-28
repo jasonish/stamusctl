@@ -224,27 +224,8 @@ services:
       network:
 `
 
-type Parameters struct {
-	InterfacesList string
-	RestartMode    string
-	ElasticPath    string
-	VolumeDataPath string
-	Registry       string
-	SciriusToken   string
-	ElkVersion     string
-}
-
-func GenerateComposeFile(netInterface, restart, elasticPath, dataPath, registry, token, elkVersion string) string {
+func GenerateComposeFile(params Parameters) string {
 	var out bytes.Buffer
-	params := Parameters{
-		InterfacesList: netInterface,
-		RestartMode:    restart,
-		ElasticPath:    elasticPath,
-		VolumeDataPath: dataPath,
-		Registry:       registry,
-		SciriusToken:   token,
-		ElkVersion:     elkVersion,
-	}
 
 	tmpl, err := template.New("Dockerfile").Funcs(sprig.FuncMap()).Parse(dockerFile)
 	if err != nil {

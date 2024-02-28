@@ -26,30 +26,14 @@ func NewTemplate() *cobra.Command {
 			}
 
 			if nonInteractive == false {
-				compose.Ask(
-					cmd,
-					&netInterface,
-					&restart,
-					&elasticPath,
-					&dataPath,
-					&registry,
-					&token,
-				)
+				compose.Ask(cmd, &params)
 			}
 
 			if netInterface == "" {
 				logging.Sugar.Fatal("please provide a valid network interface.")
 			}
 
-			manifest := compose.GenerateComposeFile(
-				netInterface,
-				restart,
-				elasticPath,
-				dataPath,
-				registry,
-				token,
-				elkVersion,
-			)
+			manifest := compose.GenerateComposeFile(params)
 
 			fmt.Print(manifest)
 		},

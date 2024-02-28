@@ -128,29 +128,29 @@ func getRegistry(registry *string) {
 	logging.Sugar.Debugw("selected container data path.", "result", result)
 }
 
-func Ask(cmd *cobra.Command, netInterface, restart, elasticPath, dataPath, registry, token *string) {
+func Ask(cmd *cobra.Command, params *Parameters) {
 	if cmd.Flags().Changed("restart") == false {
-		getInterface(netInterface)
+		getInterface(&params.InterfacesList)
 	}
 
 	if cmd.Flags().Changed("restart") == false {
-		getRestart(restart)
+		getRestart(&params.RestartMode)
 	}
 
 	if cmd.Flags().Changed("es-datapath") == false {
-		getElasticPath(elasticPath)
+		getElasticPath(&params.ElasticPath)
 	}
 
 	if cmd.Flags().Changed("container-datapath") == false {
-		getDataPath(dataPath)
+		getDataPath(&params.VolumeDataPath)
 	}
 
 	if cmd.Flags().Changed("registry") == false {
-		getRegistry(registry)
+		getRegistry(&params.Registry)
 	}
 
 	if cmd.Flags().Changed("token") == false {
-		*token, _ = GenerateSciriusSecretToken()
+		params.SciriusToken, _ = GenerateSciriusSecretToken()
 
 	}
 }

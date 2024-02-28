@@ -10,14 +10,16 @@ import (
 
 var (
 	nonInteractive = false
-	netInterface   = ""
-	restart        = ""
-	elasticPath    = ""
-	dataPath       = ""
-	registry       = ""
-	token          = ""
-	elkVersion     = "7.16.1"
 	outputFile     string
+
+	params       compose.Parameters
+	netInterface = ""
+	restart      = ""
+	elasticPath  = ""
+	dataPath     = ""
+	registry     = ""
+	token        = ""
+	elkVersion   = "7.16.1"
 )
 
 func NewInit() *cobra.Command {
@@ -47,12 +49,7 @@ func NewInit() *cobra.Command {
 			if nonInteractive == false {
 				compose.Ask(
 					cmd,
-					&netInterface,
-					&restart,
-					&elasticPath,
-					&dataPath,
-					&registry,
-					&token,
+					&params,
 				)
 			}
 
@@ -60,33 +57,25 @@ func NewInit() *cobra.Command {
 				logging.Sugar.Fatal("please provide a valid network interface.")
 			}
 
-			manifest := compose.GenerateComposeFile(
-				netInterface,
-				restart,
-				elasticPath,
-				dataPath,
-				registry,
-				token,
-				elkVersion,
-			)
+			manifest := compose.GenerateComposeFile(params)
 
 			f.WriteString(manifest)
 
 		},
 	}
 	command.Flags().StringVarP(&outputFile, "output", "o", "docker-compose.yaml", "Defines the path where SELKS will store it's data.")
-
 	command.PersistentFlags().BoolVarP(&nonInteractive, "non-interactive", "n", false, "set interactive mode.")
-	command.PersistentFlags().StringVarP(&netInterface, "interface", "i", "", "Defines an interface on which SELKS should listen.")
-	command.PersistentFlags().StringVarP(&token, "token", "t", "", "Scirius secret key.")
 
-	command.PersistentFlags().StringVar(&dataPath, "container-datapath", "", "Defines the path where SELKS will store it's data.")
-	command.PersistentFlags().StringVar(&registry, "registry", "", "Defines the path where SELKS will store it's data.")
+	command.PersistentFlags().StringVarP(&params.InterfacesList, "interface", "i", "", "Defines an interface on which SELKS should listen.")
+	command.PersistentFlags().StringVarP(&params.SciriusToken, "token", "t", "", "Scirius secret key.")
 
-	command.PersistentFlags().StringVar(&elasticPath, "es-datapath", "ghcr.io/stamusnetworks", "Defines the path where Elasticsearch will store it's data.")
-	command.PersistentFlags().StringVar(&elkVersion, "elk-version", "7.16.1", "Defines the version of the ELK stack to use.")
+	command.PersistentFlags().StringVar(&params.VolumeDataPath, "container-datapath", "", "Defines the path where SELKS will store it's data.")
+	command.PersistentFlags().StringVar(&params.Registry, "registry", "", "Defines the path where SELKS will store it's data.")
 
-	command.PersistentFlags().StringVarP(&restart, "restart", "r", "unless-stopped",
+	command.PersistentFlags().StringVar(&params.ElasticPath, "es-datapath", "ghcr.io/stamusnetworks", "Defines the path where Elasticsearch will store it's data.")
+	command.PersistentFlags().StringVar(&params.ElkVersion, "elk-version", "7.16.1", "Defines the version of the ELK stack to use.")
+
+	command.PersistentFlags().StringVarP(&params.RestartMode, "restart", "r", "unless-stopped",
 		`restart mode.
 'no': never restart automatically the containers
 'always': automatically restart the containers even if they have been manually stopped
