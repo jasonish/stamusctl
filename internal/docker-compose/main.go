@@ -1,17 +1,20 @@
 package compose
 
 import (
+	"fmt"
+
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"github.com/spf13/cobra"
 )
 
-func ValidateInputFlag(params Parameters) {
+func ValidateInputFlag(params Parameters) error {
 	if params.RestartMode != "no" &&
 		params.RestartMode != "always" &&
 		params.RestartMode != "on-failure" &&
 		params.RestartMode != "unless-stopped" {
-		logging.Sugar.Fatalf("Please provid a valid value for --restart. %s is not valid.", params.RestartMode)
+		return fmt.Errorf("please provid a valid value for --restart. %s is not valid", params.RestartMode)
 	}
+	return nil
 }
 
 func GenerateComposeFileFromCli(cmd *cobra.Command, params Parameters, nonInteractive bool) string {

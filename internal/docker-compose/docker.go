@@ -7,9 +7,11 @@ import (
 	"os/exec"
 	"slices"
 	"strings"
+	"time"
 
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"github.com/Masterminds/semver/v3"
+	"github.com/briandowns/spinner"
 )
 
 func GetExecDockerVersion(executable string) (*semver.Version, error) {
@@ -44,7 +46,10 @@ func RetrieveValideInterfacesFromDockerContainer() ([]string, error) {
 	if images != nil {
 		alreadyHasBusybox = slices.Contains(images, "busybox")
 	}
-
+	s := spinner.New(spinner.CharSets[7], 100*time.Millisecond)
+	s.Prefix = "fetching network interfaces form inside docker container: "
+	s.FinalMSG = "fetching network interfaces form inside docker container. done\n"
+	s.Start()
 	cmd := exec.Command("docker", "run", "--net=host", "--rm", "busybox", "ls", "/sys/class/net")
 
 	var stdout bytes.Buffer
@@ -54,6 +59,8 @@ func RetrieveValideInterfacesFromDockerContainer() ([]string, error) {
 		logging.Sugar.Infow("cannot fetch interfaces.", "error", err)
 		return nil, err
 	}
+
+	s.Stop()
 
 	output := stdout.String()
 	logging.Sugar.Debugw("detected interfaces.", "interfaces", output)

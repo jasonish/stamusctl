@@ -2,7 +2,6 @@ package compose
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"time"
 
@@ -24,8 +23,8 @@ func NewInit() *cobra.Command {
 	var command = &cobra.Command{
 		Use:   "init",
 		Short: "create docker compose file",
-		PreRun: func(cmd *cobra.Command, args []string) {
-			compose.ValidateInputFlag(params)
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return compose.ValidateInputFlag(params)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			f, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY, 0644)
@@ -42,10 +41,10 @@ func NewInit() *cobra.Command {
 			if _, err := os.Stat(params.VolumeDataPath + "/nginx/ssl"); errors.Is(err, os.ErrNotExist) {
 				s := spinner.New(spinner.CharSets[7], 100*time.Millisecond)
 				s.Prefix = "creating SSL certificates: "
+				s.FinalMSG = "creating SSL certificates. done\n"
 				s.Start()
 				compose.GenerateSSLWithDocker(params.VolumeDataPath + "/nginx/ssl")
 				s.Stop()
-				fmt.Print("creating SSL certificates. done\n")
 			} else {
 				logging.Sugar.Debugw("cert already exist. skiped.", "path", params.VolumeDataPath+"/nginx/ssl")
 			}
