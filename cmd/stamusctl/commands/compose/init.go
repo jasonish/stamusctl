@@ -2,11 +2,14 @@ package compose
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"time"
 
 	compose "git.stamus-networks.com/lanath/stamus-ctl/internal/docker-compose"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/utils"
+	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +40,12 @@ func NewInit() *cobra.Command {
 			f.WriteString(manifest)
 
 			if _, err := os.Stat(params.VolumeDataPath + "/nginx/ssl"); errors.Is(err, os.ErrNotExist) {
+				s := spinner.New(spinner.CharSets[7], 100*time.Millisecond)
+				s.Prefix = "creating SSL certificates: "
+				s.Start()
 				compose.GenerateSSLWithDocker(params.VolumeDataPath + "/nginx/ssl")
+				s.Stop()
+				fmt.Print("creating SSL certificates. done\n")
 			} else {
 				logging.Sugar.Debugw("cert already exist. skiped.", "path", params.VolumeDataPath+"/nginx/ssl")
 			}
