@@ -2,7 +2,6 @@ package compose
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"os/exec"
 	"slices"
@@ -20,7 +19,7 @@ func GetExecDockerVersion(executable string) (*semver.Version, error) {
 
 	if err := cmd.Run(); err != nil {
 		logging.Sugar.Errorw("cannot fetch version.", "error", err, "exec", executable)
-		return nil, errors.New(fmt.Sprintf("cannot %s fetch version.", executable))
+		return nil, fmt.Errorf("cannot %s fetch version", executable)
 	}
 
 	output := stdout.String()
@@ -29,7 +28,7 @@ func GetExecDockerVersion(executable string) (*semver.Version, error) {
 	version, err := semver.NewVersion(extracted)
 	if err != nil {
 		logging.Sugar.Errorw("cannot parse version.", "error", err, "exec", extracted)
-		return nil, errors.New(fmt.Sprintf("cannot parse %s version.", executable))
+		return nil, fmt.Errorf("cannot parse %s version", executable)
 	}
 
 	logging.Sugar.Debugw("detected version.", "version", version, "executable", executable)
@@ -58,7 +57,7 @@ func RetrieveValideInterfaceFromDockerContainer() ([]string, error) {
 	output := stdout.String()
 	logging.Sugar.Debugw("detected interfaces.", "interfaces", output)
 
-	if alreadyHasBusybox == false {
+	if !alreadyHasBusybox {
 		logging.Sugar.Debug("busybox image was not previously installed, deleting.")
 		DeleteDockerImage("busybox:latest")
 	}
