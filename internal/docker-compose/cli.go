@@ -2,7 +2,6 @@ package compose
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
@@ -74,23 +73,6 @@ func getElasticPathCli(elasticPath *string) {
 
 	*elasticPath = result
 	logging.Sugar.Debugw("selected elastic data path.", "result", result)
-}
-
-func getDataPathCli(elasticPath *string) {
-	path, _ := os.Getwd()
-	prompt := promptui.Prompt{
-		Label:   "container data volume path",
-		Default: path,
-	}
-
-	result, err := prompt.Run()
-
-	if err != nil {
-		logging.Sugar.Error("Prompt for container data path.", err)
-	}
-
-	*elasticPath = result
-	logging.Sugar.Debugw("selected container data path.", "result", result)
 }
 
 func getRegistryCli(registry *string) {
