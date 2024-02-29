@@ -3,8 +3,6 @@ package compose
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"errors"
-	"os"
 
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/utils"
@@ -37,9 +35,4 @@ func Ask(cmd *cobra.Command, params *Parameters) {
 
 	params.MLEnabled = utils.GetSSESupport()
 
-	if _, err := os.Stat(params.VolumeDataPath + "/nginx/ssl"); errors.Is(err, os.ErrNotExist) {
-		GenerateSSLWithDocker(params.VolumeDataPath + "/nginx/ssl")
-	} else {
-		logging.Sugar.Debugw("cert already exist. skiped.", "path", params.VolumeDataPath+"/nginx/ssl")
-	}
 }

@@ -1,6 +1,7 @@
 package compose
 
 import (
+	"errors"
 	"os"
 
 	compose "git.stamus-networks.com/lanath/stamus-ctl/internal/docker-compose"
@@ -34,6 +35,14 @@ func NewInit() *cobra.Command {
 			manifest := compose.GenerateComposeFileFromCli(cmd, params, nonInteractive)
 
 			f.WriteString(manifest)
+
+			if _, err := os.Stat(params.VolumeDataPath + "/nginx/ssl"); errors.Is(err, os.ErrNotExist) {
+				compose.GenerateSSLWithDocker(params.VolumeDataPath + "/nginx/ssl")
+			} else {
+				logging.Sugar.Debugw("cert already exist. skiped.", "path", params.VolumeDataPath+"/nginx/ssl")
+			}
+
+			compose.WriteConfigFiles(params.VolumeDataPath)
 
 		},
 	}

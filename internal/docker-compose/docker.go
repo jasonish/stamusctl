@@ -77,7 +77,7 @@ func GenerateSSLWithDocker(sslPath string) error {
 	images, _ := GetInstalledImages()
 	var alreadyHasNginx = true
 	if images != nil {
-		alreadyHasNginx = slices.Contains(images, "busybox")
+		alreadyHasNginx = slices.Contains(images, "nginx")
 	}
 	cmd := exec.Command(
 		"docker",

@@ -42,8 +42,6 @@ func initConfig() {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("/etc/appname/")
-	viper.AddConfigPath("$HOME/.appname")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
