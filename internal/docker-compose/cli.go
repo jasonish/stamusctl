@@ -1,41 +1,19 @@
 package compose
 
 import (
-	"bytes"
-	"crypto/rand"
-	"encoding/hex"
 	"errors"
 	"os"
-	"os/exec"
 	"strings"
 
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/utils"
 	"github.com/manifoldco/promptui"
-	"github.com/spf13/cobra"
 )
 
-func getInterfaceFormFS() ([]string, error) {
-	cmd := exec.Command("ls", "/sys/class/net")
-
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
-
-	if err := cmd.Run(); err != nil {
-		logging.Sugar.Infow("cannot fetch version.", "error", err)
-		return nil, err
-	}
-
-	output := stdout.String()
-	logging.Sugar.Debugw("detected interfaces.", "interfaces", output)
-	splited := strings.Split(output, " ")
-	return splited, nil
-}
-
-func getInterface(netInterface *string) {
+func getInterfaceCli(netInterface *string) {
 	interfaces, err := RetrieveValideInterfaceFromDockerContainer()
 	if err != nil {
-		interfaces, _ = getInterfaceFormFS()
+		interfaces, _ = utils.GetInterfaceFormFS()
 	}
 
 	interfacesSelect := promptui.Select{
@@ -52,7 +30,7 @@ func getInterface(netInterface *string) {
 	logging.Sugar.Debugw("selected interface.", "interface", netInterface)
 }
 
-func getRestart(restart *string) {
+func getRestartCli(restart *string) {
 	prompt := promptui.Prompt{
 		Label:     "Do you want the containers to restart automatically on startup",
 		IsConfirm: true,
@@ -81,7 +59,7 @@ func getRestart(restart *string) {
 	logging.Sugar.Debugw("selected restart.", "restart", *restart)
 }
 
-func getElasticPath(elasticPath *string) {
+func getElasticPathCli(elasticPath *string) {
 	root, _ := GetDockerRootPath()
 	prompt := promptui.Prompt{
 		Label:   "elasticsearch database volume path",
@@ -98,7 +76,7 @@ func getElasticPath(elasticPath *string) {
 	logging.Sugar.Debugw("selected elastic data path.", "result", result)
 }
 
-func getDataPath(elasticPath *string) {
+func getDataPathCli(elasticPath *string) {
 	path, _ := os.Getwd()
 	prompt := promptui.Prompt{
 		Label:   "container data volume path",
@@ -115,7 +93,7 @@ func getDataPath(elasticPath *string) {
 	logging.Sugar.Debugw("selected container data path.", "result", result)
 }
 
-func getRegistry(registry *string) {
+func getRegistryCli(registry *string) {
 	prompt := promptui.Prompt{
 		Label:   "Image registry",
 		Default: "ghcr.io/stamusnetworks",
@@ -129,35 +107,4 @@ func getRegistry(registry *string) {
 
 	*registry = result
 	logging.Sugar.Debugw("selected container data path.", "result", result)
-}
-
-func Ask(cmd *cobra.Command, params *Parameters) {
-	if !cmd.Flags().Changed("interface") {
-		getInterface(&params.InterfacesList)
-	}
-
-	if !cmd.Flags().Changed("restart") {
-		getRestart(&params.RestartMode)
-	}
-
-	if !cmd.Flags().Changed("es-datapath") {
-		getElasticPath(&params.ElasticPath)
-	}
-
-	if !cmd.Flags().Changed("container-datapath") {
-		getDataPath(&params.VolumeDataPath)
-	}
-
-	if !cmd.Flags().Changed("registry") {
-		getRegistry(&params.Registry)
-	}
-
-	if !cmd.Flags().Changed("token") {
-		b := make([]byte, 24)
-		rand.Read(b)
-		params.SciriusToken = hex.EncodeToString(b)
-		logging.Sugar.Debugw("generated token.", "token", params.SciriusToken)
-	}
-
-	params.MLEnabled = utils.GetSSESupport()
 }

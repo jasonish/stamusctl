@@ -172,7 +172,7 @@ services:
   nginx:
     container_name: nginx
     image: nginx
-    command: ['{{.NginxExec | default nginx}}', '-g', 'daemon off;']
+    command: ['{{.NginxExec | default "nginx"}}', '-g', 'daemon off;']
     restart: {{.RestartMode | default "unless-stopped"}}
     volumes:
       - scirius-static:/static/:ro
