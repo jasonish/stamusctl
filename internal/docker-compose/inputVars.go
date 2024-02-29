@@ -2,12 +2,15 @@ package compose
 
 import (
 	"bytes"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"os"
 	"os/exec"
 	"strings"
 
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"git.stamus-networks.com/lanath/stamus-ctl/internal/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
@@ -96,7 +99,7 @@ func getElasticPath(elasticPath *string) {
 }
 
 func getDataPath(elasticPath *string) {
-	path, err := os.Getwd()
+	path, _ := os.Getwd()
 	prompt := promptui.Prompt{
 		Label:   "container data volume path",
 		Default: path,
@@ -129,28 +132,32 @@ func getRegistry(registry *string) {
 }
 
 func Ask(cmd *cobra.Command, params *Parameters) {
-	if cmd.Flags().Changed("restart") == false {
+	if !cmd.Flags().Changed("interface") {
 		getInterface(&params.InterfacesList)
 	}
 
-	if cmd.Flags().Changed("restart") == false {
+	if !cmd.Flags().Changed("restart") {
 		getRestart(&params.RestartMode)
 	}
 
-	if cmd.Flags().Changed("es-datapath") == false {
+	if !cmd.Flags().Changed("es-datapath") {
 		getElasticPath(&params.ElasticPath)
 	}
 
-	if cmd.Flags().Changed("container-datapath") == false {
+	if !cmd.Flags().Changed("container-datapath") {
 		getDataPath(&params.VolumeDataPath)
 	}
 
-	if cmd.Flags().Changed("registry") == false {
+	if !cmd.Flags().Changed("registry") {
 		getRegistry(&params.Registry)
 	}
 
-	if cmd.Flags().Changed("token") == false {
-		params.SciriusToken, _ = GenerateSciriusSecretToken()
-
+	if !cmd.Flags().Changed("token") {
+		b := make([]byte, 24)
+		rand.Read(b)
+		params.SciriusToken = hex.EncodeToString(b)
+		logging.Sugar.Debugw("generated token.", "token", params.SciriusToken)
 	}
+
+	params.MLEnabled = utils.GetSSESupport()
 }

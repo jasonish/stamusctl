@@ -20,12 +20,7 @@ func NewInit() *cobra.Command {
 		Use:   "init",
 		Short: "create docker compose file",
 		PreRun: func(cmd *cobra.Command, args []string) {
-			if params.RestartMode != "no" &&
-				params.RestartMode != "always" &&
-				params.RestartMode != "on-failure" &&
-				params.RestartMode != "unless-stopped" {
-				logging.Sugar.Fatalf("Please provid a valid value for --restart. %s is not valid", params.RestartMode)
-			}
+			compose.ValidateInputFlag(params)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			f, err := os.OpenFile(outputFile, os.O_CREATE|os.O_WRONLY, 0644)
@@ -35,22 +30,7 @@ func NewInit() *cobra.Command {
 
 			defer f.Close()
 
-			if _, err := compose.CheckVersions(); err != nil {
-				logging.Sugar.Fatal(err.Error())
-			}
-
-			if nonInteractive == false {
-				compose.Ask(
-					cmd,
-					&params,
-				)
-			}
-
-			if params.InterfacesList == "" {
-				logging.Sugar.Fatal("please provide a valid network interface.")
-			}
-
-			manifest := compose.GenerateComposeFile(params)
+			manifest := compose.GenerateComposeFileFromCli(cmd, params, nonInteractive)
 
 			f.WriteString(manifest)
 
@@ -65,9 +45,14 @@ func NewInit() *cobra.Command {
 	command.PersistentFlags().StringVar(&params.VolumeDataPath, "container-datapath", "", "Defines the path where SELKS will store it's data.")
 	command.PersistentFlags().StringVar(&params.Registry, "registry", "", "Defines the path where SELKS will store it's data.")
 
-	command.PersistentFlags().StringVar(&params.ElasticPath, "es-datapath", "ghcr.io/stamusnetworks", "Defines the path where Elasticsearch will store it's data.")
-	command.PersistentFlags().StringVar(&params.ElasticMemory, "es-memory", "3G", "Defines the path where Elasticsearch will store it's data.")
+	command.PersistentFlags().StringVar(&params.SciriusToken, "scirius-version", "master", "Defines the version of the scirius to use.")
+	command.PersistentFlags().StringVar(&params.ArkimeviewerVersion, "arkimeviewer-version", "master", "Defines the version of arkimeviewer to use.")
 	command.PersistentFlags().StringVar(&params.ElkVersion, "elk-version", "7.16.1", "Defines the version of the ELK stack to use.")
+
+	command.PersistentFlags().StringVar(&params.ElasticPath, "es-datapath", "ghcr.io/stamusnetworks", "Defines the path where Elasticsearch will store it's data.")
+
+	command.PersistentFlags().StringVar(&params.ElasticMemory, "es-memory", "3G", "Amount of memory to give to the elasticsearch container.")
+	command.PersistentFlags().StringVar(&params.LogstashMemory, "ls-memory", "2G", "Amount of memory to give to the logstash container.")
 
 	command.PersistentFlags().StringVarP(&params.RestartMode, "restart", "r", "unless-stopped",
 		`restart mode.
@@ -76,6 +61,8 @@ func NewInit() *cobra.Command {
 'on-failure': only restart the containers if they failed
 'unless-stopped': always restart the container except if it has been manually stopped`,
 	)
+	command.PersistentFlags().BoolVarP(&params.DebugMode, "debug", "d", false, "Activate debug mode for scirius and nginx.")
+
 	return command
 }
 
