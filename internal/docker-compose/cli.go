@@ -11,7 +11,7 @@ import (
 )
 
 func getInterfaceCli(netInterface *string) {
-	interfaces, err := RetrieveValideInterfaceFromDockerContainer()
+	interfaces, err := RetrieveValideInterfacesFromDockerContainer()
 	if err != nil {
 		interfaces, _ = utils.GetInterfaceFormFS()
 	}

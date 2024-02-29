@@ -5,6 +5,7 @@ import (
 
 	compose "git.stamus-networks.com/lanath/stamus-ctl/internal/docker-compose"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"git.stamus-networks.com/lanath/stamus-ctl/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -42,7 +43,7 @@ func NewInit() *cobra.Command {
 	command.PersistentFlags().StringVarP(&params.InterfacesList, "interface", "i", "", "Defines an interface on which SELKS should listen.")
 	command.PersistentFlags().StringVarP(&params.SciriusToken, "token", "t", "", "Scirius secret key.")
 
-	command.PersistentFlags().StringVar(&params.VolumeDataPath, "container-datapath", "", "Defines the path where SELKS will store it's data.")
+	command.PersistentFlags().StringVar(&params.VolumeDataPath, "container-datapath", utils.IgnoreError(os.Getwd())+"/containers-data", "Defines the path where SELKS will store it's data.")
 	command.PersistentFlags().StringVar(&params.Registry, "registry", "", "Defines the path where SELKS will store it's data.")
 
 	command.PersistentFlags().StringVar(&params.SciriusToken, "scirius-version", "master", "Defines the version of the scirius to use.")

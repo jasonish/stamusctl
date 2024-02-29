@@ -3,6 +3,7 @@ package compose
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"slices"
 	"strings"
@@ -36,7 +37,7 @@ func GetExecDockerVersion(executable string) (*semver.Version, error) {
 	return version, nil
 }
 
-func RetrieveValideInterfaceFromDockerContainer() ([]string, error) {
+func RetrieveValideInterfacesFromDockerContainer() ([]string, error) {
 
 	images, _ := GetInstalledImages()
 	var alreadyHasBusybox = true
@@ -63,6 +64,52 @@ func RetrieveValideInterfaceFromDockerContainer() ([]string, error) {
 	}
 
 	return strings.Split(output, "\n"), nil
+}
+
+func GenerateSSLWithDocker(sslPath string) error {
+	logging.Sugar.Debugw("Generating ssl cert.", "path", sslPath)
+
+	err := os.MkdirAll(sslPath, os.ModePerm)
+	if err != nil {
+		logging.Sugar.Errorw("cannot create cert containing folder.", "error", err)
+	}
+
+	images, _ := GetInstalledImages()
+	var alreadyHasNginx = true
+	if images != nil {
+		alreadyHasNginx = slices.Contains(images, "busybox")
+	}
+	cmd := exec.Command(
+		"docker",
+		"run",
+		"--rm",
+		"-v",
+		sslPath+":/etc/nginx/ssl",
+		"nginx",
+		"openssl",
+		"req", "-new", "-nodes", "-x509",
+		"-subj", "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS",
+		"-days", "3650",
+		"-keyout", "/etc/nginx/ssl/scirius.key",
+		"-out", "/etc/nginx/ssl/scirius.crt",
+		"-extensions", "v3_ca")
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		output := stderr.String()
+		logging.Sugar.Infow("cannot generate cert.", "error", err, "stderr", output)
+		return err
+	}
+
+	if !alreadyHasNginx {
+		logging.Sugar.Debug("nginx image was not previously installed, deleting.")
+		DeleteDockerImage("nginx")
+	}
+
+	logging.Sugar.Debug("cert created.", "path", sslPath)
+	return nil
 }
 
 func GetInstalledImages() ([]string, error) {
