@@ -1,6 +1,3 @@
-package compose
-
-const dockerFile = `
 # Copyright(C) 2024, Stamus Networks
 # Written by Raphaël Brogat <rbrogat@stamus-networks.com> and Valentin Vivier <vvivier@stamus-networks.com>
 #
@@ -214,4 +211,3 @@ services:
       - arkime-logs:/data/logs
     networks:
       network:
-`

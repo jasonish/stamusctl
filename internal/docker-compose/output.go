@@ -6,6 +6,7 @@ import (
 	"path"
 	"text/template"
 
+	"git.stamus-networks.com/lanath/stamus-ctl/internal/embeds"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"github.com/Masterminds/sprig/v3"
 )
@@ -13,7 +14,7 @@ import (
 func GenerateComposeFile(params Parameters) string {
 	var out bytes.Buffer
 
-	tmpl, err := template.New("Dockerfile").Funcs(sprig.FuncMap()).Parse(dockerFile)
+	tmpl, err := template.New("Dockerfile").Funcs(sprig.FuncMap()).Parse(embeds.DockerFile)
 	if err != nil {
 		logging.Sugar.Fatalw("Template rendering failed", "error", err)
 	}
@@ -44,17 +45,17 @@ func writeConfGeneric(filePath, outputFile, data string) {
 
 func WriteConfigFiles(volumePath string) {
 
-	writeConfGeneric(path.Join(volumePath, "nginx"), "nginx.conf", nginxMainConf)
-	writeConfGeneric(path.Join(volumePath, "nginx", "conf.d"), "selks6.conf", selksNginxConfig)
+	writeConfGeneric(path.Join(volumePath, "nginx"), "nginx.conf", embeds.NginxMainConf)
+	writeConfGeneric(path.Join(volumePath, "nginx", "conf.d"), "selks6.conf", embeds.SelksNginxConfig)
 
-	writeConfGeneric(path.Join(volumePath, "logstash", "conf.d"), "logstash.conf", logstashConfig)
-	writeConfGeneric(path.Join(volumePath, "logstash", "templates"), "elasticsearch7-template.json", elasticTemplate)
+	writeConfGeneric(path.Join(volumePath, "logstash", "conf.d"), "logstash.conf", embeds.LogstashConfig)
+	writeConfGeneric(path.Join(volumePath, "logstash", "templates"), "elasticsearch7-template.json", embeds.ElasticTemplate)
 
-	writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "scirius-update-suri-rules.sh", cronJobsDailyScirius)
-	writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "suricata-logrotate.sh", cronJobsDailySuricata)
+	writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "scirius-update-suri-rules.sh", embeds.CronJobsDailyScirius)
+	writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "suricata-logrotate.sh", embeds.CronJobsDailySuricata)
 
-	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "new_entrypoint.sh", suricataEtcEntryPoint)
-	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "selks6-addin.yaml", suricataEtcAddin)
+	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "new_entrypoint.sh", embeds.SuricataEtcEntryPoint)
+	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "selks6-addin.yaml", embeds.SuricataEtcAddin)
 
 	os.MkdirAll(path.Join(volumePath, "cron-jobs", "1min"), os.ModePerm)
 	os.MkdirAll(path.Join(volumePath, "cron-jobs", "15min"), os.ModePerm)
