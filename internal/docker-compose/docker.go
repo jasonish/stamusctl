@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"slices"
 	"strings"
-	"time"
+	"unicode"
 
+	"git.stamus-networks.com/lanath/stamus-ctl/internal/docker"
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
 	"github.com/Masterminds/semver/v3"
-	"github.com/briandowns/spinner"
 )
 
 func GetExecDockerVersion(executable string) (*semver.Version, error) {
@@ -41,36 +40,27 @@ func GetExecDockerVersion(executable string) (*semver.Version, error) {
 
 func RetrieveValideInterfacesFromDockerContainer() ([]string, error) {
 
-	images, _ := GetInstalledImages()
-	var alreadyHasBusybox = true
-	if images != nil {
-		alreadyHasBusybox = slices.Contains(images, "busybox")
-	}
-	s := spinner.New(spinner.CharSets[7], 100*time.Millisecond)
-	s.Prefix = "fetching network interfaces form inside docker container: "
-	s.FinalMSG = "fetching network interfaces form inside docker container. done\n"
-	s.Start()
-	cmd := exec.Command("docker", "run", "--net=host", "--rm", "busybox", "ls", "/sys/class/net")
+	alreadyHasBusybox, _ := docker.PullImageIfNotExisted("busybox")
 
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
-
-	if err := cmd.Run(); err != nil {
-		logging.Sugar.Infow("cannot fetch interfaces.", "error", err)
-		return nil, err
-	}
-
-	s.Stop()
-
-	output := stdout.String()
-	logging.Sugar.Debugw("detected interfaces.", "interfaces", output)
+	output, _ := docker.RunContainer("busybox", []string{
+		"ls",
+		"/sys/class/net",
+	}, nil, "host")
 
 	if !alreadyHasBusybox {
 		logging.Sugar.Debug("busybox image was not previously installed, deleting.")
-		DeleteDockerImage("busybox:latest")
+		docker.DeleteDockerImageByName("busybox")
 	}
 
-	return strings.Split(output, "\n"), nil
+	interfaces := strings.Split(output, "\n")
+	interfaces = interfaces[:len(interfaces)-1]
+	for i, in := range interfaces {
+		in = strings.TrimFunc(in, unicode.IsControl)
+		interfaces[i] = in
+	}
+	logging.Sugar.Debugw("detected interfaces.", "interfaces", interfaces)
+
+	return interfaces, nil
 }
 
 func GenerateSSLWithDocker(sslPath string) error {
@@ -81,81 +71,36 @@ func GenerateSSLWithDocker(sslPath string) error {
 		logging.Sugar.Errorw("cannot create cert containing folder.", "error", err)
 	}
 
-	images, _ := GetInstalledImages()
-	var alreadyHasNginx = true
-	if images != nil {
-		alreadyHasNginx = slices.Contains(images, "nginx")
+	alreadyHasNginx, err := docker.PullImageIfNotExisted("nginx")
+	if err != nil {
+		logging.Sugar.Warnw("nginx pull failed", "error", err)
+		return err
 	}
-	cmd := exec.Command(
-		"docker",
-		"run",
-		"--rm",
-		"-v",
-		sslPath+":/etc/nginx/ssl",
-		"nginx",
+
+	_, err = docker.RunContainer("nginx", []string{
 		"openssl",
 		"req", "-new", "-nodes", "-x509",
 		"-subj", "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS",
 		"-days", "3650",
 		"-keyout", "/etc/nginx/ssl/scirius.key",
 		"-out", "/etc/nginx/ssl/scirius.crt",
-		"-extensions", "v3_ca")
+		"-extensions", "v3_ca",
+	}, []string{
+		sslPath + ":/etc/nginx/ssl",
+	}, "")
 
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		output := stderr.String()
-		logging.Sugar.Infow("cannot generate cert.", "error", err, "stderr", output)
+	if err != nil {
+		logging.Sugar.Infow("cannot generate cert.", "error", err)
 		return err
 	}
 
 	if !alreadyHasNginx {
 		logging.Sugar.Debug("nginx image was not previously installed, deleting.")
-		DeleteDockerImage("nginx")
+		docker.DeleteDockerImageByName("nginx")
 	}
 
 	logging.Sugar.Debug("cert created.", "path", sslPath)
 	return nil
-}
-
-func GetInstalledImages() ([]string, error) {
-	cmd := exec.Command("docker", "image", "ls", "--all")
-
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
-
-	if err := cmd.Run(); err != nil {
-		logging.Sugar.Warnw("cannot fetch images.", "error", err)
-		return nil, err
-	}
-
-	output := stdout.String()
-	imagesFullList := strings.Split(output, "\n")
-	var imagesName []string
-	for i := 1; i != len(imagesFullList); i++ {
-		imageData := imagesFullList[i]
-		splited := strings.Split(imageData, " ")
-		imageName := splited[0]
-
-		imagesName = append(imagesName, imageName)
-	}
-	logging.Sugar.Debugw("detected images.", "images", imagesName)
-	return imagesName, nil
-}
-
-func DeleteDockerImage(name string) (bool, error) {
-	cmd := exec.Command("docker", "rmi", name)
-
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
-
-	if err := cmd.Run(); err != nil {
-		logging.Sugar.Warnw("cannot delete image.", "error", err, "image", name)
-		return false, err
-	}
-
-	return true, nil
 }
 
 func GetDockerRootPath() (string, error) {

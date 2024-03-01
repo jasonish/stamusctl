@@ -38,7 +38,7 @@ func SetLogger() {
 	if envType == "prd" {
 		encoder.StacktraceKey = zapcore.OmitKey
 
-		if app.Name == "stamusctl" {
+		if app.Name == app.CtlName {
 			encoder.TimeKey = zapcore.OmitKey
 			encoder.LevelKey = zapcore.OmitKey
 			encoder.CallerKey = zapcore.OmitKey

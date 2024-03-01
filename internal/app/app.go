@@ -12,6 +12,8 @@ var (
 
 const (
 	binaryNameEnv = "STAMUSCTL_NAME"
+
+	CtlName = "stamusctl"
 )
 
 func CatchException() {

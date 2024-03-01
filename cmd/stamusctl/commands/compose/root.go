@@ -10,8 +10,12 @@ func NewCompose() *cobra.Command {
 		Short: "work with docker-compose",
 	}
 	initCommand := NewInit()
+
 	command.AddCommand(initCommand)
+	command.AddCommand(NewCleanup())
+
 	initCommand.AddCommand(NewTemplate())
+
 	return command
 }
 
