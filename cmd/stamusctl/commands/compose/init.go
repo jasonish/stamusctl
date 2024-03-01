@@ -59,7 +59,7 @@ func NewInit() *cobra.Command {
 	command.PersistentFlags().StringVar(&params.ArkimeviewerVersion, "arkimeviewer-version", "master", "Defines the version of arkimeviewer to use.")
 	command.PersistentFlags().StringVar(&params.ElkVersion, "elk-version", "7.16.1", "Defines the version of the ELK stack to use.")
 
-	command.PersistentFlags().StringVar(&params.ElasticPath, "es-datapath", "ghcr.io/stamusnetworks", "Defines the path where Elasticsearch will store it's data.")
+	command.PersistentFlags().StringVar(&params.ElasticPath, "es-datapath", "/var/lib/docker", "Defines the path where Elasticsearch will store it's data.")
 
 	command.PersistentFlags().StringVar(&params.ElasticMemory, "es-memory", "3G", "Amount of memory to give to the elasticsearch container.")
 	command.PersistentFlags().StringVar(&params.LogstashMemory, "ls-memory", "2G", "Amount of memory to give to the logstash container.")
