@@ -36,4 +36,7 @@ all: cli
 cli:
 	CGO_ENABLED=0 GODEBUG="tarinsecurepath=0,zipinsecurepath=0" go build -v -ldflags '${LDFLAGS}' -o ${DIST_DIR}/${CLI_NAME} ./cmd
 
-.PHONY: all cli
+test:
+	go test ./...
+
+.PHONY: all cli test
