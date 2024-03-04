@@ -13,7 +13,7 @@ var (
 	levels  = [...]zapcore.Level{zap.WarnLevel, zap.InfoLevel, zap.DebugLevel}
 )
 
-func SetLogger() {
+func NewLogger() *zap.Logger {
 	verbosity := viper.GetInt("verbose")
 	encoder := zapcore.EncoderConfig{
 		// Keys can be anything except the empty string.
@@ -56,7 +56,12 @@ func SetLogger() {
 
 	log, _ := config.Build()
 	defer log.Sync()
-	Sugar = log.Sugar()
+	return log
+}
+
+func SetLogger() {
+
+	Sugar = NewLogger().Sugar()
 }
 
 func init() {

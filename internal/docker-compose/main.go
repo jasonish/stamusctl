@@ -7,23 +7,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func isValideRestartModeDocker(restart string) bool {
+	if restart != "no" &&
+		restart != "always" &&
+		restart != "on-failure" &&
+		restart != "unless-stopped" {
+		return false
+	}
+	return true
+}
+
+func isValideRamSizeDocker(ram string) bool {
+	return true
+}
+
 func ValidateInputFlag(params Parameters) error {
-	if params.RestartMode != "no" &&
-		params.RestartMode != "always" &&
-		params.RestartMode != "on-failure" &&
-		params.RestartMode != "unless-stopped" {
+	if !isValideRestartModeDocker(params.RestartMode) {
 		return fmt.Errorf("please provid a valid value for --restart. %s is not valid", params.RestartMode)
+	}
+	if !isValideRamSizeDocker(params.ElasticMemory) {
+		return fmt.Errorf("please provide a valid value for --es-memory")
+	}
+	if !isValideRamSizeDocker(params.LogstashMemory) {
+		return fmt.Errorf("please provide a valid value for --ls-memory")
 	}
 	return nil
 }
 
-func GenerateComposeFileFromCli(cmd *cobra.Command, params Parameters, nonInteractive bool) string {
+func GenerateComposeFileFromCli(cmd *cobra.Command, params *Parameters, nonInteractive bool) string {
 	if _, err := CheckVersions(); err != nil {
 		logging.Sugar.Fatal(err.Error())
 	}
 
 	if !nonInteractive {
-		Ask(cmd, &params)
+		Ask(cmd, params)
 	}
 
 	if params.InterfacesList == "" {
@@ -35,7 +52,7 @@ func GenerateComposeFileFromCli(cmd *cobra.Command, params Parameters, nonIntera
 	} else {
 		params.NginxExec = "nginx-debug"
 	}
-	manifest := GenerateComposeFile(params)
+	manifest := GenerateComposeFile(*params)
 
 	return manifest
 }

@@ -1,8 +1,10 @@
 package compose
 
 import (
+	"fmt"
 	"os"
 
+	compose "git.stamus-networks.com/lanath/stamus-ctl/internal/docker-compose"
 	"github.com/spf13/cobra"
 )
 
@@ -18,8 +20,16 @@ func NewCleanup() *cobra.Command {
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			os.Remove("docker-compose.yaml")
-			os.Remove("containers-data")
+			p := compose.NewParametersFromEnv(v)
+
+			if print {
+				fmt.Printf("Deleting %s\n", p.OutputFile)
+			}
+			os.Remove(p.OutputFile)
+			if print {
+				fmt.Printf("Deleting %s\n", p.VolumeDataPath)
+			}
+			os.RemoveAll(p.VolumeDataPath)
 		},
 	}
 	command.PersistentFlags().BoolVarP(&print, "print", "p", false, "Print before deleting.")

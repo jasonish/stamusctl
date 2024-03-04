@@ -15,7 +15,7 @@ func NewTemplate() *cobra.Command {
 			return compose.ValidateInputFlag(params)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			manifest := compose.GenerateComposeFileFromCli(cmd, params, nonInteractive)
+			manifest := compose.GenerateComposeFileFromCli(cmd, &params, nonInteractive)
 
 			fmt.Print(manifest)
 		},

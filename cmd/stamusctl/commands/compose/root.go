@@ -1,7 +1,16 @@
 package compose
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+)
+
+const (
+	InputFileConfigName = ".config.yaml"
+	InputFileConfigType = "yaml"
+	InputFileConfigPath = "."
 )
 
 func NewCompose() *cobra.Command {
@@ -9,14 +18,29 @@ func NewCompose() *cobra.Command {
 		Use:   "compose",
 		Short: "work with docker-compose",
 	}
-	initCommand := NewInit()
 
-	command.AddCommand(initCommand)
+	command.AddCommand(NewInit())
 	command.AddCommand(NewCleanup())
+	command.AddCommand(NewGetConfig())
 
-	initCommand.AddCommand(NewTemplate())
+	cobra.OnInitialize(initConfig)
 
 	return command
+}
+
+func initConfig() {
+
+	v.SetConfigName(InputFileConfigName)
+	v.SetConfigType(InputFileConfigType)
+	v.AddConfigPath(InputFileConfigPath)
+	err := v.ReadInConfig()
+	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+		} else {
+			panic(fmt.Errorf("fatal error config file: %w", err))
+		}
+	}
+
 }
 
 func init() {
