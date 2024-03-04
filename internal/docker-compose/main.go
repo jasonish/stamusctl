@@ -18,7 +18,7 @@ func isValideRestartModeDocker(restart string) bool {
 }
 
 func isValideRamSizeDocker(ram string) bool {
-	return true
+	return ram != "" && ram != "0" && ram != "0m" && ram != "0g	" && ram != "0k" && ram != "0t" && ram != "0p"
 }
 
 func ValidateInputFlag(params Parameters) error {
