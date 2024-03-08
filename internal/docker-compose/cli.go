@@ -2,6 +2,7 @@ package compose
 
 import (
 	"errors"
+	"os"
 	"strings"
 
 	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
@@ -59,7 +60,7 @@ func getRestartCli(restart *string) {
 }
 
 func getElasticPathCli(elasticPath *string) {
-	root, _ := GetDockerRootPath()
+	root := utils.IgnoreError(os.Getwd()) + "/elastic-data"
 	prompt := promptui.Prompt{
 		Label:   "elasticsearch database volume path",
 		Default: root,
