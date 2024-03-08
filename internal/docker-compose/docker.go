@@ -102,21 +102,3 @@ func GenerateSSLWithDocker(sslPath string) error {
 	logging.Sugar.Debug("cert created.", "path", sslPath)
 	return nil
 }
-
-func GetDockerRootPath() (string, error) {
-	cmd := exec.Command("docker", "system", "info", "--format", "{{.DockerRootDir}}")
-
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
-
-	if err := cmd.Run(); err != nil {
-		logging.Sugar.Errorw("cannot fetch docker root dir.", "error", err)
-		return "", err
-	}
-
-	output := stdout.String()
-
-	logging.Sugar.Debugw("detected docker root dir.", "dir", output)
-
-	return strings.Trim(output, "\n"), nil
-}
