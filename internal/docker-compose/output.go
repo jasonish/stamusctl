@@ -2,6 +2,7 @@ package compose
 
 import (
 	"bytes"
+	"io/fs"
 	"os"
 	"path"
 	"text/template"
@@ -26,14 +27,19 @@ func GenerateComposeFile(params Parameters) string {
 	return out.String()
 }
 
-func writeConfGeneric(filePath, outputFile, data string) {
+func writeConfGeneric(filePath, outputFile, data string, rights ...fs.FileMode) {
 	err := os.MkdirAll(filePath, os.ModePerm)
 	if err != nil {
 		logging.Sugar.Errorw("cannot create config folder.", "error", err, "path", filePath)
 		return
 	}
 
-	f, err := os.OpenFile(path.Join(filePath, outputFile), os.O_CREATE|os.O_WRONLY, 0644)
+	var fileRights fs.FileMode = 0644
+	if len(rights) > 0 {
+		fileRights = rights[0]
+	}
+
+	f, err := os.OpenFile(path.Join(filePath, outputFile), os.O_CREATE|os.O_WRONLY, fileRights)
 	if err != nil {
 		logging.Sugar.Errorw("cannot create output file", "error", err, "path", filePath, "outputFile", outputFile)
 	}
@@ -54,7 +60,7 @@ func WriteConfigFiles(volumePath string) {
 	writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "scirius-update-suri-rules.sh", embeds.CronJobsDailyScirius)
 	writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "suricata-logrotate.sh", embeds.CronJobsDailySuricata)
 
-	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "new_entrypoint.sh", embeds.SuricataEtcEntryPoint)
+	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "new_entrypoint.sh", embeds.SuricataEtcEntryPoint, 0755)
 	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "selks6-addin.yaml", embeds.SuricataEtcAddin)
 
 	os.MkdirAll(path.Join(volumePath, "cron-jobs", "1min"), os.ModePerm)
