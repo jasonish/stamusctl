@@ -11,6 +11,10 @@ import (
 )
 
 func ImageName(image image.Summary) string {
+	logging.Sugar.Debugw("image", "RepoDigests", image.RepoDigests, "RepoTags", image.RepoTags)
+	if len(image.RepoDigests) == 0 {
+		return image.RepoTags[0]
+	}
 	return strings.Split(image.RepoDigests[0], "@")[0]
 }
 
