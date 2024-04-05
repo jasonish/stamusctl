@@ -67,6 +67,15 @@ test cli:
         - |
             ./stamusctl
 
+test cli in docker:
+    image: git.stamus-networks.com:4567/lanath/stamus-ctl/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+    stage: test
+    dependencies:
+        - build cli
+    script:
+        - |
+            stamusctl
+
 ut:
     image: golang:alpine
     stage: test
