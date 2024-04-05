@@ -73,6 +73,7 @@ test cli in docker:
     dependencies:
         - build cli
     entrypoint: [stamusctl]
+    script: ''
 
 ut:
     image: golang:alpine
