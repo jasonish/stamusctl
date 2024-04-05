@@ -9,6 +9,7 @@ stages:
     - test
     - docker
     - build
+    - test
 
 sast:
     stage: test
@@ -65,3 +66,20 @@ build-cli:
             apk add --no-cache gcc musl-dev make
             make cli
             mv dist/stamusctl .
+
+test-cli:
+    image: busybox
+    stage: test
+    dependencies:
+        - build-cli
+    script:
+        - |
+            stamusctl
+
+ut:
+    image: golang:alpine
+    stage: test
+    script:
+        - |
+            apk add --no-cache gcc musl-dev make
+            make test
