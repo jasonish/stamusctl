@@ -74,7 +74,7 @@ test cli in docker:
     stage: test
     dependencies:
         - build cli
-    script: ''
+    script: 'exit 0'
 
 ut:
     image: golang:alpine
