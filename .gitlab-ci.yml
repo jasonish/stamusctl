@@ -61,4 +61,6 @@ build-cli:
         paths:
             - dist/stamusctl
     script:
-        - make cli
+        - |
+            apk add --no-cache gcc musl-dev make
+            make cli
