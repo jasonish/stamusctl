@@ -8,6 +8,7 @@
 stages:
     - test
     - docker
+    - build
 
 sast:
     stage: test
@@ -51,3 +52,13 @@ kaniko-cli-main:
             --cache=true \
             --cache-copy-layers=true \
             --cache-ttl=72h
+
+build-cli:
+    image: golang:alpine
+    stage: build
+    artifacts:
+        expire_in: 1 day
+        paths:
+            - dist/stamusctl
+    script:
+        - make cli
