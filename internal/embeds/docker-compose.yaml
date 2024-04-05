@@ -124,7 +124,7 @@ services:
 
   scirius:
     container_name: scirius
-    image: {{.Registry | default "ghcr.io/stamusnetworks"}}/scirius:{{.SciriusToken | default "master"}}
+    image: {{.Registry | default "ghcr.io/stamusnetworks"}}/scirius:{{.SciriusVersion | default "selks"}}
     restart: {{.RestartMode | default "unless-stopped"}}
     environment:
       - SECRET_KEY={{.SciriusToken}}
