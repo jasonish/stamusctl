@@ -68,11 +68,12 @@ test cli:
             ./stamusctl
 
 test cli in docker:
-    image: git.stamus-networks.com:4567/lanath/stamus-ctl/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+    image:
+        name: git.stamus-networks.com:4567/lanath/stamus-ctl/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+        entrypoint: [stamusctl]
     stage: test
     dependencies:
         - build cli
-    entrypoint: [stamusctl]
     script: ''
 
 ut:
