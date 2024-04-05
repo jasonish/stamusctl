@@ -17,7 +17,7 @@ var validateInputFlagTests = []validateInputFlagTest{
 func TestValidateInputFlag(t *testing.T) {
 
 	for _, test := range validateInputFlagTests {
-		input := Parameters{RestartMode: test.input}
+		input := Parameters{RestartMode: test.input, ElasticMemory: "1m", LogstashMemory: "1m"}
 
 		output := ValidateInputFlag(input)
 		if (output == nil) == test.errors {
