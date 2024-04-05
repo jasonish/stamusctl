@@ -65,7 +65,7 @@ test cli:
         - build cli
     script:
         - |
-            stamusctl
+            ./stamusctl
 
 ut:
     image: golang:alpine
