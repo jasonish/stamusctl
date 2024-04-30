@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"html/template"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/internal/logging"
+
 	"github.com/Masterminds/sprig/v3"
 	"github.com/spf13/viper"
 )

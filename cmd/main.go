@@ -1,23 +1,23 @@
 package main
 
 import (
-	"os"
 
-	cli "git.stamus-networks.com/lanath/stamus-ctl/cmd/stamusctl/commands"
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/app"
+	// cli "stamus-ctl/cmd/stamusctl/commands"
+	ctl "stamus-ctl/cmd/ctl"
+	"stamus-ctl/internal/app"
 )
 
 func main() {
-	var err error
+	// var err error
 
 	switch app.Name {
 	case "stamusctl":
-		cli.Execute()
+		ctl.Execute()
 	default:
-		cli.Execute()
+		ctl.Execute()
 	}
 
-	if err != nil {
-		os.Exit(1)
-	}
+	// if err != nil {
+	// 	os.Exit(1)
+	// }
 }

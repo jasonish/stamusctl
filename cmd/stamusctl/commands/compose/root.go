@@ -16,12 +16,12 @@ const (
 func NewCompose() *cobra.Command {
 	var command = &cobra.Command{
 		Use:   "compose",
-		Short: "work with docker-compose",
+		Short: "Interact with container compose",
 	}
 
 	command.AddCommand(NewInit())
-	command.AddCommand(NewCleanup())
-	command.AddCommand(NewGetConfig())
+	command.AddCommand(CleanupHandler())
+	command.AddCommand(ConfigHandler())
 
 	cobra.OnInitialize(initConfig)
 

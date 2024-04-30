@@ -5,9 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/cmd/stamusctl/commands/compose"
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/app"
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/cmd/stamusctl/commands/compose"
+	"stamus-ctl/internal/app"
+	"stamus-ctl/internal/logging"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

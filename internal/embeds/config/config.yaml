@@ -1,0 +1,100 @@
+ArkimeviewerVersion:
+  type: string
+  usage: Arkime version to install
+  name: arkimeviewer-version
+  default: master
+
+volumepath:
+  type: string
+  usage: Path where data will be stored
+  name: volume-path
+  default: ./containers-data
+
+RestartMode:
+  type: string
+  usage: Restart mode for services
+  name: restart-mode
+  default: unless-stopped
+  choices: restartModes
+
+MLEnabled:
+  type: bool
+  usage: Enable or disable Machine Learning
+  name: ml-enabled
+  default: false
+
+elk:
+  version:
+    type: string
+    usage: ELK version to install
+    name: elk-version
+    default: 7.16.1
+  elastic:
+    path:
+      type: string
+      usage: Path where Elastic data will be stored
+      name: elastic-path
+      default: elastic-data
+    memory:
+      type: string
+      usage: Memory limit for Elastic
+      name: elastic-memory
+      default: 3G
+  logstash:
+    memory:
+      type: string
+      usage: Memory limit for Logstash
+      name: logstash-memory
+      default: 3G
+
+InterfacesList:
+  type: string
+  usage: List of interfaces to monitor
+  name: interfaces-list
+  choices: interfaces
+
+Registry:
+  type: string
+  usage: Docker registry to use
+  name: registry
+  default: ghcr.io/stamusnetworks
+
+scirius:
+  version:
+    type: string
+    usage: Scirius version to install
+    name: scirius-version
+    default: selks
+  token:
+    type: string
+    usage: Scirius token
+    name: scirius-token
+    default: ""
+
+DebugMode:
+  type: bool
+  usage: Enable debug mode
+  name: debug-mode
+  default: false
+
+NginxExec:
+  type: string
+  usage: Path to nginx executable
+  name: nginx-exec
+  default: nginx
+  choices: nginx
+
+
+# parameters:
+#   ArkimeViewer:
+#     parameters:
+#       Enabled:
+#         type: bool
+#         usage: Enable or disable Arkime viewer
+#         name: arkimeviewer-enabled
+#         default: false
+#       ArkimeviewerVersion:
+#         type: string
+#         usage: Arkime version to install
+#         name: arkimeviewer-version
+#         default: master

@@ -7,8 +7,9 @@ import (
 	"path"
 	"text/template"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/embeds"
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/internal/embeds"
+	"stamus-ctl/internal/logging"
+
 	"github.com/Masterminds/sprig/v3"
 )
 
@@ -51,25 +52,25 @@ func writeConfGeneric(filePath, outputFile, data string, rights ...fs.FileMode) 
 
 func WriteConfigFiles(volumePath string) {
 
-	writeConfGeneric(path.Join(volumePath, "nginx"), "nginx.conf", embeds.NginxMainConf)
-	writeConfGeneric(path.Join(volumePath, "nginx", "conf.d"), "selks6.conf", embeds.SelksNginxConfig)
+	// writeConfGeneric(path.Join(volumePath, "nginx"), "nginx.conf", embeds.NginxMainConf)
+	// writeConfGeneric(path.Join(volumePath, "nginx", "conf.d"), "selks6.conf", embeds.SelksNginxConfig)
 
-	writeConfGeneric(path.Join(volumePath, "logstash", "conf.d"), "logstash.conf", embeds.LogstashConfig)
-	writeConfGeneric(path.Join(volumePath, "logstash", "templates"), "elasticsearch7-template.json", embeds.ElasticTemplate)
+	// writeConfGeneric(path.Join(volumePath, "logstash", "conf.d"), "logstash.conf", embeds.LogstashConfig)
+	// writeConfGeneric(path.Join(volumePath, "logstash", "templates"), "elasticsearch7-template.json", embeds.ElasticTemplate)
 
-	writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "scirius-update-suri-rules.sh", embeds.CronJobsDailyScirius)
-	writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "suricata-logrotate.sh", embeds.CronJobsDailySuricata)
+	// writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "scirius-update-suri-rules.sh", embeds.CronJobsDailyScirius)
+	// writeConfGeneric(path.Join(volumePath, "cron-jobs", "daily"), "suricata-logrotate.sh", embeds.CronJobsDailySuricata)
 
-	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "new_entrypoint.sh", embeds.SuricataEtcEntryPoint, 0755)
-	writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "selks6-addin.yaml", embeds.SuricataEtcAddin)
+	// writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "new_entrypoint.sh", embeds.SuricataEtcEntryPoint, 0755)
+	// writeConfGeneric(path.Join(volumePath, "suricata", "etc"), "selks6-addin.yaml", embeds.SuricataEtcAddin)
 
-	os.MkdirAll(path.Join(volumePath, "cron-jobs", "1min"), os.ModePerm)
-	os.MkdirAll(path.Join(volumePath, "cron-jobs", "15min"), os.ModePerm)
-	os.MkdirAll(path.Join(volumePath, "cron-jobs", "hourly"), os.ModePerm)
-	os.MkdirAll(path.Join(volumePath, "cron-jobs", "daily"), os.ModePerm)
-	os.MkdirAll(path.Join(volumePath, "cron-jobs", "weekly"), os.ModePerm)
-	os.MkdirAll(path.Join(volumePath, "cron-jobs", "monthly"), os.ModePerm)
+	// os.MkdirAll(path.Join(volumePath, "cron-jobs", "1min"), os.ModePerm)
+	// os.MkdirAll(path.Join(volumePath, "cron-jobs", "15min"), os.ModePerm)
+	// os.MkdirAll(path.Join(volumePath, "cron-jobs", "hourly"), os.ModePerm)
+	// os.MkdirAll(path.Join(volumePath, "cron-jobs", "daily"), os.ModePerm)
+	// os.MkdirAll(path.Join(volumePath, "cron-jobs", "weekly"), os.ModePerm)
+	// os.MkdirAll(path.Join(volumePath, "cron-jobs", "monthly"), os.ModePerm)
 
-	os.MkdirAll(path.Join(volumePath, "suricata", "logs"), os.ModePerm)
-	os.MkdirAll(path.Join(volumePath, "suricata", "logrotate"), os.ModePerm)
+	// os.MkdirAll(path.Join(volumePath, "suricata", "logs"), os.ModePerm)
+	// os.MkdirAll(path.Join(volumePath, "suricata", "logrotate"), os.ModePerm)
 }

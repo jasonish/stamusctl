@@ -1,3 +1,6 @@
 .envrc
 .direnv
 dist/
+
+.configs/
+tmp/

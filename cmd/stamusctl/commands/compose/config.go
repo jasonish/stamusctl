@@ -1,17 +1,22 @@
 package compose
 
 import (
+	// Common
 	"fmt"
 
-	compose "git.stamus-networks.com/lanath/stamus-ctl/internal/docker-compose"
+	// External
 	"github.com/spf13/cobra"
+
+	// Custom
+	compose "stamus-ctl/internal/docker-compose"
+	"stamus-ctl/internal/logging"
 )
 
 var (
 	format = ""
 )
 
-func run() {
+func getConfig() {
 	p := compose.NewParametersFromEnv(v)
 	if format != "" {
 		out := p.Format(format)
@@ -24,32 +29,46 @@ func run() {
 	}
 }
 
-func NewGetConfig() *cobra.Command {
+func ConfigHandler() *cobra.Command {
 	var command = &cobra.Command{
 		Use:   "config",
-		Short: "clean docker compose file",
+		Short: "Interact with container compose config file",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			run()
+			getConfig()
 		},
 	}
 
-	get := &cobra.Command{
-		Use:   "config",
-		Short: "clean docker compose file",
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			return nil
+	var subCommands = []*cobra.Command{
+		{
+			Use:   "get",
+			Short: "Get container compose config file",
+			PreRunE: func(cmd *cobra.Command, args []string) error {
+				return nil
+			},
+			Run: func(cmd *cobra.Command, args []string) {
+				getConfig()
+			},
 		},
-		Run: func(cmd *cobra.Command, args []string) {
-			run()
+		{
+			Use:   "set",
+			Short: "Set container compose config file",
+			PreRunE: func(cmd *cobra.Command, args []string) error {
+				return nil
+			},
+			Run: func(cmd *cobra.Command, args []string) {
+				logging.Sugar.Errorw("compose config set not yet implemented")
+			},
 		},
 	}
 
 	command.Flags().StringVarP(&format, "format", "f", "", "format")
 
-	command.AddCommand(get)
+	for _, subCommand := range subCommands {
+		command.AddCommand(subCommand)
+	}
 	return command
 }
 

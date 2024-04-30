@@ -1,10 +1,15 @@
 package compose
 
 import (
+	// Common
 	"errors"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	// External
 	"github.com/Masterminds/semver/v3"
+
+	// Custom
+	"stamus-ctl/internal/logging"
+	"stamus-ctl/internal/utils"
 )
 
 const (
@@ -18,7 +23,7 @@ var (
 )
 
 func CheckVersions() (bool, error) {
-	if version, err := GetExecDockerVersion("docker"); err != nil || version.Compare(minimalDockerSemVersion) == -1 {
+	if version, err := utils.GetExecVersion("docker", "--format", "{{.Server.Version}}"); err != nil || version.Compare(minimalDockerSemVersion) == -1 {
 		if err != nil {
 			return false, err
 		}
@@ -26,7 +31,7 @@ func CheckVersions() (bool, error) {
 		return false, errors.New("docker version not supported")
 	}
 
-	if version, err := GetExecDockerVersion("docker-compose"); err != nil || version.Compare(minimalComposeSemVersion) == -1 {
+	if version, err := utils.GetExecVersion("docker-compose", "--format", "{{.Server.Version}}"); err != nil || version.Compare(minimalComposeSemVersion) == -1 {
 		if err != nil {
 			return false, err
 		}

@@ -3,7 +3,8 @@ package compose
 import (
 	"fmt"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/internal/logging"
+
 	"github.com/spf13/cobra"
 )
 

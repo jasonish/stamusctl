@@ -5,7 +5,8 @@ import (
 	"slices"
 	"strings"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/internal/logging"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/image"
 )

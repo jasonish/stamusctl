@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/internal/logging"
+
 	"github.com/docker/docker/api/types"
 )
 
@@ -23,8 +24,8 @@ func PullImageIfNotExisted(name string) (bool, error) {
 	logger.Debugw("image not found")
 
 	s := logging.NewSpinner(
-		fmt.Sprintf("pulling %s. please wait", name),
-		fmt.Sprintf("pulling %s done", name),
+		fmt.Sprintf("Pulling %s. Please wait", name),
+		fmt.Sprintf("Pulling %s done\n", name),
 	)
 	reader, err := cli.ImagePull(ctx, "docker.io/library/"+name, types.ImagePullOptions{})
 

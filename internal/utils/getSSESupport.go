@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/internal/logging"
 )
 
 func readFile(procFile string) string {

@@ -3,7 +3,8 @@ package docker
 import (
 	"errors"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/internal/logging"
+
 	"github.com/docker/docker/api/types"
 )
 

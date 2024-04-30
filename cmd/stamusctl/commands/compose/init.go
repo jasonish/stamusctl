@@ -4,9 +4,10 @@ import (
 	"errors"
 	"os"
 
-	compose "git.stamus-networks.com/lanath/stamus-ctl/internal/docker-compose"
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/utils"
+	compose "stamus-ctl/internal/docker-compose"
+	"stamus-ctl/internal/logging"
+	"stamus-ctl/internal/utils"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

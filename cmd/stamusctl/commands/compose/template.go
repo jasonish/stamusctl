@@ -3,7 +3,8 @@ package compose
 import (
 	"fmt"
 
-	compose "git.stamus-networks.com/lanath/stamus-ctl/internal/docker-compose"
+	compose "stamus-ctl/internal/docker-compose"
+
 	"github.com/spf13/cobra"
 )
 

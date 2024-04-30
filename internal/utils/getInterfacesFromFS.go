@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
+	"stamus-ctl/internal/logging"
 )
 
 func GetInterfaceFormFS() ([]string, error) {

@@ -1,7 +1,8 @@
 package logging
 
 import (
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/app"
+	"stamus-ctl/internal/app"
+
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

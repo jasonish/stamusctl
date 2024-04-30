@@ -1,42 +1,13 @@
 package compose
 
 import (
-	"bytes"
-	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 	"unicode"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/docker"
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/logging"
-	"github.com/Masterminds/semver/v3"
+	"stamus-ctl/internal/docker"
+	"stamus-ctl/internal/logging"
 )
-
-func GetExecDockerVersion(executable string) (*semver.Version, error) {
-	cmd := exec.Command(executable, "version", "--format", "{{.Server.Version}}")
-
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
-
-	if err := cmd.Run(); err != nil {
-		logging.Sugar.Errorw("cannot fetch version.", "error", err, "exec", executable)
-		return nil, fmt.Errorf("cannot %s fetch version", executable)
-	}
-
-	output := stdout.String()
-	splited := strings.Split(output, " ")
-	extracted := strings.Trim(splited[len(splited)-1], "\n")
-	version, err := semver.NewVersion(extracted)
-	if err != nil {
-		logging.Sugar.Errorw("cannot parse version.", "error", err, "exec", extracted)
-		return nil, fmt.Errorf("cannot parse %s version", executable)
-	}
-
-	logging.Sugar.Debugw("detected version.", "version", version, "executable", executable)
-
-	return version, nil
-}
 
 func RetrieveValideInterfacesFromDockerContainer() ([]string, error) {
 

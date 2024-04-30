@@ -3,7 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"git.stamus-networks.com/lanath/stamus-ctl/internal/app"
+	"stamus-ctl/internal/app"
+
 	"github.com/spf13/cobra"
 )
 

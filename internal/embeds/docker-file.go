@@ -1,6 +1,8 @@
 package embeds
 
-import _ "embed"
+import (
+	_ "embed"
+)
 
-//go:embed docker-compose.yaml
+//go:embed config/docker-compose.yaml
 var DockerFile string

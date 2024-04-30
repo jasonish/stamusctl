@@ -1,4 +1,6 @@
-module git.stamus-networks.com/lanath/stamus-ctl
+module stamus-ctl
+// TODO: once public repo created, uncomment the following line  
+// replace stamus-ctl => github.com/StamusNetworks/stamus-ctl v1
 
 go 1.21.5
 
@@ -33,6 +35,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
+	github.com/otiai10/copy v1.14.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
@@ -54,6 +57,7 @@ require (
 	golang.org/x/crypto v0.20.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/mod v0.15.0 // indirect
+	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/term v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
