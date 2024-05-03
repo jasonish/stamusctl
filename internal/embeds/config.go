@@ -12,7 +12,7 @@ var AllConf embed.FS
 var base string = "config"
 
 func Extract() error {
-	outputFolder := ".configs/selks/embeded"
+	outputFolder := ".configs/selks/embedded"
 	files := getAllFiles(base)
 
 	for _, file := range files {

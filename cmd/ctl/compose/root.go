@@ -9,7 +9,7 @@ import (
 )
 
 // Constants
-const DefaultSelksPath = ".configs/selks/embeded"
+const DefaultSelksPath = ".configs/selks/embedded"
 
 // Flags
 var interactive = models.Parameter{
