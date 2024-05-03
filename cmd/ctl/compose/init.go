@@ -82,11 +82,6 @@ func SELKSHandler(cmd *cobra.Command) error {
 		log.Println("Interactive mode")
 		config.GetProjectParams().AskAll()
 	}
-	// Validate the configuration
-	err = config.Validate()
-	if err != nil {
-		return err
-	}
 	// Save the configuration
 	config.SaveConfigTo(*output.Variable.String)
 	return nil

@@ -108,11 +108,6 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	}
 	// Set the parameters
 	config.GetProjectParams().SetLooseValues(paramsArgs)
-	// Validate the configuration
-	err = config.Validate()
-	if err != nil {
-		return err
-	}
 	// Save the configuration
 	config.SaveConfigTo(*output.Variable.String)
 	return nil

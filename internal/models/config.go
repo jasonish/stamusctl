@@ -130,10 +130,6 @@ func (f *Config) getIntParamValue(name string, param string) int {
 	return f.viperInstance.GetInt(fmt.Sprintf("%s.%s", name, param))
 }
 
-func (f *Config) Validate() error {
-	return f.instanciateViper(f.path)
-}
-
 func (f *Config) instanciateViper(path string) error {
 	// Extract the properties from the path
 	properties := extractProperties(path + "/config.yaml")
