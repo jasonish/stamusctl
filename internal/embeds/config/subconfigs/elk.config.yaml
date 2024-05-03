@@ -1,0 +1,23 @@
+elk:
+  version:
+    type: string
+    usage: ELK version to install
+    name: elk-version
+    default: 7.16.1
+  elastic:
+    path:
+      type: string
+      usage: Path where Elastic data will be stored
+      name: elastic-path
+      default: elastic-data
+    memory:
+      type: string
+      usage: Memory limit for Elastic
+      name: elastic-memory
+      default: 3G
+  logstash:
+    memory:
+      type: string
+      usage: Memory limit for Logstash
+      name: logstash-memory
+      default: 3G

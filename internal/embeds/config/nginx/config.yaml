@@ -1,0 +1,6 @@
+nginx:
+  type: string
+  usage: Path to nginx executable
+  name: nginx-exec
+  default: nginx
+  choices: nginx
