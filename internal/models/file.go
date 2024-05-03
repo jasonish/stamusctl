@@ -5,6 +5,7 @@ import (
 
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 	// External
@@ -23,8 +24,7 @@ func createFileInstanceFromPath(path string) (file, error) {
 	pathSplited := strings.Split(path, "/")
 	nameSplited := strings.Split(pathSplited[len(pathSplited)-1], ".")
 	// Validate all
-	fmt.Println(path)
-	if len(nameSplited) != 2 {
+	if len(nameSplited) < 2 {
 		return file{}, fmt.Errorf("path %s is not a valid file name", path)
 	}
 	err := isValidPath(path)
@@ -34,8 +34,8 @@ func createFileInstanceFromPath(path string) (file, error) {
 	// Return file instance
 	return file{
 		Path: strings.Join(pathSplited[:len(pathSplited)-1], "/"),
-		Name: nameSplited[0],
-		Type: nameSplited[1],
+		Name: strings.Join(nameSplited[:len(nameSplited)-1], "."),
+		Type: nameSplited[len(nameSplited)-1],
 	}, nil
 }
 
@@ -70,6 +70,8 @@ func (f *file) completePath() string {
 // Empirical function to check if a path is valid
 func isValidPath(path string) error {
 	// Check if file already exists
+	stuff, err := os.Stat(path)
+	log.Println("Checking path", path, stuff, err)
 	if _, err := os.Stat(path); err == nil {
 		return nil
 	}

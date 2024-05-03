@@ -154,7 +154,6 @@ func (p *Parameter) AskUser() error {
 				return err
 			}
 			p.Variable = CreateVariableString(result)
-			fmt.Println(p, choices)
 		} else {
 			defaultValue := *p.Default.String
 			result, err := textPrompt(p, defaultValue)
