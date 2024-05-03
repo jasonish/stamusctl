@@ -5,7 +5,6 @@ import (
 
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 	// External
@@ -70,8 +69,6 @@ func (f *file) completePath() string {
 // Empirical function to check if a path is valid
 func isValidPath(path string) error {
 	// Check if file already exists
-	stuff, err := os.Stat(path)
-	log.Println("Checking path", path, stuff, err)
 	if _, err := os.Stat(path); err == nil {
 		return nil
 	}

@@ -85,8 +85,6 @@ func (f *Config) extracKeys() ([]string, []string) {
 	for key, _ := range parametersMap {
 		parametersList = append(parametersList, key)
 	}
-	log.Println("Includes", includes)
-	log.Println("Parameters", parametersList)
 	return includes, parametersList
 }
 
@@ -123,15 +121,11 @@ func (f *Config) ExtractParams() (*Parameters, error) {
 	for _, parameter := range parametersList {
 		// Extract and add the parameter to the list
 		parameters.AddAsParameter(parameter, f.extractParam(parameter))
-		log.Println("Parameter extracted", parameter, f.extractParam(parameter))
 	}
-	log.Println("Parameters extracted", parameters)
 	// Extract includes parameters
 	for _, include := range includesList {
-		log.Println("Extracting parameters from include", include)
 		// Create config instance for the include
 		file, err := createFileInstanceFromPath(defaultConfPath + include)
-		log.Println("File instance created", file, err)
 		if err != nil {
 			return nil, fmt.Errorf("Error creating file instance", err)
 		}
@@ -139,14 +133,11 @@ func (f *Config) ExtractParams() (*Parameters, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Error creating config instance", err)
 		}
-		log.Println("Config instance created", conf)
 		// Extract parameters
 		conf.ExtractParams()
 		// Merge parameters
 		parameters.AddAsParameters(*conf.GetProjectParams())
-		log.Println("Finish Extracting parameters from include", include)
 	}
-	log.Println("Parameters extracted from includes", parameters)
 	f.parameters = &parameters
 	return &parameters, nil
 }

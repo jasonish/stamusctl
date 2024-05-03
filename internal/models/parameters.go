@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
@@ -47,7 +46,6 @@ func (p *Parameters) ValidateAll() string {
 }
 
 func (p *Parameters) AskAll() {
-	log.Println("Asking for parameters", p)
 	for _, param := range *p {
 		err := param.AskUser()
 		if err != nil {
