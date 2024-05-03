@@ -14,9 +14,7 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	cp "github.com/otiai10/copy"
 	"github.com/spf13/viper"
-
 	// Custom
-	"stamus-ctl/internal/app"
 )
 
 type Config struct {
@@ -25,18 +23,19 @@ type Config struct {
 	viperInstance *viper.Viper
 }
 
-func NewConfigFrom(path string) (*Config, error) {
+func NewConfigFrom(file file) (*Config, error) {
 	conf := Config{
-		path: path,
+		path: file.Path,
 	}
-	err := conf.instanciateViper(path)
+	viperInstance, err := instanciateViper(file)
 	if err != nil {
 		return nil, err
 	}
+	conf.viperInstance = viperInstance
 	return &conf, nil
 }
 
-func LoadConfigFrom(path string) (*Config, error) {
+func LoadConfigFrom(path file) (*Config, error) {
 	// Load the config
 	configured, err := NewConfigFrom(path)
 	if err != nil {
@@ -46,8 +45,9 @@ func LoadConfigFrom(path string) (*Config, error) {
 	values := configured.ExtractValues()
 	stamusConfPathPointer := values["stamusconfig"]
 	stamusConfPath := *stamusConfPathPointer.String
+	file := createFileFromPath(stamusConfPath)
 	// Load origin config
-	originConf, err := NewConfigFrom(stamusConfPath)
+	originConf, err := NewConfigFrom(file)
 	if err != nil {
 		return nil, err
 	}
@@ -130,27 +130,6 @@ func (f *Config) getIntParamValue(name string, param string) int {
 	return f.viperInstance.GetInt(fmt.Sprintf("%s.%s", name, param))
 }
 
-func (f *Config) instanciateViper(path string) error {
-	// Extract the properties from the path
-	properties := extractProperties(path + "/config.yaml")
-	// Create a new viper instance
-	f.viperInstance = viper.New()
-	// General configuration
-	f.viperInstance.SetEnvPrefix(app.Name)
-	f.viperInstance.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	f.viperInstance.AutomaticEnv()
-	// Specific configuration
-	f.viperInstance.SetConfigName(properties.Name)
-	f.viperInstance.SetConfigType(properties.Type)
-	f.viperInstance.AddConfigPath(properties.Path)
-	// Read the config file
-	err := f.viperInstance.ReadInConfig()
-	if err != nil {
-		return fmt.Errorf("cannot read config file: %w", err)
-	}
-	return nil
-}
-
 func (f *Config) GetProjectParams() *Parameters {
 	return f.parameters
 }
@@ -160,7 +139,7 @@ func (f *Config) CopyToPath(dest string) error {
 	return cp.Copy(f.path, dest)
 }
 
-func (f *Config) SaveConfigTo(dest string) error {
+func (f *Config) SaveConfigTo(dest file) error {
 	// Get flat map of parameters
 	var data = map[string]any{}
 	for key, param := range *f.parameters {
@@ -168,7 +147,7 @@ func (f *Config) SaveConfigTo(dest string) error {
 	}
 	data = nestMap(data)
 	// Process templates
-	err := processTemplates(f.path, dest, data)
+	err := processTemplates(f.path, dest.Path, data)
 	if err != nil {
 		return err
 	}
@@ -244,23 +223,29 @@ func processTemplates(inputFolder string, outputFolder string, data map[string]i
 }
 
 // Save parameters values to config file
-func (f *Config) saveParamsTo(dest string) error {
+func (f *Config) saveParamsTo(dest file) error {
 	//Clear the file
-	err := os.Remove(dest + "/config.yaml")
+	err := os.Remove(dest.completePath())
 	if err != nil {
 		fmt.Println("Error removing config file", err)
 		return err
 	}
 	//ReCreate the file
-	file, err := os.Create(dest + "/config.yaml")
+	file, err := os.Create(dest.completePath())
 	if err != nil {
 		fmt.Println("Error creating config file", err)
 		return err
 	}
 	defer file.Close()
 
+	// Instanciate viper
+	viperInstance, err := instanciateViper(dest)
+	if err != nil {
+		fmt.Println("Error instanciating viper", err)
+		return err
+	}
+	f.viperInstance = viperInstance
 	//Get current config parameters values
-	f.instanciateViper(dest)
 	paramsValues := make(map[string]any)
 	for key, param := range *f.parameters {
 		paramsValues[key] = param.GetValue()

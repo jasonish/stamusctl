@@ -70,7 +70,7 @@ func initSelksFolder(path string) {
 func SELKSHandler(cmd *cobra.Command) error {
 	// Instanciate config
 	var config models.Config
-	configPointer, err := models.NewConfigFrom(DefaultSelksPath)
+	configPointer, err := models.NewConfigFrom(models.CreateFile(DefaultSelksPath, "config.yaml"))
 	if err != nil {
 		return err
 	}
@@ -83,6 +83,6 @@ func SELKSHandler(cmd *cobra.Command) error {
 		config.GetProjectParams().AskAll()
 	}
 	// Save the configuration
-	config.SaveConfigTo(*output.Variable.String)
+	config.SaveConfigTo(models.CreateFile(*output.Variable.String, "config.yaml"))
 	return nil
 }

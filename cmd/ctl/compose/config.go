@@ -92,7 +92,9 @@ func getHandler(cmd *cobra.Command) error {
 
 func setHandler(cmd *cobra.Command, args []string) error {
 	// Load the config
-	config, err := models.LoadConfigFrom(input.GetValue().(string))
+	inputAsString := input.GetValue().(string)
+	inputAsFile := models.CreateFile(inputAsString, "config.yaml")
+	config, err := models.LoadConfigFrom(inputAsFile)
 	if err != nil {
 		return err
 	}
@@ -109,6 +111,8 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	// Set the parameters
 	config.GetProjectParams().SetLooseValues(paramsArgs)
 	// Save the configuration
-	config.SaveConfigTo(*output.Variable.String)
+	outputAsString := *output.Variable.String
+	outputAsFile := models.CreateFile(outputAsString, "config.yaml")
+	config.SaveConfigTo(outputAsFile)
 	return nil
 }
