@@ -80,7 +80,10 @@ func SELKSHandler(cmd *cobra.Command) error {
 	}
 	config = *configPointer
 	// Read the folder configuration
-	config.ExtractParams()
+	_, err = config.ExtractParams()
+	if err != nil {
+		return err
+	}
 	// Ask for the parameters
 	if *interactive.Variable.Bool {
 		log.Println("Interactive mode")

@@ -17,21 +17,25 @@ import (
 	// Custom
 )
 
+const defaultConfPath = ".configs/selks/embedded/"
+
 type Config struct {
-	path          string
+	file          file
 	parameters    *Parameters
 	viperInstance *viper.Viper
 }
 
 func NewConfigFrom(file file) (*Config, error) {
-	conf := Config{
-		path: file.Path,
-	}
+	// Instanciate viper
 	viperInstance, err := instanciateViper(file)
 	if err != nil {
 		return nil, err
 	}
-	conf.viperInstance = viperInstance
+	// Create the config
+	conf := Config{
+		file:          file,
+		viperInstance: viperInstance,
+	}
 	return &conf, nil
 }
 
@@ -60,49 +64,91 @@ func LoadConfigFrom(path file) (*Config, error) {
 	return originConf, nil
 }
 
-func (f *Config) extracKeys() map[string]bool {
+// Return list of config files to include and list of parameters for current config
+func (f *Config) extracKeys() ([]string, []string) {
+	// Extract includes list
+	includes := []string{}
+	// Fron viperInstance, get the key "includes" as string list
+	includes = f.viperInstance.GetStringSlice("includes")
 	// Extract parameters list
-	parametersList := make(map[string]bool)
+	parametersMap := map[string]bool{}
 	for _, key := range f.viperInstance.AllKeys() {
 		// Extract the parameter name
 		parameterAsArray := strings.Split(key, ".")
 		parameter := strings.Join(parameterAsArray[:len(parameterAsArray)-1], ".")
-		parametersList[parameter] = true
+		if len(parameter) != 0 {
+			parametersMap[parameter] = true
+		}
 	}
-	return parametersList
+	// Convert map to list
+	parametersList := []string{}
+	for key, _ := range parametersMap {
+		parametersList = append(parametersList, key)
+	}
+	log.Println("Includes", includes)
+	log.Println("Parameters", parametersList)
+	return includes, parametersList
 }
 
-func (f *Config) ExtractParams() *Parameters {
-	// Extract parameters list
-	parametersList := f.extracKeys()
+// Returns the parameter extracted from the config file
+func (f *Config) extractParam(parameter string) *Parameter {
+	// Extract the parameter
+	currentParam := Parameter{
+		Name:         f.getStringParamValue(parameter, "name"),
+		Shorthand:    f.getStringParamValue(parameter, "shorthand"),
+		Type:         f.getStringParamValue(parameter, "type"),
+		Usage:        f.getStringParamValue(parameter, "usage"),
+		ValidateFunc: GetValidateFunc(f.getStringParamValue(parameter, "validate")),
+	}
+	// Extract variables
+	switch currentParam.Type {
+	case "string":
+		currentParam.Default = CreateVariableString(f.getStringParamValue(parameter, "default"))
+		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
+	case "bool":
+		currentParam.Default = CreateVariableBool(f.getBoolParamValue(parameter, "default"))
+		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
+	case "int":
+		currentParam.Default = CreateVariableInt(f.getIntParamValue(parameter, "default"))
+		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
+	}
+	return &currentParam
+}
+
+func (f *Config) ExtractParams() (*Parameters, error) {
+	// Extract lists
+	includesList, parametersList := f.extracKeys()
 	// Extract parameters
 	var parameters Parameters = make(Parameters)
-	for parameter, _ := range parametersList {
-		// Extract the parameter
-		currentParam := Parameter{
-			Name:         f.getStringParamValue(parameter, "name"),
-			Shorthand:    f.getStringParamValue(parameter, "shorthand"),
-			Type:         f.getStringParamValue(parameter, "type"),
-			Usage:        f.getStringParamValue(parameter, "usage"),
-			ValidateFunc: GetValidateFunc(f.getStringParamValue(parameter, "validate")),
-		}
-		// Extract variables
-		switch currentParam.Type {
-		case "string":
-			currentParam.Default = CreateVariableString(f.getStringParamValue(parameter, "default"))
-			currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
-		case "bool":
-			currentParam.Default = CreateVariableBool(f.getBoolParamValue(parameter, "default"))
-			currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
-		case "int":
-			currentParam.Default = CreateVariableInt(f.getIntParamValue(parameter, "default"))
-			currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
-		}
-		// Add the parameter to the list
-		parameters.AddAsParameter(parameter, &currentParam)
+	for _, parameter := range parametersList {
+		// Extract and add the parameter to the list
+		parameters.AddAsParameter(parameter, f.extractParam(parameter))
+		log.Println("Parameter extracted", parameter, f.extractParam(parameter))
 	}
+	log.Println("Parameters extracted", parameters)
+	// Extract includes parameters
+	for _, include := range includesList {
+		log.Println("Extracting parameters from include", include)
+		// Create config instance for the include
+		file, err := createFileInstanceFromPath(defaultConfPath + include)
+		log.Println("File instance created", file, err)
+		if err != nil {
+			return nil, fmt.Errorf("Error creating file instance", err)
+		}
+		conf, err := NewConfigFrom(file)
+		if err != nil {
+			return nil, fmt.Errorf("Error creating config instance", err)
+		}
+		log.Println("Config instance created", conf)
+		// Extract parameters
+		conf.ExtractParams()
+		// Merge parameters
+		parameters.AddAsParameters(*conf.GetProjectParams())
+		log.Println("Finish Extracting parameters from include", include)
+	}
+	log.Println("Parameters extracted from includes", parameters)
 	f.parameters = &parameters
-	return &parameters
+	return &parameters, nil
 }
 
 func (f *Config) ExtractValues() map[string]*Variable {
@@ -139,7 +185,7 @@ func (f *Config) GetProjectParams() *Parameters {
 
 // Copy everything from the f.path to the destination path
 func (f *Config) CopyToPath(dest string) error {
-	return cp.Copy(f.path, dest)
+	return cp.Copy(f.file.Path, dest)
 }
 
 func (f *Config) SaveConfigTo(dest file) error {
@@ -150,7 +196,7 @@ func (f *Config) SaveConfigTo(dest file) error {
 	}
 	data = nestMap(data)
 	// Process templates
-	err := processTemplates(f.path, dest.Path, data)
+	err := processTemplates(f.file.Path, dest.Path, data)
 	if err != nil {
 		return err
 	}
@@ -254,7 +300,7 @@ func (f *Config) saveParamsTo(dest file) error {
 		paramsValues[key] = param.GetValue()
 	}
 	// Set the new values
-	f.viperInstance.Set("stamusconfig", f.path)
+	f.viperInstance.Set("stamusconfig", f.file.Path)
 	for key, value := range paramsValues {
 		f.viperInstance.Set(key, value)
 	}
