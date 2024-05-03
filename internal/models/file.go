@@ -18,7 +18,7 @@ type file struct {
 }
 
 // Used to get the file as properties from path
-func createFileFromPath(path string) (file, error) {
+func createFileInstanceFromPath(path string) (file, error) {
 	// Extract the file properties
 	pathSplited := strings.Split(path, "/")
 	nameSplited := strings.Split(pathSplited[len(pathSplited)-1], ".")
@@ -40,13 +40,27 @@ func createFileFromPath(path string) (file, error) {
 }
 
 // Used create a file from path and name
-func CreateFile(path string, fileName string) file {
+func CreateFileInstance(path string, fileName string) (file, error) {
+	// Extract the file properties
 	nameSplited := strings.Split(fileName, ".")
+	// Validate all
+	if len(nameSplited) != 2 {
+		return file{}, fmt.Errorf("path %s is not a valid file name", path)
+	}
+	err := isValidPath(path)
+	if err != nil {
+		return file{}, err
+	}
+	err = isValidPath(fileName)
+	if err != nil {
+		return file{}, err
+	}
+	// Return file instance
 	return file{
 		Path: path,
 		Name: nameSplited[0],
 		Type: nameSplited[1],
-	}
+	}, nil
 }
 
 func (f *file) completePath() string {

@@ -45,7 +45,7 @@ func LoadConfigFrom(path file) (*Config, error) {
 	values := configured.ExtractValues()
 	stamusConfPathPointer := values["stamusconfig"]
 	stamusConfPath := *stamusConfPathPointer.String
-	file, err := createFileFromPath(stamusConfPath)
+	file, err := CreateFileInstance(stamusConfPath, "config.yaml")
 	if err != nil {
 		return nil, err
 	}
