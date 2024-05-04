@@ -87,7 +87,7 @@ func SELKSHandler(cmd *cobra.Command) error {
 	// Ask for the parameters
 	if *interactive.Variable.Bool {
 		log.Println("Interactive mode")
-		config.GetProjectParams().AskAll()
+		config.GetParams().AskAll()
 	}
 	// Save the configuration
 	outputFile, err := models.CreateFileInstance(*output.Variable.String, "config.yaml")

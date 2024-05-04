@@ -103,7 +103,7 @@ func (f *Config) extractParam(parameter string) *Parameter {
 	case "string":
 		currentParam.Default = CreateVariableString(f.getStringParamValue(parameter, "default"))
 		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
-	case "bool":
+	case "bool", "optional":
 		currentParam.Default = CreateVariableBool(f.getBoolParamValue(parameter, "default"))
 		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
 	case "int":
@@ -119,7 +119,6 @@ func (f *Config) ExtractParams() (*Parameters, error) {
 	// Extract parameters
 	var parameters Parameters = make(Parameters)
 	for _, parameter := range parametersList {
-		// Extract and add the parameter to the list
 		parameters.AddAsParameter(parameter, f.extractParam(parameter))
 	}
 	// Extract includes parameters
@@ -134,9 +133,12 @@ func (f *Config) ExtractParams() (*Parameters, error) {
 			return nil, fmt.Errorf("Error creating config instance", err)
 		}
 		// Extract parameters
-		conf.ExtractParams()
+		params, err := conf.ExtractParams()
+		if err != nil {
+			return nil, fmt.Errorf("Error extracting parameters", err)
+		}
 		// Merge parameters
-		parameters.AddAsParameters(*conf.GetProjectParams())
+		parameters.AddAsParameters(params)
 	}
 	f.parameters = &parameters
 	return &parameters, nil
@@ -170,7 +172,7 @@ func (f *Config) getIntParamValue(name string, param string) int {
 	return f.viperInstance.GetInt(fmt.Sprintf("%s.%s", name, param))
 }
 
-func (f *Config) GetProjectParams() *Parameters {
+func (f *Config) GetParams() *Parameters {
 	return f.parameters
 }
 
@@ -189,6 +191,7 @@ func (f *Config) SaveConfigTo(dest file) error {
 	// Process templates
 	err := processTemplates(f.file.Path, dest.Path, data)
 	if err != nil {
+		log.Println("Error processing templates", err)
 		return err
 	}
 	// Save parameters values to config file
@@ -258,7 +261,6 @@ func processTemplates(inputFolder string, outputFolder string, data map[string]i
 	if err != nil {
 		return err
 	}
-	log.Println("Templates processed", err)
 	return nil
 }
 

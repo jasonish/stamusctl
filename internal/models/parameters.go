@@ -2,8 +2,9 @@ package models
 
 import (
 	"fmt"
-	"os"
+	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -12,9 +13,9 @@ import (
 type Parameters map[string]*Parameter
 
 // Adds the parameters to the given parameters
-func (p *Parameters) AddAsParameters(paramsList ...Parameters) *Parameters {
+func (p *Parameters) AddAsParameters(paramsList ...*Parameters) *Parameters {
 	for _, params := range paramsList {
-		for key, param := range params {
+		for key, param := range *params {
 			(*p)[key] = param
 		}
 	}
@@ -45,14 +46,75 @@ func (p *Parameters) ValidateAll() string {
 	return ""
 }
 
-func (p *Parameters) AskAll() {
+func (p *Parameters) AskAll() error {
+	// Preprocess optional parameters
+	err := p.ProcessOptionnalParams("ask")
+	if err != nil {
+		return err
+	}
+	// Ask for all remaining parameters
 	for _, param := range *p {
-		err := param.AskUser()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+		if param.Type != "optional" {
+			err := param.AskUser()
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
+}
+
+func (p *Parameters) ProcessOptionnalParams(defaultValue ...string) error {
+	// Filter optional parameters
+	optionalParams := []string{}
+	for key, param := range *p {
+		if param.Type == "optional" {
+			optionalParams = append(optionalParams, key)
+		}
+	}
+	// Sort by specificity
+	sort.Slice(optionalParams, func(i, j int) bool {
+		return len(strings.Split(optionalParams[i], ".")) < len(strings.Split(optionalParams[j], "."))
+	})
+	// Ask for optional parameters, filtering optional parameters and concerned parameters from instance
+	for len(optionalParams) != 0 {
+		// Get first element and remove it
+		optionalParam := optionalParams[0]
+		optionalParams = optionalParams[1:]
+		// Get the optionnal parameter value
+		param := (*p)[optionalParam]
+		if len(defaultValue) != 0 {
+			switch defaultValue[0] {
+			case "default":
+				param.Variable = param.Default
+			case "ask":
+				err := param.AskUser()
+				if err != nil {
+					return err
+				}
+			}
+		}
+		// Clean if false
+		if !*param.Variable.Bool {
+			// Remove all concerned parameters, except the optional one
+			for paramKey, _ := range *p {
+				if strings.HasPrefix(paramKey, optionalParam) && paramKey != optionalParam {
+					delete(*p, paramKey)
+				}
+			}
+			// Remove all concerned optional parameters
+			remain := []string{}
+			for _, key := range optionalParams {
+				if !strings.HasPrefix(key, optionalParam) && key != optionalParam {
+					remain = append(remain, key)
+				}
+			}
+			optionalParams = remain
+		} else {
+			delete(*p, optionalParam)
+		}
+	}
+	return nil
 }
 
 // Sets paramaters values to given values
@@ -69,6 +131,7 @@ func (p *Parameters) SetValues(values map[string]*Variable) {
 }
 
 func (p *Parameters) SetLooseValues(values map[string]string) {
+	p.ProcessOptionnalParams()
 	for key, value := range values {
 		if (*p)[key] != nil {
 			switch (*p)[key].Type {
@@ -93,7 +156,12 @@ func (p *Parameters) SetLooseValues(values map[string]string) {
 						(*p)[key].Variable = CreateVariableInt(asInt)
 					}
 				}
+			case "optional":
+				fmt.Println("Changing optional parameter", key, "is not supported")
+				fmt.Println("Use `stamus-ctl compose init` to change optional blocks")
 			}
+		} else {
+			fmt.Println("You cannot set value for", key)
 		}
 	}
 }

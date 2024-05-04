@@ -112,7 +112,7 @@ func setHandler(cmd *cobra.Command, args []string) error {
 		}
 	}
 	// Set the parameters
-	config.GetProjectParams().SetLooseValues(paramsArgs)
+	config.GetParams().SetLooseValues(paramsArgs)
 	// Save the configuration
 	outputAsString := *output.Variable.String
 	outputAsFile, err := models.CreateFileInstance(outputAsString, "config.yaml")

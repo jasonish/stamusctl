@@ -32,7 +32,7 @@ func (p *Parameter) GetValue() any {
 	switch p.Type {
 	case "string":
 		return *p.Variable.String
-	case "bool":
+	case "bool", "optional":
 		return *p.Variable.Bool
 	case "int":
 		return *p.Variable.Int
@@ -132,7 +132,7 @@ func (p *Parameter) ValidateType() bool {
 	switch p.Type {
 	case "string":
 		return p.Variable.String != nil
-	case "bool":
+	case "bool", "optional":
 		return p.Variable.Bool != nil
 	case "int":
 		return p.Variable.Int != nil
@@ -162,7 +162,7 @@ func (p *Parameter) AskUser() error {
 			}
 			p.Variable = CreateVariableString(result)
 		}
-	case "bool":
+	case "bool", "optional":
 		result, err := selectPrompt(p, []string{"true", "false"})
 		if err != nil {
 			return err
