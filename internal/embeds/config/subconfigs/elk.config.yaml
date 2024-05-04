@@ -16,6 +16,9 @@ elk:
       name: elastic-memory
       default: 3G
   logstash:
+    type: optional
+    usage: Enable Logstash instance ?
+    default: true
     memory:
       type: string
       usage: Memory limit for Logstash

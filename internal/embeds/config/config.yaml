@@ -34,6 +34,9 @@ Registry:
   default: ghcr.io/stamusnetworks
 
 scirius:
+  type: optional
+  usage: Enable Scirius instance ?
+  default: true
   version:
     type: string
     usage: Scirius version to install    

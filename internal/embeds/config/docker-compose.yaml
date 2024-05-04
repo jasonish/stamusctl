@@ -78,6 +78,8 @@ services:
     networks:
       network:
 
+  {{if .elk.logstash}}
+  # if logstash is enabled
   logstash:
     container_name: logstash
     image:  elastic/logstash:{{.elk.version}}
@@ -99,6 +101,7 @@ services:
       - {{.volumepath}}/logstash/templates/elasticsearch7-template.json:/usr/share/logstash/config/elasticsearch7-template.json
     networks:
       network:
+  {{end}}
 
   suricata:
     container_name: suricata
