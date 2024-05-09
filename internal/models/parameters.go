@@ -64,7 +64,7 @@ func (p *Parameters) AskAll() error {
 	return nil
 }
 
-func (p *Parameters) ProcessOptionnalParams(defaultValue ...string) error {
+func (p *Parameters) ProcessOptionnalParams(defaultValueChoice ...string) error {
 	// Filter optional parameters
 	optionalParams := []string{}
 	for key, param := range *p {
@@ -83,15 +83,15 @@ func (p *Parameters) ProcessOptionnalParams(defaultValue ...string) error {
 		optionalParams = optionalParams[1:]
 		// Get the optionnal parameter value
 		param := (*p)[optionalParam]
-		if len(defaultValue) != 0 {
-			switch defaultValue[0] {
-			case "default":
-				param.Variable = param.Default
+		if len(defaultValueChoice) != 0 {
+			switch defaultValueChoice[0] {
 			case "ask":
 				err := param.AskUser()
 				if err != nil {
 					return err
 				}
+			default:
+				param.Variable = param.Default
 			}
 		}
 		// Clean if false

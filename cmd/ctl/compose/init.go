@@ -20,6 +20,13 @@ var output = models.Parameter{
 	Default:   models.CreateVariableString("tmp"),
 	Usage:     "Declare the folder where to save configuration files",
 }
+var interactive = models.Parameter{
+	Name:      "interactive",
+	Shorthand: "i",
+	Type:      "bool",
+	Default:   models.CreateVariableBool(true),
+	Usage:     "Interactive mode",
+}
 
 // Commands
 func initCmd() *cobra.Command {
@@ -35,6 +42,7 @@ func initCmd() *cobra.Command {
 	}
 	// Flags
 	output.AddAsFlag(cmd, false)
+	interactive.AddAsFlag(cmd, false)
 	// Commands
 	cmd.AddCommand(SELKSCmd())
 	return cmd
@@ -80,17 +88,23 @@ func SELKSHandler(cmd *cobra.Command) error {
 	}
 	config = *configPointer
 	// Read the folder configuration
-	_, err = config.ExtractParams()
+	_, _, err = config.ExtractParams()
 	if err != nil {
 		return err
 	}
 	// Ask for the parameters
 	if *interactive.Variable.Bool {
 		log.Println("Interactive mode")
-		config.GetParams().AskAll()
+		err := config.GetParams().AskAll()
+		if err != nil {
+			return err
+		}
 	}
 	// Save the configuration
 	outputFile, err := models.CreateFileInstance(*output.Variable.String, "config.yaml")
+	if err != nil {
+		return err
+	}
 	config.SaveConfigTo(outputFile)
 	return nil
 }

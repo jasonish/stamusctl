@@ -4,6 +4,7 @@ import (
 	// Common
 
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -113,11 +114,14 @@ func (f *Config) extractParam(parameter string) *Parameter {
 	return &currentParam
 }
 
-func (f *Config) ExtractParams() (*Parameters, error) {
+func (f *Config) ExtractParams() (*Parameters, []string, error) {
+	// To return
+	var parameters Parameters = make(Parameters)
+	var includes []string = []string{}
 	// Extract lists
 	includesList, parametersList := f.extracKeys()
+	includes = append(includes, includesList...)
 	// Extract parameters
-	var parameters Parameters = make(Parameters)
 	for _, parameter := range parametersList {
 		parameters.AddAsParameter(parameter, f.extractParam(parameter))
 	}
@@ -126,22 +130,23 @@ func (f *Config) ExtractParams() (*Parameters, error) {
 		// Create config instance for the include
 		file, err := createFileInstanceFromPath(defaultConfPath + include)
 		if err != nil {
-			return nil, fmt.Errorf("Error creating file instance", err)
+			return nil, nil, fmt.Errorf("Error creating file instance", err)
 		}
 		conf, err := NewConfigFrom(file)
 		if err != nil {
-			return nil, fmt.Errorf("Error creating config instance", err)
+			return nil, nil, fmt.Errorf("Error creating config instance", err)
 		}
 		// Extract parameters
-		params, err := conf.ExtractParams()
+		fileParams, fileIncludes, err := conf.ExtractParams()
 		if err != nil {
-			return nil, fmt.Errorf("Error extracting parameters", err)
+			return nil, nil, fmt.Errorf("Error extracting parameters", err)
 		}
-		// Merge parameters
-		parameters.AddAsParameters(params)
+		// Merge data
+		parameters.AddAsParameters(fileParams)
+		includes = append(includes, fileIncludes...)
 	}
 	f.parameters = &parameters
-	return &parameters, nil
+	return &parameters, includes, nil
 }
 
 func (f *Config) ExtractValues() map[string]*Variable {
@@ -182,7 +187,7 @@ func (f *Config) CopyToPath(dest string) error {
 }
 
 func (f *Config) SaveConfigTo(dest file) error {
-	// Get flat map of parameters
+	// Get flat map of parameters and convert to nested map
 	var data = map[string]any{}
 	for key, param := range *f.parameters {
 		data[key] = param.GetValue()
@@ -196,8 +201,88 @@ func (f *Config) SaveConfigTo(dest file) error {
 	}
 	// Save parameters values to config file
 	f.saveParamsTo(dest)
-
+	// Get list of all included subconfigs
+	_, includes, err := f.ExtractParams()
+	if err != nil {
+		log.Println("Error extracting parameters", err)
+		return err
+	}
+	// Delete all included subconfig filess
+	for _, include := range includes {
+		err := os.Remove(filepath.Join(dest.Path, include))
+		if err != nil {
+			log.Println("Error deleting included config", err)
+			return err
+		}
+	}
+	// Clean destination folder
+	err = deleteEmptyFiles(dest.Path)
+	if err != nil {
+		log.Println("Error deleting empty files", err)
+		return err
+	}
+	err = deleteEmptyFolders(dest.Path)
+	if err != nil {
+		log.Println("Error deleting empty folders", err)
+		return err
+	}
 	return nil
+}
+
+func deleteEmptyFiles(folderPath string) error {
+	err := filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		// Check if it's a regular file and empty
+		if !info.IsDir() && info.Size() == 0 {
+			err := os.Remove(path)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return err
+}
+
+func deleteEmptyFolders(folderPath string) error {
+	err := filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		// Check if it's a directory and empty
+		if info.IsDir() {
+
+			isEmpty, err := isDirEmpty(path)
+			if err != nil {
+				log.Println("Error checking if directory is empty", err)
+				return err
+			}
+			if isEmpty {
+				err := os.Remove(path)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+	return err
+}
+
+func isDirEmpty(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1) // Or f.Readdir(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err // Either not empty or error, suits both cases
 }
 
 // Nests a flat map into a nested map
@@ -280,25 +365,25 @@ func (f *Config) saveParamsTo(dest file) error {
 	}
 	defer file.Close()
 
-	// Instanciate viper
-	viperInstance, err := instanciateViper(dest)
+	// Instanciate config to dest file
+	conf, err := NewConfigFrom(dest)
 	if err != nil {
-		fmt.Println("Error instanciating viper", err)
+		fmt.Println("Error creating config instance", err)
 		return err
 	}
-	f.viperInstance = viperInstance
+	conf.parameters = f.parameters
 	//Get current config parameters values
 	paramsValues := make(map[string]any)
-	for key, param := range *f.parameters {
+	for key, param := range *conf.parameters {
 		paramsValues[key] = param.GetValue()
 	}
 	// Set the new values
-	f.viperInstance.Set("stamusconfig", f.file.Path)
+	conf.viperInstance.Set("stamusconfig", conf.file.Path)
 	for key, value := range paramsValues {
-		f.viperInstance.Set(key, value)
+		conf.viperInstance.Set(key, value)
 	}
 	// Write the new config file
-	err = f.viperInstance.WriteConfig()
+	err = conf.viperInstance.WriteConfig()
 	if err != nil {
 		fmt.Println("Error writing config file", err)
 		return err
