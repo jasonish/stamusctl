@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	// External
 	"github.com/spf13/cobra"
 	// Custom
 	"stamus-ctl/internal/models"
+	"stamus-ctl/internal/utils"
 )
 
 // Flags
@@ -78,7 +78,11 @@ func init() {
 // Handlers
 func getHandler(cmd *cobra.Command) error {
 	// Read the file content
-	content, err := ioutil.ReadFile(fmt.Sprintf("%s/config.yaml", input.GetValue().(string)))
+	value, err := input.GetValue()
+	if err != nil {
+		return err
+	}
+	content, err := ioutil.ReadFile(fmt.Sprintf("%s/config.yaml", value.(string)))
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		os.Exit(1)
@@ -92,7 +96,11 @@ func getHandler(cmd *cobra.Command) error {
 
 func setHandler(cmd *cobra.Command, args []string) error {
 	// Load the config
-	inputAsString := input.GetValue().(string)
+	value, err := input.GetValue()
+	if err != nil {
+		return err
+	}
+	inputAsString := value.(string)
 	inputAsFile, err := models.CreateFileInstance(inputAsString, "config.yaml")
 	if err != nil {
 		return err
@@ -101,17 +109,8 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Extract the parameters to set
-	paramsArgs := make(map[string]string)
-	for _, arg := range args {
-		splited := strings.Split(arg, "=")
-		if len(splited) != 2 {
-			fmt.Println("Error: invalid argument", arg)
-		} else {
-			paramsArgs[splited[0]] = splited[1]
-		}
-	}
-	// Set the parameters
+	// Extract and set parameters from args
+	paramsArgs := utils.ExtractArgs(args)
 	config.GetParams().SetLooseValues(paramsArgs)
 	// Save the configuration
 	outputAsString := *output.Variable.String

@@ -111,6 +111,9 @@ func (f *Config) extractParam(parameter string) *Parameter {
 		currentParam.Default = CreateVariableInt(f.getIntParamValue(parameter, "default"))
 		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
 	}
+	if f.getStringParamValue(parameter, "default") == "" {
+		currentParam.Default = Variable{}
+	}
 	return &currentParam
 }
 
@@ -190,7 +193,12 @@ func (f *Config) SaveConfigTo(dest file) error {
 	// Get flat map of parameters and convert to nested map
 	var data = map[string]any{}
 	for key, param := range *f.parameters {
-		data[key] = param.GetValue()
+		value, err := param.GetValue()
+		if err != nil {
+			log.Println("Error getting parameter value", key, err)
+			return err
+		}
+		data[key] = value
 	}
 	data = nestMap(data)
 	// Process templates
@@ -375,7 +383,12 @@ func (f *Config) saveParamsTo(dest file) error {
 	//Get current config parameters values
 	paramsValues := make(map[string]any)
 	for key, param := range *conf.parameters {
-		paramsValues[key] = param.GetValue()
+		value, err := param.GetValue()
+		if err != nil {
+			fmt.Println("Error getting parameter value", key, err)
+			return err
+		}
+		paramsValues[key] = value
 	}
 	// Set the new values
 	conf.viperInstance.Set("stamusconfig", conf.file.Path)

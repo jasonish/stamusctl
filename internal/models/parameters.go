@@ -48,7 +48,7 @@ func (p *Parameters) ValidateAll() string {
 
 func (p *Parameters) AskAll() error {
 	// Preprocess optional parameters
-	err := p.ProcessOptionnalParams("ask")
+	err := p.ProcessOptionnalParams(true)
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,22 @@ func (p *Parameters) AskAll() error {
 	return nil
 }
 
-func (p *Parameters) ProcessOptionnalParams(defaultValueChoice ...string) error {
+func (p *Parameters) SetToDefaults() error {
+	// Preprocess optional parameters with default values
+	err := p.ProcessOptionnalParams(false)
+	if err != nil {
+		return err
+	}
+	// Set all parameters to their default values
+	for _, param := range *p {
+		if param.Type != "optional" {
+			param.SetToDefault()
+		}
+	}
+	return nil
+}
+
+func (p *Parameters) ProcessOptionnalParams(interactive bool) error {
 	// Filter optional parameters
 	optionalParams := []string{}
 	for key, param := range *p {
@@ -83,16 +98,13 @@ func (p *Parameters) ProcessOptionnalParams(defaultValueChoice ...string) error 
 		optionalParams = optionalParams[1:]
 		// Get the optionnal parameter value
 		param := (*p)[optionalParam]
-		if len(defaultValueChoice) != 0 {
-			switch defaultValueChoice[0] {
-			case "ask":
-				err := param.AskUser()
-				if err != nil {
-					return err
-				}
-			default:
-				param.Variable = param.Default
+		if interactive {
+			err := param.AskUser()
+			if err != nil {
+				return err
 			}
+		} else {
+			param.SetToDefault()
 		}
 		// Clean if false
 		if !*param.Variable.Bool {
@@ -131,7 +143,7 @@ func (p *Parameters) SetValues(values map[string]*Variable) {
 }
 
 func (p *Parameters) SetLooseValues(values map[string]string) {
-	p.ProcessOptionnalParams()
+	p.ProcessOptionnalParams(false)
 	for key, value := range values {
 		if (*p)[key] != nil {
 			switch (*p)[key].Type {

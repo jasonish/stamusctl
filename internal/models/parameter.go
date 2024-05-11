@@ -28,17 +28,23 @@ type Variable struct {
 	Int    *int
 }
 
-func (p *Parameter) GetValue() any {
+func (v *Variable) IsNil() bool {
+	return v.String == nil && v.Bool == nil && v.Int == nil
+}
+
+func (p *Parameter) GetValue() (any, error) {
+	if p.Variable.IsNil() && p.Default.IsNil() {
+		return nil, fmt.Errorf("Variable has not been set")
+	}
 	switch p.Type {
 	case "string":
-		return *p.Variable.String
+		return *p.Variable.String, nil
 	case "bool", "optional":
-		return *p.Variable.Bool
+		return *p.Variable.Bool, nil
 	case "int":
-		return *p.Variable.Int
-	default:
-		return nil
+		return *p.Variable.Int, nil
 	}
+	return nil, fmt.Errorf("Invalid type")
 }
 
 // Adds the parameter as a flag to the command
@@ -140,6 +146,11 @@ func (p *Parameter) ValidateType() bool {
 		return false
 	}
 }
+func (p *Parameter) SetToDefault() {
+	if p.Variable.IsNil() {
+		p.Variable = p.Default
+	}
+}
 
 func (p *Parameter) AskUser() error {
 	switch p.Type {
@@ -188,17 +199,6 @@ func CreateVariableBool(value bool) Variable {
 }
 func CreateVariableInt(value int) Variable {
 	return Variable{Int: &value}
-}
-
-func CreateParameterString(name string, shorthand string, variable Variable, defaultValue Variable, usage string) Parameter {
-	return Parameter{
-		Name:      name,
-		Shorthand: shorthand,
-		Type:      "string",
-		Variable:  variable,
-		Default:   defaultValue,
-		Usage:     usage,
-	}
 }
 
 func textPrompt(param *Parameter, defaultValue string) (string, error) {
