@@ -145,11 +145,11 @@ func (f *Config) ExtractParams(isDeep bool) (*Parameters, []string, error) {
 		// Create config instance for the include
 		file, err := createFileInstanceFromPath(defaultConfPath + include)
 		if err != nil {
-			return nil, nil, fmt.Errorf("Error creating file instance", err)
+			return nil, nil, err
 		}
 		conf, err := NewConfigFrom(file)
 		if err != nil {
-			return nil, nil, fmt.Errorf("Error creating config instance", err)
+			return nil, nil, err
 		}
 		// Extract parameters
 		fileParams, fileIncludes, err := conf.ExtractParams(isDeep)
