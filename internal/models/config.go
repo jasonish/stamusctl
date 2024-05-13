@@ -59,7 +59,7 @@ func LoadConfigFrom(path file) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, _, err = originConf.ExtractParams()
+	_, _, err = originConf.ExtractParams(true)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (f *Config) extracKeys() ([]string, []string) {
 }
 
 // Returns the parameter extracted from the config file
-func (f *Config) extractParam(parameter string) (*Parameter, error) {
+func (f *Config) extractParam(parameter string, isDeep bool) (*Parameter, error) {
 	// Extract the parameter
 	currentParam := Parameter{
 		Name:         f.getStringParamValue(parameter, "name"),
@@ -101,6 +101,9 @@ func (f *Config) extractParam(parameter string) (*Parameter, error) {
 		Type:         f.getStringParamValue(parameter, "type"),
 		Usage:        f.getStringParamValue(parameter, "usage"),
 		ValidateFunc: GetValidateFunc(f.getStringParamValue(parameter, "validate")),
+	}
+	if !isDeep {
+		return &currentParam, nil
 	}
 	// Extract variables
 	switch currentParam.Type {
@@ -122,7 +125,7 @@ func (f *Config) extractParam(parameter string) (*Parameter, error) {
 	return &currentParam, nil
 }
 
-func (f *Config) ExtractParams() (*Parameters, []string, error) {
+func (f *Config) ExtractParams(isDeep bool) (*Parameters, []string, error) {
 	// To return
 	var parameters Parameters = make(Parameters)
 	var includes []string = []string{}
@@ -131,7 +134,7 @@ func (f *Config) ExtractParams() (*Parameters, []string, error) {
 	includes = append(includes, includesList...)
 	// Extract parameters
 	for _, parameter := range parametersList {
-		param, err := f.extractParam(parameter)
+		param, err := f.extractParam(parameter, isDeep)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -149,7 +152,7 @@ func (f *Config) ExtractParams() (*Parameters, []string, error) {
 			return nil, nil, fmt.Errorf("Error creating config instance", err)
 		}
 		// Extract parameters
-		fileParams, fileIncludes, err := conf.ExtractParams()
+		fileParams, fileIncludes, err := conf.ExtractParams(isDeep)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -204,7 +207,8 @@ func (f *Config) SaveConfigTo(dest file) error {
 	for key, param := range *f.parameters {
 		value, err := param.GetValue()
 		if err != nil {
-			log.Println("Error getting parameter value", key, err)
+			fmt.Println("Error getting parameter value", key, err)
+			fmt.Printf("Use %s=<your value> to set it\n", key)
 			return err
 		}
 		data[key] = value
@@ -219,7 +223,7 @@ func (f *Config) SaveConfigTo(dest file) error {
 	// Save parameters values to config file
 	f.saveParamsTo(dest)
 	// Get list of all included subconfigs
-	_, includes, err := f.ExtractParams()
+	_, includes, err := f.ExtractParams(false)
 	if err != nil {
 		return err
 	}
@@ -361,6 +365,7 @@ func processTemplates(inputFolder string, outputFolder string, data map[string]i
 	if err != nil {
 		return err
 	}
+	fmt.Println("Templates processed. Files saved to: ", outputFolder)
 	return nil
 }
 
@@ -393,6 +398,7 @@ func (f *Config) saveParamsTo(dest file) error {
 		value, err := param.GetValue()
 		if err != nil {
 			fmt.Println("Error getting parameter value", key, err)
+			log.Printf("Use %s=<your value> to set it", key)
 			return err
 		}
 		paramsValues[key] = value

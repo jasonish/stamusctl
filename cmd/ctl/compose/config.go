@@ -112,6 +112,10 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	// Extract and set parameters from args
 	paramsArgs := utils.ExtractArgs(args)
 	config.GetParams().SetLooseValues(paramsArgs)
+	err = config.GetParams().ValidateAll()
+	if err != nil {
+		return err
+	}
 	// Save the configuration
 	outputAsString := *output.Variable.String
 	outputAsFile, err := models.CreateFileInstance(outputAsString, "config.yaml")

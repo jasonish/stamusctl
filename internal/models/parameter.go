@@ -111,8 +111,8 @@ func (p *Parameter) AddAsFlag(cmd *cobra.Command, persistent bool) {
 // Validates the variable with the given function
 // If choices are provided, the variable must be in the list of choices
 func (p *Parameter) Validate() bool {
-	if p.ValidateFunc != nil {
-		return p.ValidateFunc(p.Variable)
+	if !p.ValidateFunc(p.Variable) {
+		return false
 	}
 	if p.Choices != nil && len(p.Choices) > 0 {
 		switch p.Type {

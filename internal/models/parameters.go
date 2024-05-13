@@ -36,14 +36,13 @@ func (p *Parameters) AddAsFlags(cmd *cobra.Command, persistent bool) {
 
 // Validates the parameters using their respective validation functions
 // Returns the name of the parameter that failed validation or an empty string if all parameters are valid
-func (p *Parameters) ValidateAll() string {
+func (p *Parameters) ValidateAll() error {
 	for key, param := range *p {
-		fmt.Println("Validating", key)
 		if !param.Validate() {
-			return key
+			return fmt.Errorf("Invalid value for %s", key)
 		}
 	}
-	return ""
+	return nil
 }
 
 func (p *Parameters) AskAll() error {

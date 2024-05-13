@@ -87,7 +87,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Read the folder configuration
-	_, _, err = config.ExtractParams()
+	_, _, err = config.ExtractParams(true)
 	if err != nil {
 		return err
 	}
@@ -106,6 +106,11 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		// Extract and set values from args
 		extractedArgs := utils.ExtractArgs(args)
 		config.GetParams().SetLooseValues(extractedArgs)
+	}
+	// Validate parameters
+	err = config.GetParams().ValidateAll()
+	if err != nil {
+		return err
 	}
 	// Save the configuration
 	outputFile, err := models.CreateFileInstance(*output.Variable.String, "config.yaml")
