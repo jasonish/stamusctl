@@ -166,7 +166,10 @@ func (p *Parameter) AskUser() error {
 			}
 			p.Variable = CreateVariableString(result)
 		} else {
-			defaultValue := *p.Default.String
+			var defaultValue string
+			if p.Default.String != nil {
+				defaultValue = *p.Default.String
+			}
 			result, err := textPrompt(p, defaultValue)
 			if err != nil {
 				return err
@@ -180,7 +183,10 @@ func (p *Parameter) AskUser() error {
 		}
 		p.Variable = CreateVariableBool(result == "true")
 	case "int":
-		defaultValue := strconv.Itoa(*p.Default.Int)
+		var defaultValue string
+		if p.Default.Int != nil {
+			defaultValue = strconv.Itoa(*p.Default.Int)
+		}
 		result, err := textPrompt(p, defaultValue)
 		if err != nil {
 			return err
@@ -214,7 +220,7 @@ func textPrompt(param *Parameter, defaultValue string) (string, error) {
 			case "int":
 				asInt, err := strconv.Atoi(input)
 				if err != nil {
-					return err
+					return fmt.Errorf("This is not a valid number")
 				}
 				if param.ValidateFunc != nil && !param.ValidateFunc(CreateVariableInt(asInt)) {
 					return fmt.Errorf("invalid input")

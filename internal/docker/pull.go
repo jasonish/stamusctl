@@ -29,15 +29,16 @@ func PullImageIfNotExisted(name string) (bool, error) {
 	)
 	reader, err := cli.ImagePull(ctx, "docker.io/library/"+name, types.ImagePullOptions{})
 
+	if err != nil {
+		logging.SpinnerStop(s)
+		logger.Debugw("image failed to pull", "error", err)
+		return false, err
+	}
+
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(reader)
 
 	logging.SpinnerStop(s)
-	if err != nil {
-		logger.Debugw("image failed to dl", "error", err)
-		return false, err
-	}
-
 	logger.Debugw("image dl", "error", err)
 	return false, nil
 }

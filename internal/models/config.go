@@ -59,7 +59,10 @@ func LoadConfigFrom(path file) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	originConf.ExtractParams()
+	_, _, err = originConf.ExtractParams()
+	if err != nil {
+		return nil, err
+	}
 	// Merge
 	originConf.parameters.SetValues(values)
 	return originConf, nil
@@ -90,7 +93,7 @@ func (f *Config) extracKeys() ([]string, []string) {
 }
 
 // Returns the parameter extracted from the config file
-func (f *Config) extractParam(parameter string) *Parameter {
+func (f *Config) extractParam(parameter string) (*Parameter, error) {
 	// Extract the parameter
 	currentParam := Parameter{
 		Name:         f.getStringParamValue(parameter, "name"),
@@ -103,18 +106,20 @@ func (f *Config) extractParam(parameter string) *Parameter {
 	switch currentParam.Type {
 	case "string":
 		currentParam.Default = CreateVariableString(f.getStringParamValue(parameter, "default"))
-		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
 	case "bool", "optional":
 		currentParam.Default = CreateVariableBool(f.getBoolParamValue(parameter, "default"))
-		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
 	case "int":
 		currentParam.Default = CreateVariableInt(f.getIntParamValue(parameter, "default"))
-		currentParam.Choices = GetChoices(f.getStringParamValue(parameter, "choices"))
 	}
+	choices, err := GetChoices(f.getStringParamValue(parameter, "choices"))
+	if err != nil {
+		return nil, err
+	}
+	currentParam.Choices = choices
 	if f.getStringParamValue(parameter, "default") == "" {
 		currentParam.Default = Variable{}
 	}
-	return &currentParam
+	return &currentParam, nil
 }
 
 func (f *Config) ExtractParams() (*Parameters, []string, error) {
@@ -126,7 +131,11 @@ func (f *Config) ExtractParams() (*Parameters, []string, error) {
 	includes = append(includes, includesList...)
 	// Extract parameters
 	for _, parameter := range parametersList {
-		parameters.AddAsParameter(parameter, f.extractParam(parameter))
+		param, err := f.extractParam(parameter)
+		if err != nil {
+			return nil, nil, err
+		}
+		parameters.AddAsParameter(parameter, param)
 	}
 	// Extract includes parameters
 	for _, include := range includesList {
@@ -142,7 +151,7 @@ func (f *Config) ExtractParams() (*Parameters, []string, error) {
 		// Extract parameters
 		fileParams, fileIncludes, err := conf.ExtractParams()
 		if err != nil {
-			return nil, nil, fmt.Errorf("Error extracting parameters", err)
+			return nil, nil, err
 		}
 		// Merge data
 		parameters.AddAsParameters(fileParams)
@@ -212,14 +221,12 @@ func (f *Config) SaveConfigTo(dest file) error {
 	// Get list of all included subconfigs
 	_, includes, err := f.ExtractParams()
 	if err != nil {
-		log.Println("Error extracting parameters", err)
 		return err
 	}
 	// Delete all included subconfig filess
 	for _, include := range includes {
 		err := os.Remove(filepath.Join(dest.Path, include))
 		if err != nil {
-			log.Println("Error deleting included config", err)
 			return err
 		}
 	}

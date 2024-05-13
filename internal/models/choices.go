@@ -8,7 +8,7 @@ import (
 	"stamus-ctl/internal/logging"
 )
 
-func GetChoices(name string) []Variable {
+func GetChoices(name string) ([]Variable, error) {
 	switch name {
 	case "restart":
 		return []Variable{
@@ -16,27 +16,31 @@ func GetChoices(name string) []Variable {
 			CreateVariableString("always"),
 			CreateVariableString("on-failure"),
 			CreateVariableString("unless-stopped"),
-		}
+		}, nil
 	case "nginx":
 		return []Variable{
 			CreateVariableString("nginx"),
 			CreateVariableString("nginx-exec"),
-		}
+		}, nil
 	case "interfaces":
 		return getInterfaces()
 	default:
-		return nil
+		return nil, nil
 	}
 }
 
-func getInterfaces() []Variable {
+func getInterfaces() ([]Variable, error) {
 	s := logging.NewSpinner(
 		"Identifying interfaces",
 		"Did identify interfaces\n",
 	)
 
 	// alreadyHasBusybox, _ := docker.PullImageIfNotExisted("busybox")
-	docker.PullImageIfNotExisted("busybox")
+	_, err := docker.PullImageIfNotExisted("busybox")
+	if err != nil {
+		logging.SpinnerStop(s)
+		return nil, err
+	}
 
 	// log.Println("alreadyHasBusybox", alreadyHasBusybox)
 
@@ -69,5 +73,5 @@ func getInterfaces() []Variable {
 	}
 
 	logging.SpinnerStop(s)
-	return interfacesVariables
+	return interfacesVariables, nil
 }
