@@ -51,69 +51,80 @@ func (p *Parameter) GetValue() (any, error) {
 func (p *Parameter) AddAsFlag(cmd *cobra.Command, persistent bool) {
 	switch p.Type {
 	case "string":
-		if p.Default.String == nil {
-			p.Default = CreateVariableString("")
-		}
-		p.Variable = p.Default
-
-		if p.Shorthand == "" {
-			if persistent {
-				cmd.PersistentFlags().StringVar(p.Variable.String, p.Name, *p.Default.String, p.Usage)
-			} else {
-				cmd.Flags().StringVar(p.Variable.String, p.Name, *p.Default.String, p.Usage)
-			}
-		} else {
-			if persistent {
-				cmd.PersistentFlags().StringVarP(p.Variable.String, p.Name, p.Shorthand, *p.Default.String, p.Usage)
-			} else {
-				cmd.Flags().StringVarP(p.Variable.String, p.Name, p.Shorthand, *p.Default.String, p.Usage)
-			}
-		}
+		p.AddStringFlag(cmd, persistent)
 	case "bool":
-		if p.Default.Bool == nil {
-			p.Default = CreateVariableBool(false)
-		}
-		p.Variable = p.Default
-		if p.Shorthand == "" {
-			if persistent {
-				cmd.PersistentFlags().BoolVar(p.Variable.Bool, p.Name, *p.Default.Bool, p.Usage)
-			} else {
-				cmd.Flags().BoolVar(p.Variable.Bool, p.Name, *p.Default.Bool, p.Usage)
-			}
-		} else {
-			if persistent {
-				cmd.PersistentFlags().BoolVarP(p.Variable.Bool, p.Name, p.Shorthand, *p.Default.Bool, p.Usage)
-			} else {
-				cmd.Flags().BoolVarP(p.Variable.Bool, p.Name, p.Shorthand, *p.Default.Bool, p.Usage)
-			}
-		}
+		p.AddBoolFlag(cmd, persistent)
 	case "int":
-		if p.Default.Int == nil {
-			p.Default = CreateVariableInt(0)
-		}
-		p.Variable = p.Default
-		if p.Shorthand == "" {
-			if persistent {
-				cmd.PersistentFlags().IntVar(p.Variable.Int, p.Name, *p.Default.Int, p.Usage)
-			} else {
-				cmd.Flags().IntVar(p.Variable.Int, p.Name, *p.Default.Int, p.Usage)
-			}
+		p.AddIntFlag(cmd, persistent)
+	}
+}
+
+func (p *Parameter) AddStringFlag(cmd *cobra.Command, persistent bool) {
+	if p.Default.String == nil {
+		p.Default = CreateVariableString("")
+	}
+	p.Variable = p.Default
+
+	if p.Shorthand == "" {
+		if persistent {
+			cmd.PersistentFlags().StringVar(p.Variable.String, p.Name, *p.Default.String, p.Usage)
 		} else {
-			if persistent {
-				cmd.PersistentFlags().IntVarP(p.Variable.Int, p.Name, p.Shorthand, *p.Default.Int, p.Usage)
-			} else {
-				cmd.Flags().IntVarP(p.Variable.Int, p.Name, p.Shorthand, *p.Default.Int, p.Usage)
-			}
+			cmd.Flags().StringVar(p.Variable.String, p.Name, *p.Default.String, p.Usage)
+		}
+	} else {
+		if persistent {
+			cmd.PersistentFlags().StringVarP(p.Variable.String, p.Name, p.Shorthand, *p.Default.String, p.Usage)
+		} else {
+			cmd.Flags().StringVarP(p.Variable.String, p.Name, p.Shorthand, *p.Default.String, p.Usage)
+		}
+	}
+}
+func (p *Parameter) AddBoolFlag(cmd *cobra.Command, persistent bool) {
+	if p.Default.Bool == nil {
+		p.Default = CreateVariableBool(false)
+	}
+	p.Variable = p.Default
+	if p.Shorthand == "" {
+		if persistent {
+			cmd.PersistentFlags().BoolVar(p.Variable.Bool, p.Name, *p.Default.Bool, p.Usage)
+		} else {
+			cmd.Flags().BoolVar(p.Variable.Bool, p.Name, *p.Default.Bool, p.Usage)
+		}
+	} else {
+		if persistent {
+			cmd.PersistentFlags().BoolVarP(p.Variable.Bool, p.Name, p.Shorthand, *p.Default.Bool, p.Usage)
+		} else {
+			cmd.Flags().BoolVarP(p.Variable.Bool, p.Name, p.Shorthand, *p.Default.Bool, p.Usage)
+		}
+	}
+}
+func (p *Parameter) AddIntFlag(cmd *cobra.Command, persistent bool) {
+	if p.Default.Int == nil {
+		p.Default = CreateVariableInt(0)
+	}
+	p.Variable = p.Default
+	if p.Shorthand == "" {
+		if persistent {
+			cmd.PersistentFlags().IntVar(p.Variable.Int, p.Name, *p.Default.Int, p.Usage)
+		} else {
+			cmd.Flags().IntVar(p.Variable.Int, p.Name, *p.Default.Int, p.Usage)
+		}
+	} else {
+		if persistent {
+			cmd.PersistentFlags().IntVarP(p.Variable.Int, p.Name, p.Shorthand, *p.Default.Int, p.Usage)
+		} else {
+			cmd.Flags().IntVarP(p.Variable.Int, p.Name, p.Shorthand, *p.Default.Int, p.Usage)
 		}
 	}
 }
 
 // Validates the variable with the given function
 // If choices are provided, the variable must be in the list of choices
-func (p *Parameter) Validate() bool {
-	if !p.ValidateFunc(p.Variable) {
-		return false
-	}
+func isValid(param *Parameter) bool {
+	return !param.Variable.IsNil() && param.ValidateFunc(param.Variable) && param.validateChoices()
+}
+
+func (p *Parameter) validateChoices() bool {
 	if p.Choices != nil && len(p.Choices) > 0 {
 		switch p.Type {
 		case "string":
@@ -133,28 +144,43 @@ func (p *Parameter) Validate() bool {
 	return true
 }
 
-// Validates the type of the variable
-func (p *Parameter) ValidateType() bool {
-	switch p.Type {
-	case "string":
-		return p.Variable.String != nil
-	case "bool", "optional":
-		return p.Variable.Bool != nil
-	case "int":
-		return p.Variable.Int != nil
-	default:
-		return false
-	}
-}
 func (p *Parameter) SetToDefault() {
 	if p.Variable.IsNil() {
 		p.Variable = p.Default
 	}
 }
 
+func (p *Parameter) SetLooseValue(key string, value string) error {
+	switch p.Type {
+	case "string":
+		p.Variable = CreateVariableString(value)
+	case "bool", "optional":
+		if value == "true" || value == "false" {
+			p.Variable = CreateVariableBool(value == "true")
+		} else {
+			fmt.Println("Invalid value for", key)
+		}
+	case "int":
+		// Convert string to int
+		asInt, err := strconv.Atoi(value)
+		if err != nil {
+			fmt.Println("Error converting string to int:", err)
+			return err
+		}
+		asIntVar := CreateVariableInt(asInt)
+		if p.ValidateFunc != nil && p.ValidateFunc(asIntVar) {
+			fmt.Println("Invalid value for", key)
+			return fmt.Errorf("Invalid value for %s", key)
+		}
+		p.Variable = CreateVariableInt(asInt)
+	}
+	return nil
+}
+
 func (p *Parameter) AskUser() error {
 	switch p.Type {
 	case "string":
+		// If choices are provided, use select prompt
 		if p.Choices != nil && len(p.Choices) > 0 {
 			choices := []string{}
 			for _, choice := range p.Choices {
@@ -165,17 +191,18 @@ func (p *Parameter) AskUser() error {
 				return err
 			}
 			p.Variable = CreateVariableString(result)
-		} else {
-			var defaultValue string
-			if p.Default.String != nil {
-				defaultValue = *p.Default.String
-			}
-			result, err := textPrompt(p, defaultValue)
-			if err != nil {
-				return err
-			}
-			p.Variable = CreateVariableString(result)
+			return nil
 		}
+		// Otherwise use text prompt
+		var defaultValue string
+		if p.Default.String != nil {
+			defaultValue = *p.Default.String
+		}
+		result, err := textPrompt(p, defaultValue)
+		if err != nil {
+			return err
+		}
+		p.Variable = CreateVariableString(result)
 	case "bool", "optional":
 		result, err := selectPrompt(p, []string{"true", "false"})
 		if err != nil {
@@ -209,31 +236,26 @@ func CreateVariableInt(value int) Variable {
 
 func textPrompt(param *Parameter, defaultValue string) (string, error) {
 	prompt := promptui.Prompt{
-		Label:   param.Usage,
-		Default: defaultValue,
-		Validate: func(input string) error {
-			switch param.Type {
-			case "string":
-				if param.ValidateFunc != nil && !param.ValidateFunc(CreateVariableString(input)) {
-					return fmt.Errorf("invalid input")
-				}
-			case "int":
-				asInt, err := strconv.Atoi(input)
-				if err != nil {
-					return fmt.Errorf("This is not a valid number")
-				}
-				if param.ValidateFunc != nil && !param.ValidateFunc(CreateVariableInt(asInt)) {
-					return fmt.Errorf("invalid input")
-				}
-			}
-			return nil
-		},
+		Label:    param.Usage,
+		Default:  defaultValue,
+		Validate: validateParamFunc(param),
 	}
 	result, err := prompt.Run()
 	if err != nil {
 		return "", fmt.Errorf("Prompt cancelled")
 	}
 	return result, nil
+}
+
+func validateParamFunc(param *Parameter) func(input string) error {
+	return func(input string) error {
+		current := param
+		current.SetLooseValue(param.Name, input)
+		if !isValid(current) {
+			return fmt.Errorf("Invalid value")
+		}
+		return nil
+	}
 }
 
 func selectPrompt(p *Parameter, choices []string) (string, error) {

@@ -91,21 +91,25 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Ask for the parameters
-	if !*defaultSettings.Variable.Bool {
-		err := config.GetParams().AskAll()
+	// Set parameters
+	if *defaultSettings.Variable.Bool {
+		// Extract and set values from args
+		extractedArgs := utils.ExtractArgs(args)
+		err = config.GetParams().SetLooseValues(extractedArgs)
 		if err != nil {
 			return err
 		}
-	} else {
 		// Set from default
 		err := config.GetParams().SetToDefaults()
 		if err != nil {
 			return err
 		}
-		// Extract and set values from args
-		extractedArgs := utils.ExtractArgs(args)
-		config.GetParams().SetLooseValues(extractedArgs)
+	} else {
+		//Set from user input
+		err := config.GetParams().AskAll()
+		if err != nil {
+			return err
+		}
 	}
 	// Validate parameters
 	err = config.GetParams().ValidateAll()

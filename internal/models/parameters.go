@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -38,7 +37,7 @@ func (p *Parameters) AddAsFlags(cmd *cobra.Command, persistent bool) {
 // Returns the name of the parameter that failed validation or an empty string if all parameters are valid
 func (p *Parameters) ValidateAll() error {
 	for key, param := range *p {
-		if !param.Validate() {
+		if !isValid(param) {
 			return fmt.Errorf("Invalid value for %s", key)
 		}
 	}
@@ -107,20 +106,8 @@ func (p *Parameters) ProcessOptionnalParams(interactive bool) error {
 		}
 		// Clean if false
 		if !*param.Variable.Bool {
-			// Remove all concerned parameters, except the optional one
-			for paramKey, _ := range *p {
-				if strings.HasPrefix(paramKey, optionalParam) && paramKey != optionalParam {
-					delete(*p, paramKey)
-				}
-			}
-			// Remove all concerned optional parameters
-			remain := []string{}
-			for _, key := range optionalParams {
-				if !strings.HasPrefix(key, optionalParam) && key != optionalParam {
-					remain = append(remain, key)
-				}
-			}
-			optionalParams = remain
+			p.cleanOptionatedParams(optionalParam)
+			optionalParams = filterRemainingOptionalParams(optionalParams, optionalParam)
 		} else {
 			delete(*p, optionalParam)
 		}
@@ -128,51 +115,50 @@ func (p *Parameters) ProcessOptionnalParams(interactive bool) error {
 	return nil
 }
 
-// Sets paramaters values to given values
-func (p *Parameters) SetValues(values map[string]*Variable) {
-	for key, value := range values {
-		if (*p)[key] != nil {
-			if (*p)[key].ValidateFunc != nil && !(*p)[key].ValidateFunc(*value) {
-				fmt.Println("Invalid value for", key)
-			} else {
-				(*p)[key].Variable = *value
-			}
+// Remove all concerned optional parameters
+func (p *Parameters) cleanOptionatedParams(optionalParam string) {
+	for paramKey, _ := range *p {
+		if strings.HasPrefix(paramKey, optionalParam) && paramKey != optionalParam {
+			delete(*p, paramKey)
 		}
 	}
 }
 
-func (p *Parameters) SetLooseValues(values map[string]string) {
-	p.ProcessOptionnalParams(false)
+// Remove all concerned optional parameters
+func filterRemainingOptionalParams(optionalParams []string, optionalParam string) []string {
+	remain := []string{}
+	for _, key := range optionalParams {
+		if !strings.HasPrefix(key, optionalParam) && key != optionalParam {
+			remain = append(remain, key)
+		}
+	}
+	return remain
+}
+
+// Sets paramaters values to given values
+func (p *Parameters) SetValues(values map[string]*Variable) any {
+	for key, value := range values {
+		if (*p)[key] == nil {
+			return nil
+		}
+		if (*p)[key].ValidateFunc != nil && !(*p)[key].ValidateFunc(*value) {
+			fmt.Println("Invalid value for", key)
+		} else {
+			(*p)[key].Variable = *value
+		}
+	}
+	return nil
+}
+
+func (p *Parameters) SetLooseValues(values map[string]string) error {
+
 	for key, value := range values {
 		if (*p)[key] != nil {
-			switch (*p)[key].Type {
-			case "string":
-				(*p)[key].Variable = CreateVariableString(value)
-			case "bool":
-				if value == "true" || value == "false" {
-					(*p)[key].Variable = CreateVariableBool(value == "true")
-				} else {
-					fmt.Println("Invalid value for", key)
-				}
-			case "int":
-				// Convert string to int
-				asInt, err := strconv.Atoi(value)
-				if err != nil {
-					fmt.Println("Error converting string to int:", err)
-				} else {
-					asIntVar := CreateVariableInt(asInt)
-					if (*p)[key].ValidateFunc != nil && !(*p)[key].ValidateFunc(asIntVar) {
-						fmt.Println("Invalid value for", key)
-					} else {
-						(*p)[key].Variable = CreateVariableInt(asInt)
-					}
-				}
-			case "optional":
-				fmt.Println("Changing optional parameter", key, "is not supported")
-				fmt.Println("Use `stamus-ctl compose init` to change optional blocks")
-			}
+			(*p)[key].SetLooseValue(key, value)
 		} else {
 			fmt.Println("You cannot set value for", key)
 		}
 	}
+
+	return nil
 }

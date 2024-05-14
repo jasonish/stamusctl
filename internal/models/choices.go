@@ -35,29 +35,18 @@ func getInterfaces() ([]Variable, error) {
 		"Did identify interfaces\n",
 	)
 
-	// alreadyHasBusybox, _ := docker.PullImageIfNotExisted("busybox")
 	_, err := docker.PullImageIfNotExisted("busybox")
 	if err != nil {
 		logging.SpinnerStop(s)
 		return nil, err
 	}
 
-	// log.Println("alreadyHasBusybox", alreadyHasBusybox)
-
 	output, _ := docker.RunContainer("busybox", []string{
 		"ls",
 		"/sys/class/net",
 	}, nil, "host")
 
-	// log.Println("output", output)
-
-	// if !alreadyHasBusybox {
-	// 	// logging.Sugar.Debug("busybox image was not previously installed, deleting.")
-	// 	docker.DeleteDockerImageByName("busybox")
-	// }
-
 	interfaces := strings.Split(output, "\n")
-	// log.Println("interfaces", interfaces)
 	interfaces = interfaces[:len(interfaces)-1]
 	for i, in := range interfaces {
 		in = strings.TrimFunc(in, unicode.IsControl)
