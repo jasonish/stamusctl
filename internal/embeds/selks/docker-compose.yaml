@@ -56,7 +56,7 @@ services:
       - xpack.ml.enabled={{.MLEnabled}}
       - ingest.geoip.downloader.enabled=false
     volumes:
-      - {{.elk.elastic.path}}:/usr/share/elasticsearch/data
+      - elastic-data:/usr/share/elasticsearch/data
     mem_limit: {{.elk.elastic.memory | default "3G"}}
     ulimits:
       memlock:
@@ -112,7 +112,7 @@ services:
       scirius:
         condition: service_healthy
     environment:
-      - SURICATA_OPTIONS={{.InterfacesList}} -vvv --set sensor-name=suricata
+      - SURICATA_OPTIONS= -i {{.InterfacesList}} -vvv --set sensor-name=suricata
     cap_add:
       - NET_ADMIN
       - SYS_NICE
@@ -126,8 +126,8 @@ services:
 
   scirius:
     container_name: scirius
-    image: {{.Registry}}/scirius:{{.SciriusVersion}}
-    restart: {{.RestartMode}}
+    image: {{.Registry | default "ghcr.io/stamusnetworks"}}/scirius:{{.SciriusVersion | default "master"}}
+    restart: {{.RestartMode | default "unless-stopped"}}
     environment:
       - SECRET_KEY={{.SciriusToken}}
       - DEBUG={{.DebugMode}}
