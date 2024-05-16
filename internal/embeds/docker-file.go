@@ -4,5 +4,5 @@ import (
 	_ "embed"
 )
 
-//go:embed config/docker-compose.yaml
+//go:embed selks/docker-compose.yaml
 var DockerFile string

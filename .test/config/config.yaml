@@ -1,0 +1,11 @@
+includes:
+  - websocket/config.yaml
+
+nginx:
+  type: optional
+  usage: Enable Nginx
+  default: true
+  image:
+    type: string
+    usage: Nginx imaghe to use
+    default: nginx:1.14.2-alpine

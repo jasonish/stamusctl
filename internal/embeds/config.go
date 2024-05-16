@@ -7,13 +7,11 @@ import (
 	"strings"
 )
 
-//go:embed config/*
+//go:embed selks/*
 var AllConf embed.FS
-var base string = "config"
 
-func Extract() error {
-	outputFolder := ".configs/selks/embedded"
-	files := getAllFiles(base)
+func ExtractEmbedTo(embed string, outputFolder string) error {
+	files := getAllFiles(embed)
 
 	for _, file := range files {
 		data, err := AllConf.ReadFile(file)
@@ -36,6 +34,7 @@ func getAllFiles(inputFolder string) []string {
 	var files []string
 	entries, err := AllConf.ReadDir(inputFolder)
 	if err != nil {
+		log.Println("Error reading dir", inputFolder)
 		log.Fatal(err)
 	}
 	for _, entry := range entries {

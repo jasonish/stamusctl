@@ -167,11 +167,6 @@ func (p *Parameter) SetLooseValue(key string, value string) error {
 			fmt.Println("Error converting string to int:", err)
 			return err
 		}
-		asIntVar := CreateVariableInt(asInt)
-		if p.ValidateFunc != nil && p.ValidateFunc(asIntVar) {
-			fmt.Println("Invalid value for", key)
-			return fmt.Errorf("Invalid value for %s", key)
-		}
 		p.Variable = CreateVariableInt(asInt)
 	}
 	return nil
@@ -250,7 +245,10 @@ func textPrompt(param *Parameter, defaultValue string) (string, error) {
 func validateParamFunc(param *Parameter) func(input string) error {
 	return func(input string) error {
 		current := param
-		current.SetLooseValue(param.Name, input)
+		err := current.SetLooseValue(param.Name, input)
+		if err != nil {
+			return err
+		}
 		if !isValid(current) {
 			return fmt.Errorf("Invalid value")
 		}

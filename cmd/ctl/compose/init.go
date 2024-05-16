@@ -12,6 +12,10 @@ import (
 	"stamus-ctl/internal/utils"
 )
 
+// Constants
+const outputFolder = ".configs/selks/embedded"
+const embed string = "selks"
+
 // Flags
 var output = models.Parameter{
 	Name:      "folder",
@@ -68,7 +72,7 @@ func initSelksFolder(path string) {
 		panic(err)
 	}
 	if !selksConfigExist {
-		err = embeds.Extract()
+		err = embeds.ExtractEmbedTo(embed, outputFolder)
 		if err != nil {
 			panic(err)
 		}

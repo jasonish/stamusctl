@@ -1,0 +1,12 @@
+websocket:
+  type: optional
+  usage: Enable websocket server
+  default: true
+  response:
+    type: string
+    usage: Response to ping
+    default: pong
+  port:
+    type: int
+    usage: Port to listen on internally
+    default: 8080
