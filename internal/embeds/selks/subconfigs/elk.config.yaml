@@ -5,6 +5,9 @@ elk:
     name: elk-version
     default: 7.16.1
   elastic:
+    type: optional
+    usage: Enable Elastic instance ?
+    default: true
     path:
       type: string
       usage: Path where Elastic data will be stored
@@ -15,6 +18,10 @@ elk:
       usage: Memory limit for Elastic
       name: elastic-memory
       default: 3G
+    ml:
+      type: bool
+      usage: Enable or disable Machine Learning
+      default: false
   logstash:
     type: optional
     usage: Enable Logstash instance ?
@@ -24,3 +31,12 @@ elk:
       usage: Memory limit for Logstash
       name: logstash-memory
       default: 3G
+  kibana:
+    type: optional
+    usage: Enable Kibana instance ?
+    default: true
+    version:
+      type: string
+      usage: Kibana version to install
+      name: kibana-version
+      default: 7.16.1

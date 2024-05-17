@@ -17,6 +17,9 @@ func ImageName(image image.Summary) string {
 		return "none"
 	}
 	if len(image.RepoDigests) == 0 {
+		if len(image.RepoTags) == 0 {
+			return ""
+		}
 		return image.RepoTags[0]
 	}
 	return strings.Split(image.RepoDigests[0], "@")[0]
