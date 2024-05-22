@@ -60,7 +60,7 @@ build cli:
 
 build test:
     image: golang:alpine
-    stage: builds
+    stage: build
     artifacts:
         expire_in: 1 day
         paths:
