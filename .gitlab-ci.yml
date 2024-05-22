@@ -99,6 +99,9 @@ e2e compose init default:
         - build test
     script:
         - |
+            ls -la
+            ls -la ./outputs
+            ls -la ./cli
             ./cli/stamusctl init --default
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default
