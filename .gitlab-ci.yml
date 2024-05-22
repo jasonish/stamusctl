@@ -58,6 +58,23 @@ build cli:
             make cli
             mv dist/stamusctl .
 
+build test:
+    image: golang:alpine
+    stage: builds
+    artifacts:
+        expire_in: 1 day
+        paths:
+            - outputs
+            - cli
+    script:
+        - |
+            apk add --no-cache gcc musl-dev make
+            chmod +x $(pwd)/scripts/move.sh
+            $(pwd)/scripts/move.sh
+            make test-cli
+            mv .test/outputs outputs
+            mv dist/stamusctl cli
+
 test cli:
     image: busybox
     stage: test
@@ -67,7 +84,7 @@ test cli:
         - |
             ./stamusctl
 
-ut:
+unit tests:
     image: golang:alpine
     stage: test
     script:
@@ -75,12 +92,14 @@ ut:
             apk add --no-cache gcc musl-dev make
             make test
 
-
-test:
-    image: golang:alpine
+e2e compose init default:
+    image: busybox
     stage: test
+    dependencies:
+        - build test
     script:
         - |
-            echo $(pwd)
-            echo $(ls -a)
-            scripts/move.sh
+            ./cli/stamusctl init --default
+            chmod +x $(pwd)/scripts/compare.sh
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default
+            
