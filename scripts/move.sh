@@ -1,8 +1,10 @@
-#!/bin/bash
+
+echo "Running move.sh"
 
 # Define source and destination directories
-SOURCE_DIR="/.test/config"
-DEST_DIR="/internal/embeds/selks"
+SOURCE_DIR=$PWD"/.test/config"
+DEST_DIR=$PWD"/internal/embeds/selks"
+
 
 # Check if the source directory exists
 if [ -d "$SOURCE_DIR" ]; then
@@ -18,7 +20,10 @@ if [ ! -d "$DEST_DIR" ]; then
     mkdir -p "$DEST_DIR"
 fi
 
-# Move the folder from source to destination
+# Remove the destination directory
+rm -rf "$DEST_DIR"
+
+# Move the source directory to the destination
 mv "$SOURCE_DIR" "$DEST_DIR"
 
 # Check if the move was successful
@@ -28,3 +33,4 @@ else
     echo "Failed to move $SOURCE_DIR to $DEST_DIR"
     exit 1
 fi
+
