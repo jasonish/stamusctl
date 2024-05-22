@@ -99,7 +99,7 @@ e2e compose init default:
         - build test
     script:
         - |
-            ./cli init --default
+            ./cli compose init --default
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default
             
