@@ -1,0 +1,6 @@
+nginx:
+    image: nginx:1.14.2-alpine
+stamusconfig: tmp
+websocket:
+    port: 8080
+    response: pong
