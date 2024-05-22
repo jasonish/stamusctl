@@ -8,6 +8,7 @@ import (
 
 var (
 	Name = ""
+	Mode = "prod"
 )
 
 const (
@@ -30,5 +31,9 @@ func init() {
 	Name = filepath.Base(os.Args[0])
 	if val := os.Getenv(binaryNameEnv); val != "" {
 		Name = val
+	}
+
+	if val := os.Getenv("BUILD_MODE"); val != "" {
+		Mode = val
 	}
 }

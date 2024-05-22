@@ -3,6 +3,11 @@ package models
 import (
 	"io/ioutil"
 	"log"
+	"stamus-ctl/internal/app"
+	"stamus-ctl/internal/docker"
+	"stamus-ctl/internal/logging"
+	"strings"
+	"unicode"
 )
 
 func GetChoices(name string) ([]Variable, error) {
@@ -27,6 +32,14 @@ func GetChoices(name string) ([]Variable, error) {
 }
 
 func getInterfaces() ([]Variable, error) {
+	if app.Mode == "prod" {
+		return getInterfacesBusybox()
+	} else {
+		return getInterfacesHost()
+	}
+}
+
+func getInterfacesHost() ([]Variable, error) {
 	// Define the directory where network interfaces are listed
 	netDir := "/sys/class/net"
 
@@ -42,4 +55,40 @@ func getInterfaces() ([]Variable, error) {
 		interfaces = append(interfaces, CreateVariableString(file.Name()))
 	}
 	return interfaces, nil
+}
+
+func getInterfacesBusybox() ([]Variable, error) {
+	s := logging.NewSpinner(
+		"Identifying interfaces",
+		"Did identify interfaces\n",
+	)
+
+	_, err := docker.PullImageIfNotExisted("busybox")
+	if err != nil {
+		logging.SpinnerStop(s)
+		return nil, err
+	}
+
+	output, _ := docker.RunContainer("busybox", []string{
+		"ls",
+		"/sys/class/net",
+	}, nil, "host")
+
+	interfaces := strings.Split(output, "\n")
+	interfaces = interfaces[:len(interfaces)-1]
+	for i, in := range interfaces {
+		in = strings.TrimFunc(in, unicode.IsControl)
+		interfaces[i] = in
+	}
+	logging.Sugar.Debugw("detected interfaces.", "interfaces", interfaces)
+
+	interfacesVariables := []Variable{}
+	for _, in := range interfaces {
+		if in != "" {
+			interfacesVariables = append(interfacesVariables, CreateVariableString(in))
+		}
+	}
+
+	logging.SpinnerStop(s)
+	return interfacesVariables, nil
 }
