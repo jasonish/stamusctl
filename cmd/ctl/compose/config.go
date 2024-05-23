@@ -112,12 +112,13 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	// Extract and set parameters from args
 	paramsArgs := utils.ExtractArgs(args)
 	config.GetParams().SetLooseValues(paramsArgs)
-	err = config.GetParams().ValidateAll()
+	// Set from default
+	err = config.GetParams().SetToDefaults()
 	if err != nil {
 		return err
 	}
-	// Set from default
-	err = config.GetParams().SetToDefaults()
+	// Validate
+	err = config.GetParams().ValidateAll()
 	if err != nil {
 		return err
 	}
