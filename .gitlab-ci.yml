@@ -92,7 +92,7 @@ unit tests:
             apk add --no-cache gcc musl-dev make
             make test
 
-e2e compose init default:
+compose init default:
     image: busybox
     stage: test
     dependencies:
@@ -102,4 +102,27 @@ e2e compose init default:
             ./cli compose init --default
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default
+
+compose init default set:
+    image: busybox
+    stage: test
+    dependencies:
+        - build test
+    script:
+        - |
+            ./cli compose init --default websocket.port=8081
+            chmod +x $(pwd)/scripts/compare.sh
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default-set
+
+compose config set:
+    image: busybox
+    stage: test
+    dependencies:
+        - build test
+    script:
+        - |
+            ./cli compose init --default 
+            ./cli compose config set websocket.port=8081
+            chmod +x $(pwd)/scripts/compare.sh
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default-set
             

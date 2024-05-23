@@ -120,12 +120,12 @@ func (p *Parameter) AddIntFlag(cmd *cobra.Command, persistent bool) {
 
 // Validates the variable with the given function
 // If choices are provided, the variable must be in the list of choices
-func isValid(param *Parameter) bool {
-	return !param.Variable.IsNil() && param.ValidateFunc(param.Variable) && param.validateChoices()
+func (p *Parameter) isValid() bool {
+	return !p.Variable.IsNil() && p.ValidateFunc(p.Variable) && p.validateChoices()
 }
 
 func (p *Parameter) validateChoices() bool {
-	if p.Choices != nil && len(p.Choices) > 0 {
+	if len(p.Choices) > 0 {
 		switch p.Type {
 		case "string":
 			asStrings := []string{}
@@ -249,7 +249,7 @@ func validateParamFunc(param *Parameter) func(input string) error {
 		if err != nil {
 			return err
 		}
-		if !isValid(current) {
+		if !current.isValid() {
 			return fmt.Errorf("Invalid value")
 		}
 		return nil

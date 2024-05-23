@@ -2,5 +2,5 @@ nginx:
     image: nginx:1.14.2-alpine
 stamusconfig: .configs/selks/embedded
 websocket:
-    port: 8080
+    port: 8081
     response: pong

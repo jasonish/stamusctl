@@ -63,6 +63,7 @@ func LoadConfigFrom(path file) (*Config, error) {
 	}
 	// Merge
 	originConf.parameters.SetValues(values)
+	originConf.parameters.ProcessOptionnalParams(false)
 	return originConf, nil
 }
 
@@ -281,7 +282,7 @@ func (f *Config) saveParamsTo(dest file) error {
 		paramsValues[key] = value
 	}
 	// Set the new values
-	conf.viperInstance.Set("stamusconfig", conf.file.Path)
+	conf.viperInstance.Set("stamusconfig", f.file.Path)
 	for key, value := range paramsValues {
 		conf.viperInstance.Set(key, value)
 	}

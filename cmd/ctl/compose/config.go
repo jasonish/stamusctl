@@ -116,6 +116,11 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	// Set from default
+	err = config.GetParams().SetToDefaults()
+	if err != nil {
+		return err
+	}
 	// Save the configuration
 	outputAsString := *output.Variable.String
 	outputAsFile, err := models.CreateFileInstance(outputAsString, "config.yaml")

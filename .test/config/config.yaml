@@ -7,5 +7,5 @@ nginx:
   default: true
   image:
     type: string
-    usage: Nginx imaghe to use
+    usage: Nginx image to use
     default: nginx:1.14.2-alpine

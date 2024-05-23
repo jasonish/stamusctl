@@ -37,7 +37,7 @@ func (p *Parameters) AddAsFlags(cmd *cobra.Command, persistent bool) {
 // Returns the name of the parameter that failed validation or an empty string if all parameters are valid
 func (p *Parameters) ValidateAll() error {
 	for key, param := range *p {
-		if !isValid(param) {
+		if !param.isValid() {
 			return fmt.Errorf("Invalid value for %s", key)
 		}
 	}
@@ -141,7 +141,7 @@ func (p *Parameters) SetValues(values map[string]*Variable) any {
 		if (*p)[key] == nil {
 			return nil
 		}
-		if (*p)[key].ValidateFunc != nil && !(*p)[key].ValidateFunc(*value) {
+		if !(*p)[key].ValidateFunc(*value) {
 			fmt.Println("Invalid value for", key)
 		} else {
 			(*p)[key].Variable = *value
@@ -151,7 +151,6 @@ func (p *Parameters) SetValues(values map[string]*Variable) any {
 }
 
 func (p *Parameters) SetLooseValues(values map[string]string) error {
-
 	for key, value := range values {
 		if (*p)[key] != nil {
 			(*p)[key].SetLooseValue(key, value)
