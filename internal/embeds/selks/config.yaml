@@ -11,7 +11,7 @@ globals:
   volumepath:
     type: string
     usage: Path where data will be stored
-    default: ./containers-data
+    default: "."
 
 suricata:
   interfaces:

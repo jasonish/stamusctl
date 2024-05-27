@@ -40,6 +40,7 @@ volumes:
   arkime-pcap:
   arkime-config:
   {{- end }}
+  db-data:
 
 
 services:
