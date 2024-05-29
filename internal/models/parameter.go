@@ -132,13 +132,21 @@ func (p *Parameter) validateChoices() bool {
 			for _, choice := range p.Choices {
 				asStrings = append(asStrings, *choice.String)
 			}
-			return slices.Contains(asStrings, *p.Variable.String)
+			isOk := slices.Contains(asStrings, *p.Variable.String)
+			if !isOk {
+				fmt.Println("Error: Must be one of:", asStrings)
+			}
+			return isOk
 		case "int":
 			asInts := []int{}
 			for _, choice := range p.Choices {
 				asInts = append(asInts, *choice.Int)
 			}
-			return slices.Contains(asInts, *p.Variable.Int)
+			isOk := slices.Contains(asInts, *p.Variable.Int)
+			if !isOk {
+				fmt.Println("Error: Must be one of:", asInts)
+			}
+			return isOk
 		}
 	}
 	return true

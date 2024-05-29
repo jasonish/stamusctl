@@ -20,6 +20,7 @@ const defaultConfPath = ".configs/selks/embedded/"
 
 type Config struct {
 	file          file
+	arbitrary     map[string]string
 	parameters    *Parameters
 	viperInstance *viper.Viper
 }
@@ -65,6 +66,10 @@ func LoadConfigFrom(path file) (*Config, error) {
 	originConf.parameters.SetValues(values)
 	originConf.parameters.ProcessOptionnalParams(false)
 	return originConf, nil
+}
+
+func (f *Config) SetArbitrary(arbitrary map[string]string) {
+	f.arbitrary = arbitrary
 }
 
 // Return list of config files to include and list of parameters for current config
@@ -201,8 +206,9 @@ func (f *Config) CopyToPath(dest string) error {
 }
 
 func (f *Config) SaveConfigTo(dest file) error {
-	// Get flat map of parameters and convert to nested map
+	// Create config value map
 	var data = map[string]any{}
+	var configData = map[string]any{}
 	for key, param := range *f.parameters {
 		value, err := param.GetValue()
 		if err != nil {
@@ -210,6 +216,13 @@ func (f *Config) SaveConfigTo(dest file) error {
 			fmt.Printf("Use %s=<your value> to set it\n", key)
 			return err
 		}
+		configData[key] = value
+	}
+	// Merge with arbitrary config values and cerate a nested map
+	for key, value := range f.arbitrary {
+		data[key] = value
+	}
+	for key, value := range configData {
 		data[key] = value
 	}
 	data = nestMap(data)

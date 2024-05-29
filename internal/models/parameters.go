@@ -154,8 +154,6 @@ func (p *Parameters) SetLooseValues(values map[string]string) error {
 	for key, value := range values {
 		if (*p)[key] != nil {
 			(*p)[key].SetLooseValue(key, value)
-		} else {
-			fmt.Println("You cannot set value for", key)
 		}
 	}
 

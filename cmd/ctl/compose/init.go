@@ -100,6 +100,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		// Extract and set values from args
 		extractedArgs := utils.ExtractArgs(args)
 		err = config.GetParams().SetLooseValues(extractedArgs)
+		config.SetArbitrary(extractedArgs)
 		if err != nil {
 			return err
 		}
