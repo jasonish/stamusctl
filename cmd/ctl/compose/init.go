@@ -19,7 +19,7 @@ const embed string = "selks"
 // Flags
 var output = models.Parameter{
 	Name:      "folder",
-	Shorthand: "f",
+	Shorthand: "F",
 	Type:      "string",
 	Default:   models.CreateVariableString("tmp"),
 	Usage:     "Declare the folder where to save configuration files",

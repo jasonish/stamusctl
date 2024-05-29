@@ -127,8 +127,19 @@ func processTemplates(inputFolder string, outputFolder string, data map[string]i
 		}
 		defer destFile.Close()
 
-		return tmpl.Execute(destFile, data)
+		err = tmpl.Execute(destFile, data)
+		if err != nil {
+			return err
+		}
 
+		if filepath.Ext(path) == ".sh" {
+			err = os.Chmod(destPath, 0755)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
 	})
 	if err != nil {
 		return err

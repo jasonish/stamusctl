@@ -24,11 +24,10 @@ func Execute() {
 
 // Flags
 var verbose = models.Parameter{
-	Name:      "verbose",
-	Shorthand: "v",
-	Type:      "int",
-	Default:   models.CreateVariableInt(0),
-	Usage:     "Verbosity level",
+	Name:    "verbose",
+	Type:    "int",
+	Default: models.CreateVariableInt(0),
+	Usage:   "Verbosity level",
 }
 
 // Commands
