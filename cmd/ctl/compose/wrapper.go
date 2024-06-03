@@ -31,7 +31,7 @@ var composeFlags = ComposeFlags{
 // Commands
 func wrappedCmd() []*cobra.Command {
 	// Docker stuff
-	if plugin.RunningStandalone() {
+	if plugin.RunningStandalone() && len(os.Args) > 2 && os.Args[1] == "compose" {
 		os.Args = append([]string{"docker"}, compatibility.Convert(os.Args[2:])...)
 	}
 	// Create docker client
