@@ -70,7 +70,7 @@ func (p *Parameters) SetToDefaults() error {
 	}
 	// Set all parameters to their default values
 	for _, param := range *p {
-		if param.Type != "optional" {
+		if param.Type != "optional" && param.Variable.IsNil() {
 			param.SetToDefault()
 		}
 	}
@@ -147,7 +147,7 @@ func filterRemainingOptionalParams(optionalParams []string, optionalParam string
 func (p *Parameters) SetValues(values map[string]*Variable) any {
 	for key, value := range values {
 		if (*p)[key] == nil {
-			return nil
+			continue
 		}
 		if !(*p)[key].ValidateFunc(*value) {
 			fmt.Println("Invalid value for", key)

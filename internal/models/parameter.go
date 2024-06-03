@@ -28,8 +28,31 @@ type Variable struct {
 	Int    *int
 }
 
+func asLooseTyped(value string) any {
+	if value == "true" || value == "false" {
+		return value == "true"
+	}
+	asInt, err := strconv.Atoi(value)
+	if err != nil {
+		return value
+	}
+	return asInt
+}
+
 func (v *Variable) IsNil() bool {
 	return v.String == nil && v.Bool == nil && v.Int == nil
+}
+func (v *Variable) asString() string {
+	if v.String != nil {
+		return *v.String
+	}
+	if v.Bool != nil {
+		return strconv.FormatBool(*v.Bool)
+	}
+	if v.Int != nil {
+		return strconv.Itoa(*v.Int)
+	}
+	return ""
 }
 
 func (p *Parameter) GetValue() (any, error) {

@@ -20,7 +20,7 @@ const defaultConfPath = ".configs/selks/embedded/"
 
 type Config struct {
 	file          file
-	arbitrary     map[string]string
+	arbitrary     map[string]any
 	parameters    *Parameters
 	viperInstance *viper.Viper
 }
@@ -35,6 +35,7 @@ func NewConfigFrom(file file) (*Config, error) {
 	conf := Config{
 		file:          file,
 		viperInstance: viperInstance,
+		arbitrary:     make(map[string]any),
 	}
 	return &conf, nil
 }
@@ -75,7 +76,9 @@ func LoadConfigFrom(path file, reload bool) (*Config, error) {
 }
 
 func (f *Config) SetArbitrary(arbitrary map[string]string) {
-	f.arbitrary = arbitrary
+	for key, value := range arbitrary {
+		f.arbitrary[key] = asLooseTyped(value)
+	}
 }
 
 // Return list of config files to include and list of parameters for current config
@@ -301,6 +304,9 @@ func (f *Config) saveParamsTo(dest file) error {
 		paramsValues[key] = value
 	}
 	// Set the new values
+	for key, value := range f.arbitrary {
+		conf.viperInstance.Set(key, value)
+	}
 	conf.viperInstance.Set("stamusconfig", f.file.Path)
 	for key, value := range paramsValues {
 		conf.viperInstance.Set(key, value)

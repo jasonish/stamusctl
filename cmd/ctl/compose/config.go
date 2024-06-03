@@ -112,6 +112,7 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	// for _, param := range config.GetParams().
 	// Set from default
 	err = config.GetParams().SetToDefaults()
 	if err != nil {
