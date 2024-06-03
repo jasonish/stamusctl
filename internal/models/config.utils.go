@@ -72,6 +72,20 @@ func isDirEmpty(name string) (bool, error) {
 	return false, err // Either not empty or error, suits both cases
 }
 
+func getAllFiles(folderPath string, extension string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && filepath.Ext(path) == extension {
+			files = append(files, path)
+		}
+		return nil
+	})
+	return files, err
+}
+
 // Nests a flat map into a nested map
 func nestMap(input map[string]interface{}) map[string]interface{} {
 	output := make(map[string]interface{})
@@ -98,8 +112,13 @@ func nestMap(input map[string]interface{}) map[string]interface{} {
 }
 
 func processTemplates(inputFolder string, outputFolder string, data map[string]interface{}) error {
+	tpls, err := getAllFiles(inputFolder, ".tpl")
+	if err != nil {
+		return err
+	}
+
 	// Walk the source directory and process templates
-	err := filepath.Walk(inputFolder, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(inputFolder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -115,7 +134,7 @@ func processTemplates(inputFolder string, outputFolder string, data map[string]i
 			return os.MkdirAll(destPath, info.Mode())
 		}
 
-		tmpl, err := template.New(filepath.Base(path)).Funcs(sprig.FuncMap()).ParseFiles(path)
+		tmpl, err := template.New(filepath.Base(path)).Funcs(sprig.FuncMap()).ParseFiles(append([]string{path}, tpls...)...)
 		if err != nil {
 			fmt.Println("Error parsing template", path, err)
 			return err
