@@ -1,28 +1,20 @@
 services:
-  
   nginx:
-    image: nginx:1.14.2-alpine
+    image:nginx:1.14.2-alpine
     container_name: nginx
     restart: always
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d/
     ports:
       - 80:80
-  
     depends_on:
       - websocket
-  
-  
-
-  
   websocket:
     container_name: websocket
     environment:
-      - WEBSOCKET_PORT=8081
+      - WEBSOCKET_PORT=6969
       - RESPONSE=pong
     restart: always
-    
     build:
       context: ./websocket
       dockerfile: Dockerfile
-  

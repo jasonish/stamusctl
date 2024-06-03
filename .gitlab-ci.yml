@@ -92,27 +92,49 @@ unit tests:
             apk add --no-cache gcc musl-dev make
             make test
 
-compose init default:
+compose init:
     image: busybox
     stage: test
     dependencies:
         - build test
     script:
         - |
-            ./cli compose init --default
+            ./cli compose init --default nginx.exec=nginx
             chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
 
-compose init default set:
+compose init set:
     image: busybox
     stage: test
     dependencies:
         - build test
     script:
         - |
-            ./cli compose init --default websocket.port=8081
+            ./cli compose init --default nginx.exec=nginx websocket.response=lel
             chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default-set
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
+
+compose init optional:
+    image: busybox
+    stage: test
+    dependencies:
+        - build test
+    script:
+        - |
+            ./cli compose init --default nginx=false
+            chmod +x $(pwd)/scripts/compare.sh
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-optional
+
+compose init arbitrary:
+    image: busybox
+    stage: test
+    dependencies:
+        - build test
+    script:
+        - |
+            ./cli compose init --default nginx.exec=nginx websocket.port=6969
+            chmod +x $(pwd)/scripts/compare.sh
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-arbitrary
 
 compose config set:
     image: busybox
@@ -121,8 +143,21 @@ compose config set:
         - build test
     script:
         - |
-            ./cli compose init --default 
-            ./cli compose config set websocket.port=8081
+            ./cli compose init --default nginx.exec=nginx
+            ./cli compose config set websocket.response=lel
             chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-default-set
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
+
+compose config reload:
+    image: busybox
+    stage: test
+    dependencies:
+        - build test
+    script:
+        - |
+            ./cli compose init --default nginx.exec=nginx
+            ./cli compose config set websocket.port=6969
+            ./cli compose config set --reload
+            chmod +x $(pwd)/scripts/compare.sh
+            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
             

@@ -1,6 +1,6 @@
 nginx:
+    exec: nginx
     image: nginx:1.14.2-alpine
 stamusconfig: .configs/selks/embedded
 websocket:
-    port: 8081
-    response: pong
+    response: lel
