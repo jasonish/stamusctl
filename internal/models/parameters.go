@@ -77,6 +77,14 @@ func (p *Parameters) SetToDefaults() error {
 	return nil
 }
 
+func (p *Parameters) GetValues() map[string]string {
+	values := make(map[string]string)
+	for key, param := range *p {
+		values[key] = param.Variable.asString()
+	}
+	return values
+}
+
 func (p *Parameters) ProcessOptionnalParams(interactive bool) error {
 	// Filter optional parameters
 	optionalParams := []string{}

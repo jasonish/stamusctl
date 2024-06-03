@@ -27,6 +27,7 @@ var format = models.Parameter{
 	Type:    "string",
 	Default: models.CreateVariableString("{{.}}"),
 }
+var reload bool = false
 
 // Commands
 func configCmd() *cobra.Command {
@@ -66,6 +67,8 @@ func setCmd() *cobra.Command {
 			return setHandler(cmd, args)
 		},
 	}
+	cmd.Flags().BoolVar(&reload, "reload", false, "Reload the configuration file")
+	cmd.Flags().MarkHidden("reload")
 	return cmd
 }
 
@@ -105,7 +108,7 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	config, err := models.LoadConfigFrom(inputAsFile)
+	config, err := models.LoadConfigFrom(inputAsFile, reload)
 	if err != nil {
 		return err
 	}

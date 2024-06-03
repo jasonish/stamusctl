@@ -39,7 +39,7 @@ func NewConfigFrom(file file) (*Config, error) {
 	return &conf, nil
 }
 
-func LoadConfigFrom(path file) (*Config, error) {
+func LoadConfigFrom(path file, reload bool) (*Config, error) {
 	// Load the config
 	configured, err := NewConfigFrom(path)
 	if err != nil {
@@ -61,6 +61,12 @@ func LoadConfigFrom(path file) (*Config, error) {
 	_, _, err = originConf.ExtractParams(true)
 	if err != nil {
 		return nil, err
+	}
+	// Set arbitrary
+	if !reload {
+		for key, value := range values {
+			originConf.SetArbitrary(map[string]string{key: value.asString()})
+		}
 	}
 	// Merge
 	originConf.parameters.SetValues(values)
