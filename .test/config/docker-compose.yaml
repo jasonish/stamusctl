@@ -1,31 +1,31 @@
 services:
-  {{if .nginx}}
+  {{- if .nginx}}
   nginx:
-    image: {{.nginx.image}}
+    image: {{- .nginx.image}}
     container_name: nginx
     restart: always
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d/
     ports:
       - 80:80
-  {{if .websocket}}
+  {{- if .websocket}}
     depends_on:
       - websocket
-  {{end}}
-  {{end}}
+  {{- end}}
+  {{- end}}
 
-  {{if .websocket}}
+  {{- if .websocket}}
   websocket:
     container_name: websocket
     environment:
-      - WEBSOCKET_PORT={{.websocket.port}}
-      - RESPONSE={{.websocket.response}}
+      - WEBSOCKET_PORT={{- template "websocketport" .}}
+      - RESPONSE={{- .websocket.response}}
     restart: always
-    {{if not .nginx}}
+    {{- if not .nginx}}
     ports:
-      - 80:{{.websocket.port}}
-    {{end}}
+      - 80:{{- template "websocketport" .}}
+    {{- end}}
     build:
       context: ./websocket
       dockerfile: Dockerfile
-  {{end}}
+  {{- end}}

@@ -9,3 +9,7 @@ nginx:
     type: string
     usage: Nginx image to use
     default: nginx:1.14.2-alpine
+  exec:
+    type: string
+    usage: Nginx exec type
+    choices: nginx
