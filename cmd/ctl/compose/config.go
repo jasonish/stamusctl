@@ -2,11 +2,12 @@ package compose
 
 import (
 	// Common
-	"fmt"
-	"io/ioutil"
-	"os"
 
 	// External
+
+	"fmt"
+	"strings"
+
 	"github.com/spf13/cobra"
 	// Custom
 	"stamus-ctl/internal/models"
@@ -16,7 +17,7 @@ import (
 // Flags
 var input = models.Parameter{
 	Name:      "folder",
-	Shorthand: "f",
+	Shorthand: "F",
 	Usage:     "Declare the folder where the configuration files are saved",
 	Type:      "string",
 	Default:   models.CreateVariableString("tmp"),
@@ -36,7 +37,7 @@ func configCmd() *cobra.Command {
 		Use:   "config",
 		Short: "Interact with compose config file",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return getHandler(cmd)
+			return getHandler(cmd, args)
 		},
 	}
 	// Flags
@@ -51,22 +52,31 @@ func configCmd() *cobra.Command {
 // Subcommands
 func getCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get",
+		Use:   "get [keys...]",
 		Short: "Get compose config file parameters values",
+		Long: `Get compose config file parameters values
+Input the keys of parameters to get
+Example: get scirius`,
+		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return getHandler(cmd)
+			return getHandler(cmd, args)
 		},
 	}
+	input.AddAsFlag(cmd, false)
 	return cmd
 }
 func setCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set",
+		Use:   "set [keys=values...]",
 		Short: "Set compose config file parameters",
+		Long: `Set compose config file parameters
+Input keys and values of parameters to set.
+Example: set scirius.token=AwesomeToken`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return setHandler(cmd, args)
 		},
 	}
+	input.AddAsFlag(cmd, false)
 	cmd.Flags().BoolVar(&reload, "reload", false, "Reload the configuration file")
 	cmd.Flags().MarkHidden("reload")
 	return cmd
@@ -79,22 +89,62 @@ func init() {
 }
 
 // Handlers
-func getHandler(cmd *cobra.Command) error {
-	// Read the file content
+func getHandler(cmd *cobra.Command, args []string) error {
+	// Load the config
 	value, err := input.GetValue()
 	if err != nil {
 		return err
 	}
-	content, err := ioutil.ReadFile(fmt.Sprintf("%s/config.yaml", value.(string)))
+	inputAsString := value.(string)
+	inputAsFile, err := models.CreateFileInstance(inputAsString, "config.yaml")
 	if err != nil {
-		fmt.Println("Error reading file:", err)
-		os.Exit(1)
+		return err
+	}
+	config, err := models.LoadConfigFrom(inputAsFile, reload)
+	if err != nil {
+		return err
 	}
 
-	// Print the content to the terminal
-	fmt.Println(string(content))
+	// Print the config
+	printConfig(config, args)
 
 	return nil
+}
+
+func printConfig(config *models.Config, args []string) {
+	// Print the config
+	values := config.GetParams().GetValues(args...)
+	groupedValues := make(map[string]interface{})
+	for _, param := range config.GetParams().GetOrdered() {
+		if value, ok := values[param]; ok {
+			parts := strings.Split(param, ".")
+			addToGroup(parts, value, groupedValues)
+		}
+	}
+	printGroupedValues(groupedValues, "")
+}
+
+func addToGroup(parts []string, value string, group map[string]interface{}) {
+	if len(parts) == 1 {
+		group[parts[0]] = value
+	} else {
+		if _, ok := group[parts[0]]; !ok {
+			group[parts[0]] = make(map[string]interface{})
+		}
+		addToGroup(parts[1:], value, group[parts[0]].(map[string]interface{}))
+	}
+}
+
+func printGroupedValues(group map[string]interface{}, prefix string) {
+	for key, value := range group {
+		switch v := value.(type) {
+		case string:
+			fmt.Printf("%s%s: %s\n", prefix, key, v)
+		case map[string]interface{}:
+			fmt.Printf("%s%s:\n", prefix, key)
+			printGroupedValues(v, prefix+"  ")
+		}
+	}
 }
 
 func setHandler(cmd *cobra.Command, args []string) error {

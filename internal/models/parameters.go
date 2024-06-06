@@ -77,12 +77,30 @@ func (p *Parameters) SetToDefaults() error {
 	return nil
 }
 
-func (p *Parameters) GetValues() map[string]string {
+func (p *Parameters) GetValues(keys ...string) map[string]string {
 	values := make(map[string]string)
 	for key, param := range *p {
-		values[key] = param.Variable.asString()
+		// if keys are provided, only return values for keys that start with the provided keys
+		if len(keys) > 0 {
+			for _, k := range keys {
+				if strings.HasPrefix(key, k) {
+					values[key] = param.Variable.asString()
+				}
+			}
+		} else {
+			values[key] = param.Variable.asString()
+		}
 	}
 	return values
+}
+
+func (p *Parameters) GetOrdered() []string {
+	keys := make([]string, 0, len(*p))
+	for key, _ := range *p {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func (p *Parameters) ProcessOptionnalParams(interactive bool) error {
