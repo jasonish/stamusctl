@@ -1,11 +1,9 @@
 # Stamus control
 
 ## Description
-stamusctl is a Command-Line Interface application written in GoLang that provides various functionalities to:
-- manage stamus stack configuration files
-
-It will also (soon) help:
-- manage stamus stack deployement
+stamusctl is a Command-Line Interface application written in GoLang by Stamus Networks that provides various functionalities to:
+- manage Stamus stack configuration files
+- deploy Stamus stack
 
 ## Installation
 To install stamusctl, you can:
@@ -21,34 +19,52 @@ and follow [golang documentation](https://go.dev/doc/tutorial/compile-install)
 ## Usage
 If you have the binary in your path, you can:
 ```
-stamusclt [command] [flag] [args]
+stamusctl [commands] [flags] [args]
 ```
 If not, you can:
 ```
-./stamusclt [command] [flag] [args]
+./stamusctl [commands] [flags] [args]
 ```
 
 ## Commands
 
-```
-stamusclt compose init
-stamusclt compose config get
-stamusclt compose config set
-```
+### Compose
+`stamusctl compose` is the command used to manage the containerized Stamus stack deployement.
+
+- `init` is used to initiate configuration files
+  - `--folder ` to select folder to save configuration
+  - `--default` to disable the interactive prompting
+    - `[key]=[value]` are the args to set configuration values (ex: scirius.token=AwesomeToken)
+- `config` is used to modify configuration files
+  - `get` to display the current configuration values
+    - `[key]` to get specific configuration values (ex: scirius)
+  - `set` to modify configuration
+    - `--reload` to reset arbitrary values
+    - `[key]=[value]` to set configuration values (ex: scirius.token=AwesomeToken)
+- `up` to start current configuration
+  - `--file` to select specific configuration
+  - `--detach` to launch in detached mode
+- `down` to stop current configuration
+  - `--file` to select specific configuration
+  - `--volumes` to remove named volumes
+  - `--remove-orphans` to remove not defined containers
 
 ## Examples
 ```
 // Init via user prompt
-stamusclt compose init
+stamusctl compose init
 
 // Init default settings
-stamusclt compose init --default scirius.token=AwesomeToken
+stamusctl compose init --default scirius.token=AwesomeToken
 
 // Get current config
-stamusclt compose config get
+stamusctl compose config get
 
 // Set parameter in current config
-stamusclt compose config set scirius.token=AnotherAwesomeToken
+stamusctl compose config set scirius.token=AnotherAwesomeToken
+
+// Start current configuration
+stamusctl compose up -d
 ```
 
 ## Contributing
