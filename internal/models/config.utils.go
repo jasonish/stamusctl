@@ -72,6 +72,7 @@ func isDirEmpty(name string) (bool, error) {
 	return false, err // Either not empty or error, suits both cases
 }
 
+// Get all files in a folder with a specific extension
 func getAllFiles(folderPath string, extension string) ([]string, error) {
 	var files []string
 	err := filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
@@ -111,6 +112,7 @@ func nestMap(input map[string]interface{}) map[string]interface{} {
 	return output
 }
 
+// Process templates from a folder to another with a data nested map
 func processTemplates(inputFolder string, outputFolder string, data map[string]interface{}) error {
 	tpls, err := getAllFiles(inputFolder, ".tpl")
 	if err != nil {

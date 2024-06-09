@@ -18,6 +18,9 @@ import (
 
 const defaultConfPath = ".configs/selks/embedded/"
 
+// Config is a struct that represents a configuration file
+// It contains the path to the file, the arbitrary values, the parameters values and the viper instnace to interact with the file
+// It can be used to get or set values, validates them etc
 type Config struct {
 	file          file
 	arbitrary     map[string]any
@@ -25,6 +28,7 @@ type Config struct {
 	viperInstance *viper.Viper
 }
 
+// Create a new config instance from a file
 func NewConfigFrom(file file) (*Config, error) {
 	// Instanciate viper
 	viperInstance, err := instanciateViper(file)
@@ -40,6 +44,7 @@ func NewConfigFrom(file file) (*Config, error) {
 	return &conf, nil
 }
 
+// Create a new config instance from a path, extract the values and return the instance
 func LoadConfigFrom(path file, reload bool) (*Config, error) {
 	// Load the config
 	configured, err := NewConfigFrom(path)
@@ -138,6 +143,7 @@ func (f *Config) extractParam(parameter string, isDeep bool) (*Parameter, error)
 	return &currentParam, nil
 }
 
+// Extract parameters and includes from the config file
 func (f *Config) ExtractParams(isDeep bool) (*Parameters, []string, error) {
 	// To return
 	var parameters Parameters = make(Parameters)
@@ -177,6 +183,7 @@ func (f *Config) ExtractParams(isDeep bool) (*Parameters, []string, error) {
 	return &parameters, includes, nil
 }
 
+// Extract values from the config file
 func (f *Config) ExtractValues() map[string]*Variable {
 	// Extract parameters list
 	parametersList := f.viperInstance.AllKeys()
@@ -214,6 +221,7 @@ func (f *Config) CopyToPath(dest string) error {
 	return cp.Copy(f.file.Path, dest)
 }
 
+// Save the config to a folder
 func (f *Config) SaveConfigTo(dest file) error {
 	// Create config value map
 	var data = map[string]any{}

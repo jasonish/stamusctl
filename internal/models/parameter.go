@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Parameter is equivalent to a flag
+// Parameter is a struct that stores the information of a parameter
 type Parameter struct {
 	Name         string
 	Shorthand    string
@@ -28,6 +28,7 @@ type Variable struct {
 	Int    *int
 }
 
+// Return the value of a string to any type
 func asLooseTyped(value string) any {
 	if value == "true" || value == "false" {
 		return value == "true"
@@ -42,6 +43,8 @@ func asLooseTyped(value string) any {
 func (v *Variable) IsNil() bool {
 	return v.String == nil && v.Bool == nil && v.Int == nil
 }
+
+// Return the value of the variable as a string
 func (v *Variable) asString() string {
 	if v.String != nil {
 		return *v.String
@@ -55,6 +58,7 @@ func (v *Variable) asString() string {
 	return ""
 }
 
+// Return the value of the variable as a any type
 func (p *Parameter) GetValue() (any, error) {
 	if p.Variable.IsNil() && p.Default.IsNil() {
 		return nil, fmt.Errorf("Variable has not been set")
@@ -82,6 +86,7 @@ func (p *Parameter) AddAsFlag(cmd *cobra.Command, persistent bool) {
 	}
 }
 
+// Adds the parameter as a string flag to the command
 func (p *Parameter) AddStringFlag(cmd *cobra.Command, persistent bool) {
 	if p.Default.String == nil {
 		p.Default = CreateVariableString("")
@@ -102,6 +107,8 @@ func (p *Parameter) AddStringFlag(cmd *cobra.Command, persistent bool) {
 		}
 	}
 }
+
+// Adds the parameter as a bool flag to the command
 func (p *Parameter) AddBoolFlag(cmd *cobra.Command, persistent bool) {
 	if p.Default.Bool == nil {
 		p.Default = CreateVariableBool(false)
@@ -121,6 +128,8 @@ func (p *Parameter) AddBoolFlag(cmd *cobra.Command, persistent bool) {
 		}
 	}
 }
+
+// Adds the parameter as an int flag to the command
 func (p *Parameter) AddIntFlag(cmd *cobra.Command, persistent bool) {
 	if p.Default.Int == nil {
 		p.Default = CreateVariableInt(0)
@@ -147,6 +156,7 @@ func (p *Parameter) isValid() bool {
 	return !p.Variable.IsNil() && p.ValidateFunc(p.Variable) && p.validateChoices()
 }
 
+// Validates the choices of the parameter
 func (p *Parameter) validateChoices() bool {
 	if len(p.Choices) > 0 {
 		switch p.Type {
@@ -175,12 +185,14 @@ func (p *Parameter) validateChoices() bool {
 	return true
 }
 
+// Set the variable to the default value
 func (p *Parameter) SetToDefault() {
 	if p.Variable.IsNil() {
 		p.Variable = p.Default
 	}
 }
 
+// Set the variable to the value provided
 func (p *Parameter) SetLooseValue(key string, value string) error {
 	switch p.Type {
 	case "string":
@@ -203,6 +215,7 @@ func (p *Parameter) SetLooseValue(key string, value string) error {
 	return nil
 }
 
+// Ask the user for the value of the parameter
 func (p *Parameter) AskUser() error {
 	switch p.Type {
 	case "string":
@@ -260,6 +273,7 @@ func CreateVariableInt(value int) Variable {
 	return Variable{Int: &value}
 }
 
+// Prompt the user for a string value
 func textPrompt(param *Parameter, defaultValue string) (string, error) {
 	prompt := promptui.Prompt{
 		Label:    param.Usage,
@@ -287,6 +301,7 @@ func validateParamFunc(param *Parameter) func(input string) error {
 	}
 }
 
+// Prompt the user for a selection
 func selectPrompt(p *Parameter, choices []string) (string, error) {
 	prompt := promptui.Select{
 		Label: p.Usage,

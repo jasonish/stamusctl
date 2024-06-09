@@ -44,14 +44,17 @@ func (p *Parameters) ValidateAll() error {
 	return nil
 }
 
+// Asks the user for all parameters
 func (p *Parameters) AskAll() error {
 	// Preprocess optional parameters
 	err := p.ProcessOptionnalParams(true)
 	if err != nil {
 		return err
 	}
+
 	// Ask for all remaining parameters
-	for _, param := range *p {
+	for _, key := range p.GetOrdered() {
+		param := (*p)[key]
 		if param.Type != "optional" {
 			err := param.AskUser()
 			if err != nil {
@@ -62,6 +65,7 @@ func (p *Parameters) AskAll() error {
 	return nil
 }
 
+// Set all parameters to their default values if they are not set
 func (p *Parameters) SetToDefaults() error {
 	// Preprocess optional parameters with default values
 	err := p.ProcessOptionnalParams(false)
@@ -94,6 +98,7 @@ func (p *Parameters) GetValues(keys ...string) map[string]string {
 	return values
 }
 
+// Returns an ordered slices of the parameters keys
 func (p *Parameters) GetOrdered() []string {
 	keys := make([]string, 0, len(*p))
 	for key, _ := range *p {
@@ -103,6 +108,8 @@ func (p *Parameters) GetOrdered() []string {
 	return keys
 }
 
+// Process optional parameters
+// If interactive is true, ask the user for the optional parameters
 func (p *Parameters) ProcessOptionnalParams(interactive bool) error {
 	// Filter optional parameters
 	optionalParams := []string{}

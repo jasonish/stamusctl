@@ -10,6 +10,8 @@ import (
 	"unicode"
 )
 
+// Get the choices for a given variable
+// Returns a list of choices given the variable name
 func GetChoices(name string) ([]Variable, error) {
 	switch name {
 	case "restart":
@@ -31,6 +33,8 @@ func GetChoices(name string) ([]Variable, error) {
 	}
 }
 
+// Get the list of network interfaces
+// Depending on the mode (prod or test), it will either use the host or a busybox container
 func getInterfaces() ([]Variable, error) {
 	if app.Mode == "prod" {
 		return getInterfacesBusybox()
@@ -39,6 +43,7 @@ func getInterfaces() ([]Variable, error) {
 	}
 }
 
+// Get the list of network interfaces using the host
 func getInterfacesHost() ([]Variable, error) {
 	// Define the directory where network interfaces are listed
 	netDir := "/sys/class/net"
@@ -57,6 +62,7 @@ func getInterfacesHost() ([]Variable, error) {
 	return interfaces, nil
 }
 
+// Get the list of network interfaces using a busybox container
 func getInterfacesBusybox() ([]Variable, error) {
 	s := logging.NewSpinner(
 		"Identifying interfaces",
