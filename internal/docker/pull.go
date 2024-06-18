@@ -9,7 +9,8 @@ import (
 	"github.com/docker/docker/api/types"
 )
 
-func PullImageIfNotExisted(name string) (bool, error) {
+func PullImageIfNotExisted(registry string, name string) (bool, error) {
+	name = name + ":main"
 	logger := logging.Sugar.With("name", name)
 	alreadyHere, err := IsImageAlreadyInstalled(name)
 	if err != nil {
@@ -27,7 +28,8 @@ func PullImageIfNotExisted(name string) (bool, error) {
 		fmt.Sprintf("Pulling %s. Please wait", name),
 		fmt.Sprintf("Pulling %s done\n", name),
 	)
-	reader, err := cli.ImagePull(ctx, "docker.io/library/"+name, types.ImagePullOptions{})
+
+	reader, err := cli.ImagePull(ctx, registry+name, types.ImagePullOptions{})
 
 	if err != nil {
 		logging.SpinnerStop(s)

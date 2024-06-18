@@ -11,7 +11,7 @@ import (
 
 func RetrieveValideInterfacesFromDockerContainer() ([]string, error) {
 
-	alreadyHasBusybox, _ := docker.PullImageIfNotExisted("busybox")
+	alreadyHasBusybox, _ := docker.PullImageIfNotExisted("docker.io/library/", "busybox")
 
 	output, _ := docker.RunContainer("busybox", []string{
 		"ls",
@@ -42,7 +42,7 @@ func GenerateSSLWithDocker(sslPath string) error {
 		logging.Sugar.Errorw("cannot create cert containing folder.", "error", err)
 	}
 
-	alreadyHasNginx, err := docker.PullImageIfNotExisted("nginx")
+	alreadyHasNginx, err := docker.PullImageIfNotExisted("docker.io/library/", "nginx")
 	if err != nil {
 		logging.Sugar.Warnw("nginx pull failed", "error", err)
 		return err
