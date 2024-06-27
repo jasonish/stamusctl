@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	Name = ""
-	Mode = "prod"
+	Name   = ""
+	Mode   = "prod"
+	Folder = "/"
 )
 
 const (
@@ -35,5 +36,11 @@ func init() {
 
 	if val := os.Getenv("BUILD_MODE"); val != "" {
 		Mode = val
+	}
+
+	if val := os.Getenv("STAMUSCTL_FOLDER"); val != "" {
+		Folder = val
+	} else {
+		Folder = os.Getenv("HOME") + "/.stamus"
 	}
 }
