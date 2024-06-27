@@ -65,6 +65,27 @@ func (p *Parameters) AskAll() error {
 	return nil
 }
 
+// Asks the user for all not set parameters
+func (p *Parameters) AskMissing() error {
+	// Preprocess optional parameters
+	err := p.ProcessOptionnalParams(false)
+	if err != nil {
+		return err
+	}
+
+	// Ask for all remaining parameters
+	for _, key := range p.GetOrdered() {
+		param := (*p)[key]
+		if param.Type != "optional" && param.Variable.IsNil() {
+			err := param.AskUser()
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 // Set all parameters to their default values if they are not set
 func (p *Parameters) SetToDefaults() error {
 	// Preprocess optional parameters with default values
@@ -93,6 +114,23 @@ func (p *Parameters) GetValues(keys ...string) map[string]string {
 			}
 		} else {
 			values[key] = param.Variable.asString()
+		}
+	}
+	return values
+}
+
+func (p *Parameters) GetVariablesValues(keys ...string) map[string]*Variable {
+	values := make(map[string]*Variable)
+	for key, param := range *p {
+		// if keys are provided, only return values for keys that start with the provided keys
+		if len(keys) > 0 {
+			for _, k := range keys {
+				if strings.HasPrefix(key, k) {
+					values[key] = &param.Variable
+				}
+			}
+		} else {
+			values[key] = &param.Variable
 		}
 	}
 	return values
@@ -169,7 +207,7 @@ func filterRemainingOptionalParams(optionalParams []string, optionalParam string
 }
 
 // Sets paramaters values to given values
-func (p *Parameters) SetValues(values map[string]*Variable) any {
+func (p *Parameters) SetValues(values map[string]*Variable) {
 	for key, value := range values {
 		if (*p)[key] == nil {
 			continue
@@ -180,13 +218,14 @@ func (p *Parameters) SetValues(values map[string]*Variable) any {
 			(*p)[key].Variable = *value
 		}
 	}
-	return nil
 }
 
 func (p *Parameters) SetLooseValues(values map[string]string) error {
 	for key, value := range values {
 		if (*p)[key] != nil {
 			(*p)[key].SetLooseValue(key, value)
+		} else {
+			fmt.Println("Invalid parameter", key)
 		}
 	}
 

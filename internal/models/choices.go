@@ -62,8 +62,14 @@ func getInterfacesHost() ([]Variable, error) {
 	return interfaces, nil
 }
 
+var interfacesCache []Variable
+
 // Get the list of network interfaces using a busybox container
 func getInterfacesBusybox() ([]Variable, error) {
+	if len(interfacesCache) != 0 {
+		return interfacesCache, nil
+	}
+
 	s := logging.NewSpinner(
 		"Identifying interfaces",
 		"Did identify interfaces\n",
@@ -96,5 +102,6 @@ func getInterfacesBusybox() ([]Variable, error) {
 	}
 
 	logging.SpinnerStop(s)
+	interfacesCache = interfacesVariables
 	return interfacesVariables, nil
 }

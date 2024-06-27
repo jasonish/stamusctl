@@ -2,7 +2,6 @@ package models
 
 import (
 	// Common
-
 	"fmt"
 	"log"
 	"os"
@@ -10,13 +9,18 @@ import (
 	"strings"
 
 	// External
-
 	cp "github.com/otiai10/copy"
 	"github.com/spf13/viper"
+
 	// Custom
+	"stamus-ctl/internal/app"
 )
 
-const defaultConfPath = ".configs/selks/embedded/"
+var defaultConfPath string
+
+func init() {
+	defaultConfPath = app.Folder + "/templates/selks/embedded/"
+}
 
 // Config is a struct that represents a configuration file
 // It contains the path to the file, the arbitrary values, the parameters values and the viper instnace to interact with the file
@@ -31,7 +35,7 @@ type Config struct {
 // Create a new config instance from a file
 func NewConfigFrom(file file) (*Config, error) {
 	// Instanciate viper
-	viperInstance, err := instanciateViper(file)
+	viperInstance, err := InstanciateViper(file)
 	if err != nil {
 		return nil, err
 	}
@@ -45,6 +49,7 @@ func NewConfigFrom(file file) (*Config, error) {
 }
 
 // Create a new config instance from a path, extract the values and return the instance
+// Reload is used to not keep the arbitrary values
 func LoadConfigFrom(path file, reload bool) (*Config, error) {
 	// Load the config
 	configured, err := NewConfigFrom(path)
@@ -76,7 +81,6 @@ func LoadConfigFrom(path file, reload bool) (*Config, error) {
 	}
 	// Merge
 	originConf.parameters.SetValues(values)
-	originConf.parameters.ProcessOptionnalParams(false)
 	return originConf, nil
 }
 
@@ -327,4 +331,8 @@ func (f *Config) saveParamsTo(dest file) error {
 	}
 
 	return nil
+}
+
+func (f *Config) DeleteFolder() error {
+	return os.RemoveAll(f.file.Path)
 }
