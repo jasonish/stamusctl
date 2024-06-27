@@ -10,7 +10,7 @@ import (
 )
 
 func PullImageIfNotExisted(registry string, name string) (bool, error) {
-	name = name + ":main"
+	// name = name + ":main"
 	logger := logging.Sugar.With("name", name)
 	alreadyHere, err := IsImageAlreadyInstalled(name)
 	if err != nil {

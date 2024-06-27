@@ -76,6 +76,13 @@ func (p *Parameter) GetValue() (any, error) {
 
 // Adds the parameter as a flag to the command
 func (p *Parameter) AddAsFlag(cmd *cobra.Command, persistent bool) {
+	// Set flag validation function
+	if p.ValidateFunc == nil {
+		p.ValidateFunc = func(v Variable) bool {
+			return true
+		}
+	}
+	// Add the flag based on the type
 	switch p.Type {
 	case "string":
 		p.AddStringFlag(cmd, persistent)

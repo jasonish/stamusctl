@@ -24,28 +24,31 @@ import (
 	// Custom
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
-	"stamus-ctl/internal/stamus"
 	"stamus-ctl/internal/utils"
 )
 
 // Flags
+var config = models.Parameter{
+	Name:      "folder",
+	Shorthand: "f",
+	Type:      "string",
+	Default:   models.CreateVariableString("tmp"),
+	Usage:     "Folder configuration to update",
+}
 var registryFlag = models.Parameter{
-	Name: "registry",
-	// Shorthand: "r",
+	Name:  "registry",
 	Type:  "string",
 	Usage: "Registry to use",
 }
 var userFlag = models.Parameter{
-	Name: "user",
-	// Shorthand: "u",
+	Name:  "user",
 	Type:  "string",
-	Usage: "Username",
+	Usage: "Registry username",
 }
 var passwordFlag = models.Parameter{
-	Name: "pass",
-	// Shorthand: "p",
+	Name:  "pass",
 	Type:  "string",
-	Usage: "Password",
+	Usage: "Registry password",
 }
 var versionFlag = models.Parameter{
 	Name:      "version",
@@ -70,30 +73,36 @@ func updateCmd() *cobra.Command {
 	userFlag.AddAsFlag(cmd, false)
 	passwordFlag.AddAsFlag(cmd, false)
 	versionFlag.AddAsFlag(cmd, false)
-	output.AddAsFlag(cmd, false)
+	config.AddAsFlag(cmd, false)
 	return cmd
 }
 
 func updateHandler(cmd *cobra.Command, args []string) error {
 	// Validate parameters from flags
-	var registryVal, usernameVal, passwordVal string
 	if *registryFlag.Variable.String == "" {
-		return fmt.Errorf("Registry is required")
+		err := registryFlag.AskUser()
+		if err != nil {
+			return err
+		}
 	}
 	if *userFlag.Variable.String == "" {
-		return fmt.Errorf("Username is required")
+		err := userFlag.AskUser()
+		if err != nil {
+			return err
+		}
 	}
 	if *passwordFlag.Variable.String == "" {
-		return fmt.Errorf("Password is required")
+		err := passwordFlag.AskUser()
+		if err != nil {
+			return err
+		}
 	}
 
 	// Get values from flags
+	var registryVal, usernameVal, passwordVal string
 	registryVal = *registryFlag.Variable.String
 	usernameVal = *userFlag.Variable.String
 	passwordVal = *passwordFlag.Variable.String
-
-	// Create auth
-	stamus.SaveLogin(registryVal, usernameVal, passwordVal)
 
 	// Create docker client
 	ctx := context.Background()
@@ -144,7 +153,7 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 			fmt.Printf("\r%s %s", pullResp.Status, pullResp.Progress)
 		}
 	}
-	fmt.Printf("\rPull complete                                                                                ")
+	fmt.Printf("\rGot configuration                                                                                 ")
 	fmt.Println()
 
 	// Run container
@@ -204,7 +213,7 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	// Save output
-	outputFile, err := os.Create(filepath.Join(*output.Variable.String, "values.yaml"))
+	outputFile, err := os.Create(filepath.Join(*config.Variable.String, "values.yaml"))
 	if err != nil {
 		return err
 	}
@@ -214,7 +223,7 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	// Load existing config
-	confFile, err := models.CreateFileInstance(*output.Variable.String, "values.yaml")
+	confFile, err := models.CreateFileInstance(*config.Variable.String, "values.yaml")
 	if err != nil {
 		return err
 	}

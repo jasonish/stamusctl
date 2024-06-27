@@ -47,6 +47,9 @@ func getInterfaces() ([]Variable, error) {
 func getInterfacesHost() ([]Variable, error) {
 	// Define the directory where network interfaces are listed
 	netDir := "/sys/class/net"
+	if len(interfacesCache) != 0 {
+		return interfacesCache, nil
+	}
 
 	// Read the directory contents
 	files, err := ioutil.ReadDir(netDir)
@@ -59,6 +62,7 @@ func getInterfacesHost() ([]Variable, error) {
 	for _, file := range files {
 		interfaces = append(interfaces, CreateVariableString(file.Name()))
 	}
+	interfacesCache = interfaces
 	return interfaces, nil
 }
 
@@ -103,5 +107,6 @@ func getInterfacesBusybox() ([]Variable, error) {
 
 	logging.SpinnerStop(s)
 	interfacesCache = interfacesVariables
+
 	return interfacesVariables, nil
 }
