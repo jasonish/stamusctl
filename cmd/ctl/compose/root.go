@@ -3,12 +3,20 @@ package compose
 import (
 	// Common
 	// External
-
 	"github.com/spf13/cobra"
+
+	// Custom
+	"stamus-ctl/internal/app"
 )
 
 // Constants
-const DefaultSelksPath = ".configs/selks/embedded"
+var DefaultSelksPath string
+var LatestSelksPath string
+
+func init() {
+	DefaultSelksPath = app.Folder + "/templates/selks/embedded/"
+	LatestSelksPath = app.Folder + "/templates/selks/latest/"
+}
 
 // Commands
 func ComposeCmd() *cobra.Command {
@@ -21,6 +29,7 @@ func ComposeCmd() *cobra.Command {
 	// Custom commands
 	cmd.AddCommand(initCmd())
 	cmd.AddCommand(configCmd())
+	cmd.AddCommand(updateCmd())
 	cmd.AddCommand(wrappedCmd()...)
 
 	return cmd

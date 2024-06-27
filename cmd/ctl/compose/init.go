@@ -7,19 +7,20 @@ import (
 
 	"github.com/spf13/cobra"
 	// Custom
+	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/embeds"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/utils"
 )
 
 // Constants
-const outputFolder = ".configs/selks/embedded"
+const outputFolder = "/templates/selks/embedded"
 const embed string = "selks"
 
 // Flags
 var output = models.Parameter{
 	Name:      "folder",
-	Shorthand: "F",
+	Shorthand: "f",
 	Type:      "string",
 	Default:   models.CreateVariableString("tmp"),
 	Usage:     "Declare the folder where to save configuration files",
@@ -72,7 +73,7 @@ func initSelksFolder(path string) {
 		panic(err)
 	}
 	if !selksConfigExist {
-		err = embeds.ExtractEmbedTo(embed, outputFolder)
+		err = embeds.ExtractEmbedTo(embed, app.Folder+outputFolder)
 		if err != nil {
 			panic(err)
 		}
@@ -82,9 +83,12 @@ func initSelksFolder(path string) {
 func SELKSHandler(cmd *cobra.Command, args []string) error {
 	// Instanciate config
 	var config *models.Config
-	confFile, err := models.CreateFileInstance(DefaultSelksPath, "config.yaml")
+	confFile, err := models.CreateFileInstance(LatestSelksPath, "config.yaml")
 	if err != nil {
-		return err
+		confFile, err = models.CreateFileInstance(DefaultSelksPath, "config.yaml")
+		if err != nil {
+			return err
+		}
 	}
 	config, err = models.NewConfigFrom(confFile)
 	if err != nil {
@@ -109,6 +113,11 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
+		// Ask for missing parameters
+		err = config.GetParams().AskMissing()
+		if err != nil {
+			return err
+		}
 	} else {
 		//Set from user input
 		err := config.GetParams().AskAll()
@@ -122,7 +131,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Save the configuration
-	outputFile, err := models.CreateFileInstance(*output.Variable.String, "config.yaml")
+	outputFile, err := models.CreateFileInstance(*output.Variable.String, "values.yaml")
 	if err != nil {
 		return err
 	}

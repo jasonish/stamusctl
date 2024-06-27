@@ -17,7 +17,7 @@ import (
 // Flags
 var input = models.Parameter{
 	Name:      "folder",
-	Shorthand: "F",
+	Shorthand: "f",
 	Usage:     "Declare the folder where the configuration files are saved",
 	Type:      "string",
 	Default:   models.CreateVariableString("tmp"),
@@ -65,6 +65,7 @@ Example: get scirius`,
 	input.AddAsFlag(cmd, false)
 	return cmd
 }
+
 func setCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set [keys=values...]",
@@ -96,11 +97,12 @@ func getHandler(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	inputAsString := value.(string)
-	inputAsFile, err := models.CreateFileInstance(inputAsString, "config.yaml")
+	inputAsFile, err := models.CreateFileInstance(inputAsString, "values.yaml")
 	if err != nil {
 		return err
 	}
 	config, err := models.LoadConfigFrom(inputAsFile, reload)
+	config.GetParams().ProcessOptionnalParams(false)
 	if err != nil {
 		return err
 	}
@@ -153,17 +155,11 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	inputAsString := value.(string)
-	inputAsFile, err := models.CreateFileInstance(inputAsString, "config.yaml")
+	file, err := models.CreateFileInstance(value.(string), "values.yaml")
 	if err != nil {
 		return err
 	}
-	config, err := models.LoadConfigFrom(inputAsFile, reload)
-	if err != nil {
-		return err
-	}
-	// Set from default
-	err = config.GetParams().SetToDefaults()
+	config, err := models.LoadConfigFrom(file, reload)
 	if err != nil {
 		return err
 	}
@@ -171,6 +167,7 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	paramsArgs := utils.ExtractArgs(args)
 	config.GetParams().SetLooseValues(paramsArgs)
 	config.SetArbitrary(paramsArgs)
+	config.GetParams().ProcessOptionnalParams(false)
 	// Validate
 	err = config.GetParams().ValidateAll()
 	if err != nil {
@@ -178,7 +175,7 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	}
 	// Save the configuration
 	outputAsString := *output.Variable.String
-	outputAsFile, err := models.CreateFileInstance(outputAsString, "config.yaml")
+	outputAsFile, err := models.CreateFileInstance(outputAsString, "values.yaml")
 	if err != nil {
 		return err
 	}
