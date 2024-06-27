@@ -284,11 +284,7 @@ func (f *Config) SaveConfigTo(dest file) error {
 // Save parameters values to config file
 func (f *Config) saveParamsTo(dest file) error {
 	//Clear the file
-	err := os.Remove(dest.completePath())
-	if err != nil {
-		fmt.Println("Error removing config file", err)
-		return err
-	}
+	os.Remove(dest.completePath())
 	//ReCreate the file
 	file, err := os.Create(dest.completePath())
 	if err != nil {
