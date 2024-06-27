@@ -48,6 +48,13 @@ If not, you can:
   - `--file` to select specific configuration
   - `--volumes` to remove named volumes
   - `--remove-orphans` to remove not defined containers
+- `update` to update the configuration
+  - `--folder` to select folder
+  - `--registry` to select registry
+  - `--user` to input user
+  - `--pass` to input password
+  - `--version` to input version
+
 
 ## Examples
 ```
