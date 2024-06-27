@@ -1,0 +1,4 @@
+nginx: false
+stamusconfig: .configs/selks/embedded
+websocket:
+    response: pong
