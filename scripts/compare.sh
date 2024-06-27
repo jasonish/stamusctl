@@ -38,6 +38,8 @@ for file in $files1; do
     diff "$folder1/$file" "$folder2/$file" > /dev/null
     if [ $? -ne 0 ]; then
         echo "Files $folder1/$file and $folder2/$file differ"
+        echo "Diff:"
+        diff "$folder1/$file" "$folder2/$file"
         exit 1
     fi
 done

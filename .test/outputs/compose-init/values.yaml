@@ -1,6 +1,6 @@
 nginx:
     exec: nginx
     image: nginx:1.14.2-alpine
-stamusconfig: .configs/selks/embedded
+stamusconfig: /root/.stamus/templates/selks/embedded/
 websocket:
     response: pong
