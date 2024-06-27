@@ -55,22 +55,45 @@ func wrappedCmd() []*cobra.Command {
 	for _, c := range cmdDocker.Commands() {
 		command := strings.Split(c.Use, " ")[0]
 		if composeFlags.Contains(command) {
+			// Filter flags
 			flags := composeFlags[command].ExtractFlags(cmdDocker.Flags(), c.Flags())
 			c.ResetFlags()
 			c.Flags().AddFlagSet(flags)
 
+			// Modify file flag
 			if c.Flags().Lookup("file") != nil {
-				c.Flags().Lookup("file").Value.Set("tmp/docker-compose.yaml")
-				c.Flags().Lookup("file").DefValue = "tmp/docker-compose.yaml"
+				c.Flags().Lookup("file").Hidden = true
+				// Save the command
+				composeCmd = c
+				currentRunE := c.RunE
+				// Modify cmd function
+				c.RunE = func(cmd *cobra.Command, args []string) error {
+
+					flagValue := cmd.Flags().Lookup("folder").Value.String() + "/docker-compose.yaml"
+
+					fileFlag := getComposeCmd().Flags().Lookup("file")
+					fileFlag.Value.Set(flagValue)
+					fileFlag.DefValue = flagValue
+
+					return currentRunE(cmd, args)
+				}
+				// Add custom folder flag
+				folderFlag := *pflag.NewFlagSet("folder", pflag.ContinueOnError)
+				folderFlag.String("folder", "tmp", "Folder where the config is located")
+				c.Flags().AddFlagSet(&folderFlag)
 			}
 
 			cmds = append(cmds, c)
 		}
 	}
 
-	// cmd.AddCommand(cmdDocker)
-
 	return cmds
+}
+
+var composeCmd *cobra.Command
+
+func getComposeCmd() *cobra.Command {
+	return composeCmd
 }
 
 type Flags struct {
