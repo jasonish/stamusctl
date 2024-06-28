@@ -14,7 +14,7 @@ import (
 )
 
 // Constants
-const outputFolder = "/templates/selks/embedded"
+const outputFolder = "templates/selks/embedded/"
 const embed string = "selks"
 
 // Flags

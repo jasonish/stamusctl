@@ -41,6 +41,6 @@ func init() {
 	if val := os.Getenv("STAMUSCTL_FOLDER"); val != "" {
 		Folder = val
 	} else {
-		Folder = os.Getenv("HOME") + "/.stamus"
+		Folder = os.Getenv("HOME") + "/.stamus/"
 	}
 }
