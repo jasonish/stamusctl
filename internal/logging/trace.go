@@ -1,0 +1,25 @@
+package logging
+
+import (
+	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
+)
+
+var Tracer trace.Tracer
+var TracerProvider trace.TracerProvider
+
+func NewTraceProvider() *tracesdk.TracerProvider {
+	exporter, err := stdouttrace.New()
+	if err != nil {
+		Sugar.Error(err)
+		panic(err)
+	}
+	provider := tracesdk.WithBatcher(exporter)
+	traceProvider := tracesdk.NewTracerProvider(provider)
+
+	TracerProvider = traceProvider
+	Tracer = traceProvider.Tracer("stamus-daemon")
+
+	return traceProvider
+}
