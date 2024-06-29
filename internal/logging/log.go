@@ -4,12 +4,14 @@ import (
 	"stamus-ctl/internal/app"
 
 	"github.com/spf13/viper"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 var (
 	envType = "dev"
+	Logger  *zap.Logger
 	Sugar   *zap.SugaredLogger
 	levels  = [...]zapcore.Level{zap.WarnLevel, zap.InfoLevel, zap.DebugLevel}
 )
@@ -61,12 +63,19 @@ func NewLogger() *zap.Logger {
 }
 
 func SetLogger() {
+	Logger = NewLogger()
+	Sugar = Logger.Sugar()
 
-	Sugar = NewLogger().Sugar()
+	config := zap.NewProductionConfig()
+	logger, _ := config.Build()
+	otellogger := otelzap.New(logger)
+
+	otelzap.ReplaceGlobals(otellogger)
 }
 
 func init() {
 	noop := zap.NewNop()
 
+	Logger = noop
 	Sugar = noop.Sugar()
 }

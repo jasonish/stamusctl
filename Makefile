@@ -4,7 +4,7 @@ LOGGER=git.stamus-networks.com/lanath/stamus-ctl/internal/logging
 CURRENT_DIR=$(shell pwd)
 DIST_DIR=${CURRENT_DIR}/dist
 CLI_NAME=stamusctl
-BIN_NAME=stamusctl
+DAEMON_NAME=stamusd
 
 
 HOST_OS:=$(shell go env GOOS)
@@ -31,7 +31,7 @@ override LDFLAGS += \
   -X ${PACKAGE}.Version=${VERSION} \
   -X ${LOGGER}.envType=prd
 
-all: cli
+all: cli daemon
 
 cli:
 	CGO_ENABLED=0 GODEBUG="tarinsecurepath=0,zipinsecurepath=0" go build -v -ldflags '${LDFLAGS}' -ldflags="-extldflags=-static" -o ${DIST_DIR}/${CLI_NAME} ./cmd
@@ -39,7 +39,13 @@ cli:
 test-cli:
 	CGO_ENABLED=0 GODEBUG="tarinsecurepath=0,zipinsecurepath=0" BUILD_MODE=test go build -v -ldflags '${LDFLAGS}' -ldflags="-extldflags=-static" -o ${DIST_DIR}/${CLI_NAME} ./cmd
 
+daemon:
+	CGO_ENABLED=0 GODEBUG="tarinsecurepath=0,zipinsecurepath=0" go build -v -ldflags '${LDFLAGS}' -ldflags="-extldflags=-static" -o ${DIST_DIR}/${DAEMON_NAME} ./cmd
+
+daemon-dev:
+	air run
+
 test:
 	go test ./...
 
-.PHONY: all cli test
+.PHONY: all cli daemon test

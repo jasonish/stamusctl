@@ -1,4 +1,4 @@
 { pkgs ? import <nixpkgs> { } }:
 pkgs.mkShell {
-  buildInputs = with pkgs; [ go ];
+  buildInputs = with pkgs; [ go air ];
 }
