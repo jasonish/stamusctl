@@ -45,6 +45,44 @@ kaniko cli main:
             --cache-copy-layers=true \
             --cache-ttl=72h
 
+kaniko daemon:
+    stage: build
+    before_script: []
+    image:
+        name: gcr.io/kaniko-project/executor:v1.14.0-debug
+        entrypoint: ['']
+    script:
+        - |
+            echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+            /kaniko/executor \
+            --context "${CI_PROJECT_DIR}" \
+            --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.daemon" \
+            --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}" \
+            --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}" \
+            --cache=true \
+            --cache-copy-layers=true \
+            --cache-ttl=72h
+
+kaniko daemon main:
+    stage: build
+    before_script: []
+    only:
+        - main
+    image:
+        name: gcr.io/kaniko-project/executor:v1.14.0-debug
+        entrypoint: ['']
+    script:
+        - |
+            echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+            /kaniko/executor \
+            --context "${CI_PROJECT_DIR}" \
+            --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.daemon" \
+            --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_SHORT_SHA}" \
+            --destination "${CI_REGISTRY_IMAGE}/daemon:latest" \
+            --cache=true \
+            --cache-copy-layers=true \
+            --cache-ttl=72h
+
 build cli:
     image: golang:alpine
     stage: build
@@ -57,6 +95,21 @@ build cli:
             apk add --no-cache gcc musl-dev make
             make cli
             mv dist/stamusctl .
+
+build daemon:
+    image: golang:alpine
+    stage: build
+    artifacts:
+        expire_in: 1 day
+        paths:
+            - stamusd
+    script:
+        - |
+            apk add --no-cache gcc musl-dev make
+            go install github.com/swaggo/swag/cmd/swag@latest
+            swag init -g root.go -o cmd/docs -d cmd/daemon/run/
+            make daemon
+            mv dist/stamusd .
 
 build test:
     image: golang:alpine
@@ -83,6 +136,15 @@ test cli:
     script:
         - |
             ./stamusctl
+
+test daemon:
+    image: busybox
+    stage: test
+    dependencies:
+        - build daemon
+    script:
+        - |
+            ./stamusd
 
 unit tests:
     image: golang:alpine
@@ -160,4 +222,3 @@ compose config reload:
             ./cli compose config set --reload
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
-            

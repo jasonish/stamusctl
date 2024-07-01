@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -30,6 +31,17 @@ func LoggerWithRequest(r *http.Request) otelzap.LoggerWithCtx {
 }
 
 func LoggerWithSpanContext(span trace.SpanContext) *zap.Logger {
+	config := zap.NewProductionConfig()
+	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
+	logger, _ := config.Build()
+	return logger.With(
+		zap.String("trace_id", span.TraceID().String()),
+		zap.String("span_id", span.SpanID().String()),
+	)
+}
+
+func LoggerWithContextToSpanContext(ctx context.Context) *zap.Logger {
+	span := trace.SpanContextFromContext(ctx)
 	config := zap.NewProductionConfig()
 	config.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.RFC3339)
 	logger, _ := config.Build()

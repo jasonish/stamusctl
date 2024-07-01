@@ -1,0 +1,12 @@
+dist/
+docker/
+scripts/
+tmp/
+
+.air.toml
+.dockerignore
+.envrc
+.gitignore
+.gitlab-*
+default.nix
+README.md
