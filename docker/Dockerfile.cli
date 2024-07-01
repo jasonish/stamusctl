@@ -5,10 +5,15 @@ ENV VERSION=$var_version
 
 RUN mkdir -p /src
 RUN apk update && apk add --no-cache gcc musl-dev make
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
+COPY ./go.mod /src/stamus-ctl/go.mod
+COPY ./go.sum /src/stamus-ctl/go.sum
+WORKDIR /src/stamus-ctl
+RUN go mod download
 
 COPY . /src/stamus-ctl
-WORKDIR /src/stamus-ctl
-
+RUN swag init -g root.go -o cmd/docs -d cmd/daemon/run/
 RUN CGO_ENABLED=1 make cli
 
 FROM scratch
