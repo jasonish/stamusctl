@@ -124,6 +124,8 @@ build test:
     script:
         - |
             apk add --no-cache gcc musl-dev make
+            go install github.com/swaggo/swag/cmd/swag@latest
+            swag init -g root.go -o cmd/docs -d cmd/daemon/run/
             chmod +x $(pwd)/scripts/move.sh
             $(pwd)/scripts/move.sh
             make test-cli
