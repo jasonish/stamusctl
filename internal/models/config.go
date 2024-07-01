@@ -19,7 +19,7 @@ import (
 var defaultConfPath string
 
 func init() {
-	defaultConfPath = app.Folder + "templates/selks/embedded/"
+	defaultConfPath = app.TemplatesFolder + "templates/selks/embedded/"
 }
 
 // Config is a struct that represents a configuration file

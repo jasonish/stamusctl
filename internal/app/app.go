@@ -1,15 +1,20 @@
 package app
 
 import (
+	// Common
 	"os"
 	"path/filepath"
 	"runtime"
+
+	// External
+	"github.com/adrg/xdg"
 )
 
 var (
-	Name   = ""
-	Mode   = "prod"
-	Folder = "/"
+	Name            = ""
+	Mode            = "prod"
+	ConfigFolder    = "/"
+	TemplatesFolder = "/"
 )
 
 const (
@@ -29,18 +34,26 @@ func CatchException() {
 }
 
 func init() {
+	// Binary name
 	Name = filepath.Base(os.Args[0])
 	if val := os.Getenv(binaryNameEnv); val != "" {
 		Name = val
 	}
 
+	// Mode
 	if val := os.Getenv("BUILD_MODE"); val != "" {
 		Mode = val
 	}
 
-	if val := os.Getenv("STAMUSCTL_FOLDER"); val != "" {
-		Folder = val
+	// Folders
+	if val := os.Getenv("STAMUS_CONFIG_FOLDER"); val != "" {
+		ConfigFolder = val
 	} else {
-		Folder = os.Getenv("HOME") + "/.stamus/"
+		ConfigFolder = xdg.ConfigHome + "/.stamus/"
+	}
+	if val := os.Getenv("STAMUS_TEMPLATES_FOLDER"); val != "" {
+		TemplatesFolder = val
+	} else {
+		TemplatesFolder = xdg.UserDirs.Templates + "/.stamus/"
 	}
 }

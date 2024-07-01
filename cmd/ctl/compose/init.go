@@ -14,7 +14,6 @@ import (
 )
 
 // Constants
-const outputFolder = "templates/selks/embedded/"
 const embed string = "selks"
 
 // Flags
@@ -73,7 +72,7 @@ func initSelksFolder(path string) {
 		panic(err)
 	}
 	if !selksConfigExist {
-		err = embeds.ExtractEmbedTo(embed, app.Folder+outputFolder)
+		err = embeds.ExtractEmbedTo(embed, app.TemplatesFolder+"selks/embedded/")
 		if err != nil {
 			panic(err)
 		}

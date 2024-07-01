@@ -12,13 +12,13 @@ import (
 
 func getOrCreateStamusConfigFile() (*os.File, error) {
 	// Create ~/.stamus directory
-	err := os.MkdirAll(app.Folder, 0755)
+	err := os.MkdirAll(app.ConfigFolder, 0755)
 	if err != nil {
 		return nil, err
 	}
 
 	// Open or create ~/.stamus/config.json
-	f, err := os.OpenFile(app.Folder+"config.json", os.O_RDWR|os.O_CREATE, 0755)
+	f, err := os.OpenFile(app.ConfigFolder+"config.json", os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return nil, err
 	}

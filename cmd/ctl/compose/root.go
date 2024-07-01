@@ -14,8 +14,8 @@ var DefaultSelksPath string
 var LatestSelksPath string
 
 func init() {
-	DefaultSelksPath = app.Folder + "templates/selks/embedded/"
-	LatestSelksPath = app.Folder + "templates/selks/latest/"
+	DefaultSelksPath = app.TemplatesFolder + "/selks/embedded/"
+	LatestSelksPath = app.TemplatesFolder + "/selks/latest/"
 }
 
 // Commands

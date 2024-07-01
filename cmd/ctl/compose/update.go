@@ -176,10 +176,10 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 	}()
 
 	// Extract conf from container
-	srcPaths := []string{"/data", "/sbin"}      // Source path inside the container
-	destPath := app.Folder + "templates/selks/" // Destination path on the host
+	srcPaths := []string{"/data", "/sbin"}     // Source path inside the container
+	destPath := app.TemplatesFolder + "selks/" // Destination path on the host
 	// Remove existing configuration
-	if err := os.RemoveAll(app.Folder + "templates/selks/latest"); err != nil {
+	if err := os.RemoveAll(app.TemplatesFolder + "selks/latest"); err != nil {
 		return err
 	}
 	// Copy files from container
@@ -189,21 +189,21 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 		}
 	}
 	// Move files to correct location
-	if err := os.Rename(app.Folder+"templates/selks/data/", app.Folder+"templates/selks/latest/"); err != nil {
+	if err := os.Rename(app.TemplatesFolder+"selks/data/", app.TemplatesFolder+"selks/latest/"); err != nil {
 		return err
 	}
 	fmt.Println("Configuration extracted")
 
 	// Execute update script
-	prerun := exec.Command(app.Folder + "templates/selks/sbin/pre-run")
-	postrun := exec.Command(app.Folder + "templates/selks/sbin/post-run")
+	prerun := exec.Command(app.TemplatesFolder + "selks/sbin/pre-run")
+	postrun := exec.Command(app.TemplatesFolder + "selks/sbin/post-run")
 	// Display output to terminal
 	runOutput := new(strings.Builder)
 	prerun.Stdout = runOutput
 	prerun.Stderr = os.Stderr
 	// Change execution rights
-	os.Chmod(app.Folder+"templates/selks/sbin/pre-run", 0755)
-	os.Chmod(app.Folder+"templates/selks/sbin/post-run", 0755)
+	os.Chmod(app.TemplatesFolder+"selks/sbin/pre-run", 0755)
+	os.Chmod(app.TemplatesFolder+"selks/sbin/post-run", 0755)
 	// Run pre-run script
 	if err := prerun.Run(); err != nil {
 		return err
@@ -230,7 +230,7 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	// Create new config
-	newConfFile, err := models.CreateFileInstance(app.Folder+"templates/selks/latest", "config.yaml")
+	newConfFile, err := models.CreateFileInstance(app.TemplatesFolder+"selks/latest", "config.yaml")
 	if err != nil {
 		return err
 	}
