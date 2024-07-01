@@ -1,4 +1,4 @@
 nginx: false
-stamusconfig: /root/.stamus/templates/selks/embedded/
+stamusconfig: /root/Templates/.stamus/selks/embedded/
 websocket:
     response: pong

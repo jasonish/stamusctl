@@ -2,6 +2,7 @@ package app
 
 import (
 	// Common
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -56,4 +57,7 @@ func init() {
 	} else {
 		TemplatesFolder = xdg.UserDirs.Templates + "/.stamus/"
 	}
+
+	log.Println("Config folder:", ConfigFolder)
+	log.Println("Templates folder:", TemplatesFolder)
 }
