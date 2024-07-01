@@ -11,6 +11,8 @@ require github.com/compose-spec/compose-go v1.20.2
 
 require github.com/compose-spec/compose-go v1.20.2
 
+require github.com/compose-spec/compose-go v1.20.2
+
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
