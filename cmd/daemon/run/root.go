@@ -20,6 +20,7 @@ import (
 
 func NewPrometheusServer(ctx context.Context) {
 	engineProm := gin.New()
+
 	p := ginprometheus.NewPrometheus("gin")
 	p.Use(engineProm)
 
@@ -70,7 +71,7 @@ func RunCmd() *cobra.Command {
 
 			logging.LoggerWithSpanContext(span.SpanContext()).Info("Setup middleware")
 			r.Use(gin.Recovery())
-			r.Use(otelgin.Middleware("service-name", otelgin.WithTracerProvider(logging.TracerProvider)))
+			r.Use(otelgin.Middleware("stamusd", otelgin.WithTracerProvider(logging.TracerProvider)))
 
 			logging.LoggerWithSpanContext(span.SpanContext()).Info("Setup routes")
 			v1 := r.Group("/api/v1")

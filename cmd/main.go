@@ -3,6 +3,7 @@ package main
 import (
 
 	// cli "stamus-ctl/cmd/stamusctl/commands"
+	"os"
 	ctl "stamus-ctl/cmd/ctl"
 	daemon "stamus-ctl/cmd/daemon"
 	"stamus-ctl/internal/app"
@@ -17,7 +18,15 @@ func main() {
 	case "stamusd":
 		daemon.Execute()
 	default:
-		daemon.Execute()
+		exec := os.Getenv("STAMUS_APP_NAME")
+		switch exec {
+		case "stamusctl":
+			ctl.Execute()
+		case "stamusd":
+			daemon.Execute()
+		default:
+			daemon.Execute()
+		}
 	}
 
 	// if err != nil {

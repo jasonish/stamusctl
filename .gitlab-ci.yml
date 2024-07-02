@@ -93,8 +93,6 @@ build cli:
     script:
         - |
             apk add --no-cache gcc musl-dev make
-            go install github.com/swaggo/swag/cmd/swag@latest
-            swag init -g root.go -o cmd/docs -d cmd/daemon/run/
             make cli
             mv dist/stamusctl .
 
@@ -124,8 +122,6 @@ build test:
     script:
         - |
             apk add --no-cache gcc musl-dev make
-            go install github.com/swaggo/swag/cmd/swag@latest
-            swag init -g root.go -o cmd/docs -d cmd/daemon/run/
             chmod +x $(pwd)/scripts/move.sh
             $(pwd)/scripts/move.sh
             make test-cli
@@ -139,7 +135,7 @@ test cli:
         - build cli
     script:
         - |
-            ./stamusctl
+            STAMUS_APP_NAME=stamusctl ./stamusctl
 
 test daemon:
     image: busybox
@@ -148,7 +144,7 @@ test daemon:
         - build daemon
     script:
         - |
-            ./stamusd
+            STAMUS_APP_NAME=stamusd ./stamusd
 
 unit tests:
     image: golang:alpine
@@ -165,7 +161,7 @@ compose init:
         - build test
     script:
         - |
-            ./cli compose init --default nginx.exec=nginx
+            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
 
@@ -176,7 +172,7 @@ compose init set:
         - build test
     script:
         - |
-            ./cli compose init --default nginx.exec=nginx websocket.response=lel
+            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.response=lel
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
 
@@ -187,7 +183,7 @@ compose init optional:
         - build test
     script:
         - |
-            ./cli compose init --default nginx=false
+            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx=false
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-optional
 
@@ -198,7 +194,7 @@ compose init arbitrary:
         - build test
     script:
         - |
-            ./cli compose init --default nginx.exec=nginx websocket.port=6969
+            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.port=6969
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-arbitrary
 
@@ -209,8 +205,8 @@ compose config set:
         - build test
     script:
         - |
-            ./cli compose init --default nginx.exec=nginx
-            ./cli compose config set websocket.response=lel
+            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
+            STAMUS_APP_NAME=stamusctl ./cli compose config set websocket.response=lel
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
 
@@ -221,8 +217,8 @@ compose config reload:
         - build test
     script:
         - |
-            ./cli compose init --default nginx.exec=nginx
-            ./cli compose config set websocket.port=6969
-            ./cli compose config set --reload
+            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
+            STAMUS_APP_NAME=stamusctl ./cli compose config set websocket.port=6969
+            STAMUS_APP_NAME=stamusctl ./cli compose config set --reload
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
