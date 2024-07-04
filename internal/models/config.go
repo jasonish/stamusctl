@@ -255,25 +255,37 @@ func (f *Config) SaveConfigTo(dest file) error {
 	}
 	// Save parameters values to config file
 	f.saveParamsTo(dest)
+
+	// Clean destination folder
+	err = f.Clean(dest)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Cleans the config folder
+func (f *Config) Clean(folder file) error {
 	// Get list of all included subconfigs
 	_, includes, err := f.ExtractParams(false)
 	if err != nil {
 		return err
 	}
-	// Delete all included subconfig filess
+	// Delete all included subconfig files
 	for _, include := range includes {
-		err := os.Remove(filepath.Join(dest.Path, include))
+		err := os.Remove(filepath.Join(folder.Path, include))
 		if err != nil {
 			return err
 		}
 	}
 	// Clean destination folder
-	err = deleteEmptyFiles(dest.Path)
+	err = deleteEmptyFiles(folder.Path)
 	if err != nil {
 		log.Println("Error deleting empty files", err)
 		return err
 	}
-	err = deleteEmptyFolders(dest.Path)
+	err = deleteEmptyFolders(folder.Path)
 	if err != nil {
 		log.Println("Error deleting empty folders", err)
 		return err
@@ -315,10 +327,28 @@ func (f *Config) saveParamsTo(dest file) error {
 	for key, value := range f.arbitrary {
 		conf.viperInstance.Set(key, value)
 	}
-	conf.viperInstance.Set("stamusconfig", f.file.Path)
+	// conf.viperInstance.Set("stamusconfig", f.file.Path)
 	for key, value := range paramsValues {
 		conf.viperInstance.Set(key, value)
 	}
+	// If latest, set stamusconfig value to version
+	path := removeEmptyStrings(strings.Split(f.file.Path, "/"))
+	if path[len(path)-1] == "latest" {
+		// Get version
+		version, err := os.ReadFile(filepath.Join(f.file.Path, "version"))
+		if err != nil {
+			log.Println("Error reading version file", err)
+			return err
+		}
+		// Set stamusconfig value to version
+		var versionPath []string = append([]string{}, path...)
+		copy(versionPath, path)
+		versionPath[len(versionPath)-1] = string(version)
+		conf.viperInstance.Set("stamusconfig", "/"+filepath.Join(versionPath...))
+	} else {
+		conf.viperInstance.Set("stamusconfig", f.file.Path)
+	}
+
 	// Write the new config file
 	err = conf.viperInstance.WriteConfig()
 	if err != nil {
@@ -327,6 +357,16 @@ func (f *Config) saveParamsTo(dest file) error {
 	}
 
 	return nil
+}
+
+func removeEmptyStrings(s []string) []string {
+	var r []string
+	for _, str := range s {
+		if str != "" {
+			r = append(r, str)
+		}
+	}
+	return r
 }
 
 func (f *Config) DeleteFolder() error {

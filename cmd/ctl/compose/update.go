@@ -19,6 +19,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
+	cp "github.com/otiai10/copy"
 	"github.com/spf13/cobra"
 
 	// Custom
@@ -176,10 +177,10 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 	}()
 
 	// Extract conf from container
-	srcPaths := []string{"/data", "/sbin"}     // Source path inside the container
-	destPath := app.TemplatesFolder + "selks/" // Destination path on the host
+	srcPaths := []string{"/data", "/sbin"}                    // Source path inside the container
+	destPath := filepath.Join(app.TemplatesFolder + "selks/") // Destination path on the host
 	// Remove existing configuration
-	if err := os.RemoveAll(app.TemplatesFolder + "selks/latest"); err != nil {
+	if err := os.RemoveAll(filepath.Join(destPath, "latest")); err != nil {
 		return err
 	}
 	// Copy files from container
@@ -188,22 +189,35 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	}
-	// Move files to correct location
-	if err := os.Rename(app.TemplatesFolder+"selks/data/", app.TemplatesFolder+"selks/latest/"); err != nil {
+	// Move files to correct locations
+	originPath := filepath.Join(destPath, "data/")
+	latestPath := filepath.Join(destPath, "latest/")
+	if err := os.Rename(originPath, latestPath); err != nil {
+		return err
+	}
+	// Copy templates latest to templates version
+	version, err := os.ReadFile(filepath.Join(latestPath, "version"))
+	if err != nil {
+		return err
+	}
+	err = cp.Copy(latestPath, filepath.Join(destPath, string(version)))
+	if err != nil {
 		return err
 	}
 	fmt.Println("Configuration extracted")
 
 	// Execute update script
-	prerun := exec.Command(app.TemplatesFolder + "selks/sbin/pre-run")
-	postrun := exec.Command(app.TemplatesFolder + "selks/sbin/post-run")
+	prerunPath := filepath.Join(destPath, "sbin/pre-run")
+	postrunPath := filepath.Join(destPath, "sbin/post-run")
+	prerun := exec.Command(prerunPath)
+	postrun := exec.Command(postrunPath)
 	// Display output to terminal
 	runOutput := new(strings.Builder)
 	prerun.Stdout = runOutput
 	prerun.Stderr = os.Stderr
 	// Change execution rights
-	os.Chmod(app.TemplatesFolder+"selks/sbin/pre-run", 0755)
-	os.Chmod(app.TemplatesFolder+"selks/sbin/post-run", 0755)
+	os.Chmod(prerunPath, 0755)
+	os.Chmod(postrunPath, 0755)
 	// Run pre-run script
 	if err := prerun.Run(); err != nil {
 		return err
@@ -230,7 +244,7 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	// Create new config
-	newConfFile, err := models.CreateFileInstance(app.TemplatesFolder+"selks/latest", "config.yaml")
+	newConfFile, err := models.CreateFileInstance(latestPath, "config.yaml")
 	if err != nil {
 		return err
 	}
