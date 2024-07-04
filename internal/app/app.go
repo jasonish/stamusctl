@@ -56,10 +56,5 @@ func init() {
 	} else {
 		TemplatesFolder = xdg.UserDirs.Templates + "/.stamus/"
 	}
-	if val := os.Getenv("STAMUS_TEMPLATES_FOLDER"); val != "" {
-		TemplatesFolder = val
-	} else {
-		TemplatesFolder = xdg.UserDirs.Templates + "/.stamus/"
-	}
 
 }
