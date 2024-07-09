@@ -10,11 +10,14 @@ import (
 	"github.com/adrg/xdg"
 )
 
+// Constants
 var (
-	Name            = ""
-	Mode            = "prod"
-	ConfigFolder    = "/"
-	TemplatesFolder = "/"
+	Name             = ""
+	Mode             = "prod"
+	ConfigFolder     = "/"
+	TemplatesFolder  = "/"
+	DefaultSelksPath = "/"
+	LatestSelksPath  = "/"
 )
 
 const (
@@ -56,5 +59,9 @@ func init() {
 	} else {
 		TemplatesFolder = xdg.UserDirs.Templates + "/.stamus/"
 	}
+
+	// Derived paths
+	DefaultSelksPath = TemplatesFolder + "selks/embedded/"
+	LatestSelksPath = TemplatesFolder + "selks/latest/"
 
 }
