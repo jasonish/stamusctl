@@ -4,19 +4,7 @@ import (
 	// Common
 	// External
 	"github.com/spf13/cobra"
-
-	// Custom
-	"stamus-ctl/internal/app"
 )
-
-// Constants
-var DefaultSelksPath string
-var LatestSelksPath string
-
-func init() {
-	DefaultSelksPath = app.TemplatesFolder + "selks/embedded/"
-	LatestSelksPath = app.TemplatesFolder + "selks/latest/"
-}
 
 // Commands
 func ComposeCmd() *cobra.Command {
@@ -30,7 +18,9 @@ func ComposeCmd() *cobra.Command {
 	cmd.AddCommand(initCmd())
 	cmd.AddCommand(configCmd())
 	cmd.AddCommand(updateCmd())
-	cmd.AddCommand(wrappedCmd()...)
+	// Docker commands
+	wrappedCmds, _ := wrappedCmd()
+	cmd.AddCommand(wrappedCmds...)
 
 	return cmd
 }

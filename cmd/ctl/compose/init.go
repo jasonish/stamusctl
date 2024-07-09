@@ -9,33 +9,18 @@ import (
 	// Custom
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/embeds"
-	"stamus-ctl/internal/models"
+	parameters "stamus-ctl/internal/handlers"
+	handlers "stamus-ctl/internal/handlers/compose"
 	"stamus-ctl/internal/utils"
 )
 
 // Constants
 const embed string = "selks"
 
-// Flags
-var output = models.Parameter{
-	Name:      "folder",
-	Shorthand: "f",
-	Type:      "string",
-	Default:   models.CreateVariableString("tmp"),
-	Usage:     "Declare the folder where to save configuration files",
-}
-var defaultSettings = models.Parameter{
-	Name:      "default",
-	Shorthand: "d",
-	Type:      "bool",
-	Default:   models.CreateVariableBool(false),
-	Usage:     "Set to default settings",
-}
-
 // Commands
 func initCmd() *cobra.Command {
 	// Setup
-	initSelksFolder(DefaultSelksPath)
+	initSelksFolder(app.DefaultSelksPath)
 	// Create
 	cmd := &cobra.Command{
 		Use:   "init",
@@ -45,8 +30,8 @@ func initCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	output.AddAsFlag(cmd, false)
-	defaultSettings.AddAsFlag(cmd, false)
+	parameters.OutputPath.AddAsFlag(cmd, false)
+	parameters.IsDefaultParam.AddAsFlag(cmd, false)
 	// Commands
 	cmd.AddCommand(SELKSCmd())
 	return cmd
@@ -80,60 +65,12 @@ func initSelksFolder(path string) {
 }
 
 func SELKSHandler(cmd *cobra.Command, args []string) error {
-	// Instanciate config
-	var config *models.Config
-	confFile, err := models.CreateFileInstance(LatestSelksPath, "config.yaml")
-	if err != nil {
-		confFile, err = models.CreateFileInstance(DefaultSelksPath, "config.yaml")
-		if err != nil {
-			return err
-		}
+	selksInitParams := handlers.InitHandlerInputs{
+		IsDefault:        *parameters.IsDefaultParam.Variable.Bool,
+		FolderPath:       app.LatestSelksPath,
+		BackupFolderPath: app.DefaultSelksPath,
+		OutputPath:       *parameters.OutputPath.Variable.String,
+		Arbitrary:        utils.ExtractArgs(args),
 	}
-	config, err = models.NewConfigFrom(confFile)
-	if err != nil {
-		return err
-	}
-	// Read the folder configuration
-	_, _, err = config.ExtractParams(true)
-	if err != nil {
-		return err
-	}
-	// Set parameters
-	if *defaultSettings.Variable.Bool {
-		// Extract and set values from args
-		extractedArgs := utils.ExtractArgs(args)
-		err = config.GetParams().SetLooseValues(extractedArgs)
-		config.SetArbitrary(extractedArgs)
-		if err != nil {
-			return err
-		}
-		// Set from default
-		err := config.GetParams().SetToDefaults()
-		if err != nil {
-			return err
-		}
-		// Ask for missing parameters
-		err = config.GetParams().AskMissing()
-		if err != nil {
-			return err
-		}
-	} else {
-		//Set from user input
-		err := config.GetParams().AskAll()
-		if err != nil {
-			return err
-		}
-	}
-	// Validate parameters
-	err = config.GetParams().ValidateAll()
-	if err != nil {
-		return err
-	}
-	// Save the configuration
-	outputFile, err := models.CreateFileInstance(*output.Variable.String, "values.yaml")
-	if err != nil {
-		return err
-	}
-	config.SaveConfigTo(outputFile)
-	return nil
+	return handlers.InitHandler(true, selksInitParams)
 }
