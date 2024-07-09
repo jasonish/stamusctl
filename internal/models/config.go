@@ -26,17 +26,18 @@ func init() {
 // It contains the path to the file, the arbitrary values, the parameters values and the viper instnace to interact with the file
 // It can be used to get or set values, validates them etc
 type Config struct {
-	file          file
+	file          File
 	arbitrary     map[string]any
 	parameters    *Parameters
 	viperInstance *viper.Viper
 }
 
 // Create a new config instance from a file
-func NewConfigFrom(file file) (*Config, error) {
+func NewConfigFrom(file File) (*Config, error) {
 	// Instanciate viper
 	viperInstance, err := InstanciateViper(file)
 	if err != nil {
+		log.Println("Error instanciating viper", err)
 		return nil, err
 	}
 	// Create the config
@@ -50,7 +51,7 @@ func NewConfigFrom(file file) (*Config, error) {
 
 // Create a new config instance from a path, extract the values and return the instance
 // Reload is used to not keep the arbitrary values
-func LoadConfigFrom(path file, reload bool) (*Config, error) {
+func LoadConfigFrom(path File, reload bool) (*Config, error) {
 	// Load the config
 	configured, err := NewConfigFrom(path)
 	if err != nil {
@@ -226,7 +227,7 @@ func (f *Config) CopyToPath(dest string) error {
 }
 
 // Save the config to a folder
-func (f *Config) SaveConfigTo(dest file) error {
+func (f *Config) SaveConfigTo(dest File) error {
 	// Create config value map
 	var data = map[string]any{}
 	var configData = map[string]any{}
@@ -266,7 +267,7 @@ func (f *Config) SaveConfigTo(dest file) error {
 }
 
 // Cleans the config folder
-func (f *Config) Clean(folder file) error {
+func (f *Config) Clean(folder File) error {
 	// Get list of all included subconfigs
 	_, includes, err := f.ExtractParams(false)
 	if err != nil {
@@ -294,7 +295,7 @@ func (f *Config) Clean(folder file) error {
 }
 
 // Save parameters values to config file
-func (f *Config) saveParamsTo(dest file) error {
+func (f *Config) saveParamsTo(dest File) error {
 	//Clear the file
 	os.Remove(dest.completePath())
 	//ReCreate the file

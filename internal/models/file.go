@@ -11,27 +11,27 @@ import (
 )
 
 // Used to setup viper instances
-type file struct {
+type File struct {
 	Path string
 	Name string
 	Type string
 }
 
 // Used to get the file as properties from path
-func createFileInstanceFromPath(path string) (file, error) {
+func createFileInstanceFromPath(path string) (File, error) {
 	// Extract the file properties
 	pathSplited := strings.Split(path, "/")
 	nameSplited := strings.Split(pathSplited[len(pathSplited)-1], ".")
 	// Validate all
 	if len(nameSplited) < 2 {
-		return file{}, fmt.Errorf("path %s is not a valid file name", path)
+		return File{}, fmt.Errorf("path %s is not a valid file name", path)
 	}
 	err := isValidPath(path)
 	if err != nil {
-		return file{}, err
+		return File{}, err
 	}
 	// Return file instance
-	return file{
+	return File{
 		Path: strings.Join(pathSplited[:len(pathSplited)-1], "/"),
 		Name: strings.Join(nameSplited[:len(nameSplited)-1], "."),
 		Type: nameSplited[len(nameSplited)-1],
@@ -39,30 +39,30 @@ func createFileInstanceFromPath(path string) (file, error) {
 }
 
 // Used create a file from path and name
-func CreateFileInstance(path string, fileName string) (file, error) {
+func CreateFileInstance(path string, fileName string) (File, error) {
 	// Extract the file properties
 	nameSplited := strings.Split(fileName, ".")
 	// Validate all
 	if len(nameSplited) != 2 {
-		return file{}, fmt.Errorf("path %s is not a valid file name", path)
+		return File{}, fmt.Errorf("path %s is not a valid file name", path)
 	}
 	err := isValidPath(path)
 	if err != nil {
-		return file{}, err
+		return File{}, err
 	}
 	err = isValidPath(fileName)
 	if err != nil {
-		return file{}, err
+		return File{}, err
 	}
 	// Return file instance
-	return file{
+	return File{
 		Path: path,
 		Name: nameSplited[0],
 		Type: nameSplited[1],
 	}, nil
 }
 
-func (f *file) completePath() string {
+func (f *File) completePath() string {
 	return f.Path + "/" + f.Name + "." + f.Type
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func InstanciateViper(file file) (*viper.Viper, error) {
+func InstanciateViper(file File) (*viper.Viper, error) {
 	// Create a new viper instance
 	viperInstance := viper.New()
 	// General configuration
