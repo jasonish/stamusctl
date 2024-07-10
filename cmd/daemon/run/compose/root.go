@@ -21,5 +21,17 @@ func NewCompose(router *gin.RouterGroup) {
 	compose := router.Group("/compose")
 	{
 		compose.GET("/pingcompose", ping)
+		compose.POST("/init", initHandler)
+		compose.POST("/config", setHandler)
+		compose.GET("/config", getHandler)
+		compose.POST("/update", updateHandler)
 	}
+}
+
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+type SuccessResponse struct {
+	Message string `json:"message"`
 }
