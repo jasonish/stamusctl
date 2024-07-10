@@ -27,7 +27,27 @@ import (
 	"stamus-ctl/internal/utils"
 )
 
-func UpdateHandler(configPath string, args []string, registryVal string, usernameVal string, passwordVal string, versionVal string) error {
+type UpdateHandlerParams struct {
+	models.RegistryInfo
+	Config  string
+	Args    []string
+	Version string
+}
+
+func UpdateHandler(params UpdateHandlerParams) error {
+	// Unpack params
+	registryVal := params.Registry
+	usernameVal := params.Username
+	passwordVal := params.Password
+	configPath := params.Config
+	args := params.Args
+	versionVal := params.Version
+
+	// Validate parameters
+	if err := params.ValidateRegistry(); err != nil {
+		return err
+	}
+
 	// Create docker client
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
