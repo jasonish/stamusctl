@@ -10,6 +10,7 @@ import (
 	// Custom
 	parameters "stamus-ctl/internal/handlers"
 	handlers "stamus-ctl/internal/handlers/compose"
+	"stamus-ctl/internal/models"
 )
 
 // Commands
@@ -51,21 +52,18 @@ func updateHandler(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	}
-	// Get values from flags
-	var registryVal, usernameVal, passwordVal, versionVal string
-	registryVal = *parameters.Registry.Variable.String
-	usernameVal = *parameters.Username.Variable.String
-	passwordVal = *parameters.Password.Variable.String
-	versionVal = *parameters.Version.Variable.String
 
 	// Call handler
-	return handlers.UpdateHandler(
-		*parameters.Config.Variable.String,
-		args,
-		registryVal,
-		usernameVal,
-		passwordVal,
-		versionVal,
-	)
+	params := handlers.UpdateHandlerParams{
+		RegistryInfo: models.RegistryInfo{
+			Registry: *parameters.Registry.Variable.String,
+			Username: *parameters.Username.Variable.String,
+			Password: *parameters.Password.Variable.String,
+		},
+		Config:  *parameters.Config.Variable.String,
+		Args:    args,
+		Version: *parameters.Version.Variable.String,
+	}
+	return handlers.UpdateHandler(params)
 
 }

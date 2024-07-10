@@ -21,6 +21,7 @@ var composeFlags = models.ComposeFlags{
 	),
 }
 
+// Commands
 func wrappedCmd() ([]*cobra.Command, map[string]*cobra.Command) {
 	return handlers.WrappedCmd(composeFlags)
 }
