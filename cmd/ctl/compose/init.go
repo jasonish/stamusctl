@@ -71,6 +71,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		BackupFolderPath: app.DefaultSelksPath,
 		OutputPath:       *parameters.OutputPath.Variable.String,
 		Arbitrary:        utils.ExtractArgs(args),
+		Project:          "selks",
 	}
 	return handlers.InitHandler(true, selksInitParams)
 }

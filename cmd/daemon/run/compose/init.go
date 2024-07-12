@@ -20,6 +20,7 @@ import (
 
 type InitRequest struct {
 	IsDefault bool              `json:"default"`
+	Folder    string            `json:"folder"`
 	Project   string            `json:"project"`
 	Values    map[string]string `json:"values"`
 	//Version   string            `json:"version"`
@@ -35,8 +36,8 @@ func initHandler(c *gin.Context) {
 	}
 
 	// Validate request
-	if req.Project == "" {
-		req.Project = "tmp"
+	if req.Folder == "" {
+		req.Folder = "tmp"
 	}
 	if req.Values == nil {
 		req.Values = make(map[string]string)
@@ -47,8 +48,9 @@ func initHandler(c *gin.Context) {
 		IsDefault:        req.IsDefault,
 		FolderPath:       app.LatestSelksPath,
 		BackupFolderPath: app.DefaultSelksPath,
-		OutputPath:       req.Project,
+		OutputPath:       req.Folder,
 		Arbitrary:        req.Values,
+		Project:          req.Project,
 	}
 	if err := handlers.InitHandler(false, parameters); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

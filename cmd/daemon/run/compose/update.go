@@ -54,14 +54,9 @@ func updateHandler(c *gin.Context) {
 
 	// Call handler
 	params := handlers.UpdateHandlerParams{
-		RegistryInfo: models.RegistryInfo{
-			Registry: req.Registry,
-			Username: req.Username,
-			Password: req.Password,
-		},
 		Config:  req.Project,
-		Args:    valuesVal,
 		Version: req.Version,
+		Args:    valuesVal,
 	}
 	err := handlers.UpdateHandler(params)
 	if err != nil {

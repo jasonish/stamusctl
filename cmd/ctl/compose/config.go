@@ -53,6 +53,7 @@ Example: set scirius.token=AwesomeToken`,
 	}
 	parameters.ConfigPath.AddAsFlag(cmd, false)
 	parameters.Reload.AddAsFlag(cmd, false)
+	parameters.Apply.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -83,13 +84,16 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	apply, err := parameters.Apply.GetValue()
+	if err != nil {
+		return err
+	}
 	// Set the values
-	err = handlers.SetHandler(configPath.(string), args, reload.(bool))
+	err = handlers.SetHandler(configPath.(string), args, reload.(bool), apply.(bool))
 	if err != nil {
 		return err
 	}
 	return nil
-	// return HandleUp(configPath.(string))
 }
 
 func getHandler(cmd *cobra.Command, args []string) error {

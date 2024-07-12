@@ -22,6 +22,7 @@ type SetRequest struct {
 	Reload  bool              `json:"reload"`
 	Project string            `json:"project"`
 	Values  map[string]string `json:"values"`
+	Apply   bool              `json:"apply"`
 }
 
 func setHandler(c *gin.Context) {
@@ -45,7 +46,7 @@ func setHandler(c *gin.Context) {
 	}
 
 	// Call handler
-	if err := handlers.SetHandler(req.Project, valuesAsStrings, req.Reload); err != nil {
+	if err := handlers.SetHandler(req.Project, valuesAsStrings, req.Reload, req.Apply); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
