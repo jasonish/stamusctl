@@ -40,6 +40,7 @@ func rootCmd() *cobra.Command {
 	verbose.AddAsFlag(cmd, true)
 	// SubCommands
 	cmd.AddCommand(versionCmd())
+	cmd.AddCommand(loginCmd())
 	cmd.AddCommand(compose.ComposeCmd())
 	return cmd
 }
