@@ -40,6 +40,13 @@ var Reload = models.Parameter{
 	Default: models.CreateVariableBool(false),
 }
 
+var Apply = models.Parameter{
+	Name:    "apply",
+	Usage:   "Apply the new configuration",
+	Type:    "bool",
+	Default: models.CreateVariableBool(false),
+}
+
 // Update
 var Config = models.Parameter{
 	Name:      "folder",
@@ -48,10 +55,20 @@ var Config = models.Parameter{
 	Default:   models.CreateVariableString("tmp"),
 	Usage:     "Configuration to update",
 }
+var Version = models.Parameter{
+	Name:      "version",
+	Shorthand: "v",
+	Type:      "string",
+	Usage:     "Target version",
+	Default:   models.CreateVariableString("latest"),
+}
+
+// Registry
 var Registry = models.Parameter{
-	Name:  "registry",
-	Type:  "string",
-	Usage: "Registry to use",
+	Name:    "registry",
+	Type:    "string",
+	Usage:   "Registry to use",
+	Default: models.CreateVariableString("docker.io/library/"),
 }
 var Username = models.Parameter{
 	Name:  "user",
@@ -62,11 +79,4 @@ var Password = models.Parameter{
 	Name:  "pass",
 	Type:  "string",
 	Usage: "Registry password",
-}
-var Version = models.Parameter{
-	Name:      "version",
-	Shorthand: "v",
-	Type:      "string",
-	Usage:     "Target version",
-	Default:   models.CreateVariableString("latest"),
 }

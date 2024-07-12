@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func SetHandler(configPath string, args []string, reload bool) error {
+func SetHandler(configPath string, args []string, reload bool, apply bool) error {
 	// Load the config
 	file, err := models.CreateFileInstance(configPath, "values.yaml")
 	if err != nil {
@@ -32,6 +32,14 @@ func SetHandler(configPath string, args []string, reload bool) error {
 		return err
 	}
 	config.SaveConfigTo(outputAsFile)
+
+	// Apply the configuration
+	if apply {
+		err = HandleUp(configPath)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
