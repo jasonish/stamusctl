@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"path/filepath"
 
 	// Custom
 	"stamus-ctl/internal/app"
@@ -18,7 +19,7 @@ func getOrCreateStamusConfigFile() (*os.File, error) {
 	}
 
 	// Open or create ~/.stamus/config.json
-	f, err := os.OpenFile(app.ConfigFolder+"config.json", os.O_RDWR|os.O_CREATE, 0755)
+	f, err := os.OpenFile(filepath.Join(app.ConfigFolder, "config.json"), os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return nil, err
 	}
@@ -32,13 +33,12 @@ func GetStamusConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	// Read the file contents
 	bytes, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
-
+	// Unmarshal the file contents
 	Config := &Config{}
 	if len(bytes) != 0 {
 		err = json.Unmarshal(bytes, &Config)

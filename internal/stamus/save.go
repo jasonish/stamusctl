@@ -1,6 +1,8 @@
 package stamus
 
-func SaveLogin(registry string, user string, token string) error {
+import "stamus-ctl/internal/models"
+
+func SaveLogin(registryInfo models.RegistryInfo) error {
 	// Get config content
 	Config, err := GetStamusConfig()
 	if err != nil {
@@ -8,7 +10,11 @@ func SaveLogin(registry string, user string, token string) error {
 	}
 
 	// Save in struct
-	Config.SetRegistry(Registry(registry), User(user), Token(token))
+	Config.SetRegistry(
+		Registry(registryInfo.Registry),
+		User(registryInfo.Username),
+		Token(registryInfo.Password),
+	)
 
 	// Save config
 	Config.setStamusConfig()

@@ -2,6 +2,7 @@ package stamus
 
 import (
 	"encoding/json"
+	"stamus-ctl/internal/models"
 )
 
 type Registry string
@@ -17,8 +18,23 @@ type Config struct {
 	Current    string     `json:"current"`
 }
 
+func (r *Registries) AsList() []models.RegistryInfo {
+	// Create RegistryInfo
+	registryInfos := []models.RegistryInfo{}
+	for registry, logins := range *r {
+		for user, token := range logins {
+			registryInfos = append(registryInfos, models.RegistryInfo{
+				Registry: string(registry),
+				Username: string(user),
+				Password: string(token),
+			})
+		}
+	}
+	return registryInfos
+}
+
 func (conf Config) setStamusConfig() error {
-	// Open or create ~/.stamus/config.json
+	// Open or create
 	file, err := getOrCreateStamusConfigFile()
 	if err != nil {
 		return err
