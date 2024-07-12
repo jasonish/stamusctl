@@ -28,6 +28,10 @@ var composeFlags = models.ComposeFlags{
 		[]string{"file"},
 		[]string{"volumes", "remove-orphans"},
 	),
+	"ps": models.CreateComposeFlags(
+		[]string{"file"},
+		[]string{"services", "quiet"},
+	),
 }
 var composeCmds map[string]*cobra.Command = make(map[string]*cobra.Command)
 
