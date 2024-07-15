@@ -56,17 +56,8 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	// Execute update script
 	prerunPath := filepath.Join(destPath, "sbin/pre-run")
 	postrunPath := filepath.Join(destPath, "sbin/post-run")
-	prerun := exec.Command(prerunPath)
-	postrun := exec.Command(postrunPath)
-	// Display output to terminal
-	runOutput := new(strings.Builder)
-	prerun.Stdout = runOutput
-	prerun.Stderr = os.Stderr
-	// Change execution rights
-	os.Chmod(prerunPath, 0755)
-	os.Chmod(postrunPath, 0755)
-	// Run pre-run script
-	if err := prerun.Run(); err != nil {
+	runOutput, err := runArbitraryScript(prerunPath)
+	if err != nil {
 		return err
 	}
 
@@ -124,14 +115,27 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	}
 
 	// Run post-run script
-	postrunOutput := new(strings.Builder)
-	postrun.Stdout = postrunOutput
-	postrun.Stderr = os.Stderr
-	// Run pre-run script
-	if err := postrun.Run(); err != nil {
+	runOutput, err = runArbitraryScript(postrunPath)
+	if err != nil {
 		return err
 	}
 	fmt.Println("")
 
 	return nil
+}
+
+func runArbitraryScript(path string) (*strings.Builder, error) {
+	// Execute arbitrary script
+	arbitrary := exec.Command(path)
+	// Display output to terminal
+	runOutput := new(strings.Builder)
+	arbitrary.Stdout = runOutput
+	arbitrary.Stderr = os.Stderr
+	// Change execution rights
+	os.Chmod(path, 0755)
+	// Run arbitrary script
+	if err := arbitrary.Run(); err != nil {
+		return nil, err
+	}
+	return runOutput, nil
 }
