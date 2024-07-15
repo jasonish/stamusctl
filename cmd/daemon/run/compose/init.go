@@ -45,11 +45,11 @@ func initHandler(c *gin.Context) {
 	// Call handler
 	parameters := handlers.InitHandlerInputs{
 		IsDefault:        req.IsDefault,
-		FolderPath:       app.LatestSelksPath,
 		BackupFolderPath: app.DefaultSelksPath,
 		OutputPath:       req.Folder,
 		Arbitrary:        req.Values,
 		Project:          req.Project,
+		Version:          req.Version,
 	}
 	if err := handlers.InitHandler(false, parameters); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

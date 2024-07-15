@@ -9,7 +9,6 @@ import (
 
 type InitHandlerInputs struct {
 	IsDefault        bool
-	FolderPath       string
 	BackupFolderPath string
 	OutputPath       string
 	Project          string
@@ -21,16 +20,18 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 	// Get registry info
 	image := "/" + params.Project + ":" + params.Version
 	destPath := filepath.Join(app.TemplatesFolder, params.Project)
+
 	// Pull latest template
 	err := pullLatestTemplate(destPath, image)
 	if err != nil {
 		return err
 	}
 	// Instanciate config
-	config, err := instanciateConfig(destPath, params.BackupFolderPath)
+	config, err := instanciateConfig(filepath.Join(destPath, params.Version), params.BackupFolderPath)
 	if err != nil {
 		return err
 	}
+
 	// Read the folder configuration
 	_, _, err = config.ExtractParams(true)
 	if err != nil {
@@ -74,15 +75,26 @@ func pullLatestTemplate(destPath string, image string) error {
 
 // Instanciate config from folder or backup folders
 func instanciateConfig(folderPath string, backupFolderPath string) (*models.Config, error) {
-	var config *models.Config
+	// Try to instanciate from folder
+	config, err := instanciateConfigFromPath(folderPath)
+	if err == nil {
+		return config, nil
+	}
+	// Try to instanciate from backup folder
+	config, err = instanciateConfigFromPath(backupFolderPath)
+	if err == nil {
+		return config, nil
+	}
+	// Return error
+	return nil, err
+}
+
+func instanciateConfigFromPath(folderPath string) (*models.Config, error) {
 	confFile, err := models.CreateFileInstance(folderPath, "config.yaml")
 	if err != nil {
-		confFile, err = models.CreateFileInstance(backupFolderPath, "config.yaml")
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
-	config, err = models.NewConfigFrom(confFile)
+	config, err := models.NewConfigFrom(confFile)
 	if err != nil {
 		return nil, err
 	}

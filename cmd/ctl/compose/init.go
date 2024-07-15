@@ -67,7 +67,6 @@ func initSelksFolder(path string) {
 func SELKSHandler(cmd *cobra.Command, args []string) error {
 	selksInitParams := handlers.InitHandlerInputs{
 		IsDefault:        *parameters.IsDefaultParam.Variable.Bool,
-		FolderPath:       app.LatestSelksPath,
 		BackupFolderPath: app.DefaultSelksPath,
 		OutputPath:       *parameters.OutputPath.Variable.String,
 		Arbitrary:        utils.ExtractArgs(args),
