@@ -1,10 +1,12 @@
 package compose
 
 import (
+	// External
+	"github.com/gin-gonic/gin"
+	// Custom
 	"stamus-ctl/internal/app"
 	handlers "stamus-ctl/internal/handlers/compose"
-
-	"github.com/gin-gonic/gin"
+	"stamus-ctl/pkg"
 )
 
 // Init godoc
@@ -18,18 +20,9 @@ import (
 // @Failure 400 {object} ErrorResponse "Bad request with explanation"
 // @Router /compose/init [post]
 
-type InitRequest struct {
-	IsDefault bool              `json:"default"`
-	Folder    string            `json:"folder"`
-	Project   string            `json:"project"`
-	Values    map[string]string `json:"values"`
-	//Version   string            `json:"version"`
-	//Template  string            `json:"template"`
-}
-
 func initHandler(c *gin.Context) {
 	// Extract request body
-	var req InitRequest
+	var req pkg.InitRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
@@ -41,6 +34,12 @@ func initHandler(c *gin.Context) {
 	}
 	if req.Values == nil {
 		req.Values = make(map[string]string)
+	}
+	if req.Project == "" {
+		req.Project = "selks"
+	}
+	if req.Version == "" {
+		req.Version = "latest"
 	}
 
 	// Call handler

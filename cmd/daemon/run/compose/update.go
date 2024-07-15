@@ -2,7 +2,7 @@ package compose
 
 import (
 	handlers "stamus-ctl/internal/handlers/compose"
-	"stamus-ctl/internal/models"
+	"stamus-ctl/pkg"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,26 +18,15 @@ import (
 // @Failure 400 {object} ErrorResponse "Bad request with explanation"
 // @Router /compose/update [post]
 
-type UpdateRequest struct {
-	models.RegistryInfo
-	Version string            `json:"version"`
-	Project string            `json:"project"`
-	Values  map[string]string `json:"values"`
-}
-
 func updateHandler(c *gin.Context) {
 	// Extract request body
-	var req UpdateRequest
+	var req pkg.UpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
 	// Validate parameters
-	if err := req.ValidateRegistry(); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
 	if req.Project == "" {
 		req.Project = "tmp"
 	}

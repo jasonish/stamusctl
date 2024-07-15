@@ -1,9 +1,11 @@
 package compose
 
 import (
-	handlers "stamus-ctl/internal/handlers/compose"
-
+	// External
 	"github.com/gin-gonic/gin"
+	//Custom
+	handlers "stamus-ctl/internal/handlers/compose"
+	"stamus-ctl/pkg"
 )
 
 // setHandler godoc
@@ -18,16 +20,9 @@ import (
 // @Failure 500 {object} ErrorResponse "Internal server error with explanation"
 // @Router /compose/config [post]
 
-type SetRequest struct {
-	Reload  bool              `json:"reload"`
-	Project string            `json:"project"`
-	Values  map[string]string `json:"values"`
-	Apply   bool              `json:"apply"`
-}
-
 func setHandler(c *gin.Context) {
 	// Extract request body
-	var req SetRequest
+	var req pkg.SetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
@@ -64,16 +59,11 @@ func setHandler(c *gin.Context) {
 // @Failure 500 {object} ErrorResponse "Internal server error with explanation"
 // @Router /compose/config [get]
 
-type GetRequest struct {
-	Project string   `json:"project"`
-	Values  []string `json:"values"`
-}
-
 type GetResponse map[string]interface{}
 
 func getHandler(c *gin.Context) {
 	// Extract request body
-	var req GetRequest
+	var req pkg.GetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
