@@ -72,6 +72,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		OutputPath:       *parameters.OutputPath.Variable.String,
 		Arbitrary:        utils.ExtractArgs(args),
 		Project:          "selks",
+		Version:          "latest",
 	}
 	return handlers.InitHandler(true, selksInitParams)
 }

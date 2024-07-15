@@ -32,14 +32,12 @@ var Format = models.Parameter{
 	Type:    "string",
 	Default: models.CreateVariableString("{{.}}"),
 }
-
 var Reload = models.Parameter{
 	Name:    "reload",
 	Usage:   "Reload the configuration, don't keep arbitrary parameters",
 	Type:    "bool",
 	Default: models.CreateVariableBool(false),
 }
-
 var Apply = models.Parameter{
 	Name:    "apply",
 	Usage:   "Apply the new configuration",
