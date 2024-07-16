@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 	"stamus-ctl/internal/models"
@@ -71,30 +70,11 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 			flags := composeFlags[command].ExtractFlags(cmdDocker.Flags(), c.Flags())
 			c.ResetFlags()
 			c.Flags().AddFlagSet(flags)
-
 			// Modify file flag
 			if c.Flags().Lookup("file") != nil {
-				c.Flags().Lookup("file").Hidden = true
-				// Save the command
-				composeCmds[command] = c
-				currentRunE := c.RunE
-				// Modify cmd function
-				c.RunE = func(cmd *cobra.Command, args []string) error {
-					log.Println("cmd.Flags()", cmd.Flags())
-					flagValue := filepath.Join(cmd.Flags().Lookup("folder").Value.String(), "/docker-compose.yaml")
-
-					fileFlag := getComposeCmd(command).Flags().Lookup("file")
-					fileFlag.Value.Set(flagValue)
-					fileFlag.DefValue = flagValue
-
-					return currentRunE(cmd, args)
-				}
-				// Add custom folder flag
-				folderFlag := *pflag.NewFlagSet("folder", pflag.ContinueOnError)
-				folderFlag.String("folder", "tmp", "Folder where the config is located")
-				c.Flags().AddFlagSet(&folderFlag)
+				modifyFileFlag(c, command)
 			}
-
+			// Save command
 			cmds = append(cmds, c)
 			mappedCmds[command] = c
 		}
@@ -136,4 +116,35 @@ func HandleDown(configPath string, removeOrphans bool, volumes bool) error {
 	cmd.AddCommand(command)
 	// Run command
 	return cmd.Execute()
+}
+
+// Modify the file flag to be hidden and add a folder flag
+func modifyFileFlag(c *cobra.Command, command string) {
+	c.Flags().Lookup("file").Hidden = true
+	// Save the command
+	composeCmds[command] = c
+	currentRunE := c.RunE
+	// Modify cmd function
+	c.RunE = makeCustomRunner(currentRunE, command)
+	// Add custom folder flag
+	folderFlag := *pflag.NewFlagSet("folder", pflag.ContinueOnError)
+	folderFlag.String("folder", "tmp", "Folder where the config is located")
+	c.Flags().AddFlagSet(&folderFlag)
+}
+
+// Return a custom runner for the command, that sets the file flag to the folder flag
+func makeCustomRunner(
+	runE func(cmd *cobra.Command, args []string) error,
+	command string,
+) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		// Get folder flag value
+		flagValue := filepath.Join(cmd.Flags().Lookup("folder").Value.String(), "/docker-compose.yaml")
+		// Set file flag
+		fileFlag := getComposeCmd(command).Flags().Lookup("file")
+		fileFlag.Value.Set(flagValue)
+		fileFlag.DefValue = flagValue
+		// Run existing command
+		return runE(cmd, args)
+	}
 }
