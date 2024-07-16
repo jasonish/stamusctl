@@ -14,6 +14,7 @@ type InitHandlerInputs struct {
 	Project          string
 	Version          string
 	Arbitrary        map[string]string
+	Values           string
 }
 
 func InitHandler(isCli bool, params InitHandlerInputs) error {
@@ -31,17 +32,21 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 	if err != nil {
 		return err
 	}
-
 	// Read the folder configuration
 	_, _, err = config.ExtractParams(true)
 	if err != nil {
 		return err
 	}
 	// Set parameters
+	err = setValuesFrom(params.Values, config.GetParams())
+	if err != nil {
+		return err
+	}
 	err = setParameters(isCli, config, params)
 	if err != nil {
 		return err
 	}
+
 	// Validate parameters
 	err = config.GetParams().ValidateAll()
 	if err != nil {
@@ -89,6 +94,7 @@ func instanciateConfig(folderPath string, backupFolderPath string) (*models.Conf
 	return nil, err
 }
 
+// Instanciate config from path
 func instanciateConfigFromPath(folderPath string) (*models.Config, error) {
 	confFile, err := models.CreateFileInstance(folderPath, "config.yaml")
 	if err != nil {
@@ -122,6 +128,21 @@ func setParameters(isCli bool, config *models.Config, params InitHandlerInputs) 
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func setValuesFrom(valuesPath string, params *models.Parameters) error {
+	if valuesPath != "" {
+		file, err := models.CreateFileInstanceFromPath(valuesPath)
+		if err != nil {
+			return err
+		}
+		valuesConf, err := models.LoadConfigFrom(file, false)
+		if err != nil {
+			return err
+		}
+		params.MergeValues(valuesConf.GetParams())
 	}
 	return nil
 }

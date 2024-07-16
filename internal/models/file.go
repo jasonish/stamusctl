@@ -18,7 +18,7 @@ type File struct {
 }
 
 // Used to get the file as properties from path
-func createFileInstanceFromPath(path string) (File, error) {
+func CreateFileInstanceFromPath(path string) (File, error) {
 	// Extract the file properties
 	pathSplited := strings.Split(path, "/")
 	nameSplited := strings.Split(pathSplited[len(pathSplited)-1], ".")

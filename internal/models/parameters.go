@@ -206,6 +206,13 @@ func filterRemainingOptionalParams(optionalParams []string, optionalParam string
 	return remain
 }
 
+func (p *Parameters) MergeValues(toMerge *Parameters) *Parameters {
+	for key, value := range *toMerge {
+		(*p)[key].Variable = value.Variable
+	}
+	return p
+}
+
 // Sets paramaters values to given values
 func (p *Parameters) SetValues(values map[string]*Variable) {
 	for key, value := range values {

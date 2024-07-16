@@ -17,6 +17,13 @@ var IsDefaultParam = models.Parameter{
 	Default:   models.CreateVariableBool(false),
 	Usage:     "Set to default settings",
 }
+var Values = models.Parameter{
+	Name:      "values",
+	Shorthand: "v",
+	Type:      "string",
+	Default:   models.CreateVariableString(""),
+	Usage:     "Values file to use",
+}
 
 // Config
 var ConfigPath = models.Parameter{

@@ -6,36 +6,51 @@ import (
 	"strings"
 )
 
-func SetHandler(configPath string, args []string, reload bool, apply bool) error {
+type SetHandlerInputs struct {
+	Config string   // Path to the config folder
+	Values string   // Path to the values.yaml file
+	Reload bool     // Reload the configuration, don't keep arbitrary parameters
+	Apply  bool     // Apply the new configuration, reload the services
+	Args   []string // Cmd arguments
+}
+
+// func SetHandler(configPath string, args []string, reload bool, apply bool) error {
+func SetHandler(params SetHandlerInputs) error {
 	// Load the config
-	file, err := models.CreateFileInstance(configPath, "values.yaml")
+	file, err := models.CreateFileInstance(params.Config, "values.yaml")
 	if err != nil {
 		return err
 	}
-	config, err := models.LoadConfigFrom(file, reload)
+	config, err := models.LoadConfigFrom(file, params.Reload)
 	if err != nil {
 		return err
 	}
+
 	// Extract and set parameters from args
-	paramsArgs := utils.ExtractArgs(args)
+	paramsArgs := utils.ExtractArgs(params.Args)
 	config.GetParams().SetLooseValues(paramsArgs)
 	config.SetArbitrary(paramsArgs)
 	config.GetParams().ProcessOptionnalParams(false)
+	// Set values from file
+	err = setValuesFrom(params.Values, config.GetParams())
+	if err != nil {
+		return err
+	}
 	// Validate
 	err = config.GetParams().ValidateAll()
 	if err != nil {
 		return err
 	}
+
 	// Save the configuration
-	outputAsFile, err := models.CreateFileInstance(configPath, "values.yaml")
+	outputAsFile, err := models.CreateFileInstance(params.Config, "values.yaml")
 	if err != nil {
 		return err
 	}
 	config.SaveConfigTo(outputAsFile)
-
 	// Apply the configuration
-	if apply {
-		err = HandleUp(configPath)
+	if params.Apply {
+		err = HandleUp(params.Config)
 		if err != nil {
 			return err
 		}
