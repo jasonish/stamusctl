@@ -52,6 +52,7 @@ Example: set scirius.token=AwesomeToken`,
 		},
 	}
 	parameters.ConfigPath.AddAsFlag(cmd, false)
+	parameters.Values.AddAsFlag(cmd, false)
 	parameters.Reload.AddAsFlag(cmd, false)
 	parameters.Apply.AddAsFlag(cmd, false)
 	return cmd
@@ -88,8 +89,19 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	values, err := parameters.Values.GetValue()
+	if err != nil {
+		return err
+	}
 	// Set the values
-	err = handlers.SetHandler(configPath.(string), args, reload.(bool), apply.(bool))
+	params := handlers.SetHandlerInputs{
+		Config: configPath.(string),
+		Args:   args,
+		Reload: reload.(bool),
+		Apply:  apply.(bool),
+		Values: values.(string),
+	}
+	err = handlers.SetHandler(params)
 	if err != nil {
 		return err
 	}

@@ -41,7 +41,13 @@ func setHandler(c *gin.Context) {
 	}
 
 	// Call handler
-	if err := handlers.SetHandler(req.Project, valuesAsStrings, req.Reload, req.Apply); err != nil {
+	params := handlers.SetHandlerInputs{
+		Config: req.Project,
+		Reload: req.Reload,
+		Apply:  req.Apply,
+		Args:   valuesAsStrings,
+	}
+	if err := handlers.SetHandler(params); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}

@@ -32,6 +32,7 @@ func initCmd() *cobra.Command {
 	// Flags
 	parameters.OutputPath.AddAsFlag(cmd, false)
 	parameters.IsDefaultParam.AddAsFlag(cmd, false)
+	parameters.Values.AddAsFlag(cmd, false)
 	// Commands
 	cmd.AddCommand(SELKSCmd())
 	return cmd
@@ -72,6 +73,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		Arbitrary:        utils.ExtractArgs(args),
 		Project:          "selks",
 		Version:          "latest",
+		Values:           *parameters.Values.Variable.String,
 	}
 	return handlers.InitHandler(true, selksInitParams)
 }
