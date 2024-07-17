@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	// Custom
-	parameters "stamus-ctl/internal/handlers"
+	flags "stamus-ctl/internal/handlers"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
 )
@@ -24,23 +24,23 @@ func loginCmd() *cobra.Command {
 		RunE:  loginHandler,
 	}
 	// Flags
-	parameters.Registry.AddAsFlag(cmd, false)
-	parameters.Username.AddAsFlag(cmd, false)
-	parameters.Password.AddAsFlag(cmd, false)
+	flags.Registry.AddAsFlag(cmd, false)
+	flags.Username.AddAsFlag(cmd, false)
+	flags.Password.AddAsFlag(cmd, false)
 	return cmd
 }
 
 func loginHandler(cmd *cobra.Command, args []string) error {
-	// Extract parameters
-	registry, err := parameters.Registry.GetValue()
+	// Extract flags
+	registry, err := flags.Registry.GetValue()
 	if err != nil {
 		return err
 	}
-	username, err := parameters.Username.GetValue()
+	username, err := flags.Username.GetValue()
 	if err != nil {
 		return err
 	}
-	password, err := parameters.Password.GetValue()
+	password, err := flags.Password.GetValue()
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func loginHandler(cmd *cobra.Command, args []string) error {
 }
 
 func LoginHandler(registryInfo models.RegistryInfo) error {
-	// Validate parameters from flags
+	// Validate flags
 	err := registryInfo.ValidateAllRegistry()
 	if err != nil {
 		return err

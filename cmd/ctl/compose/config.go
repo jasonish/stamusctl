@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	// Custom
 	"stamus-ctl/internal/app"
-	parameters "stamus-ctl/internal/handlers"
+	flags "stamus-ctl/internal/handlers"
 	handlers "stamus-ctl/internal/handlers/compose"
 )
 
@@ -31,7 +31,7 @@ func configCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	parameters.ConfigPath.AddAsFlag(cmd, false)
+	flags.ConfigPath.AddAsFlag(cmd, false)
 
 	// Add Commands
 	cmd.AddCommand(getCmd())
@@ -51,10 +51,10 @@ Example: set scirius.token=AwesomeToken`,
 			return setHandler(cmd, args)
 		},
 	}
-	parameters.ConfigPath.AddAsFlag(cmd, false)
-	parameters.Values.AddAsFlag(cmd, false)
-	parameters.Reload.AddAsFlag(cmd, false)
-	parameters.Apply.AddAsFlag(cmd, false)
+	flags.ConfigPath.AddAsFlag(cmd, false)
+	flags.Values.AddAsFlag(cmd, false)
+	flags.Reload.AddAsFlag(cmd, false)
+	flags.Apply.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -70,26 +70,26 @@ Example: get scirius`,
 			return getHandler(cmd, args)
 		},
 	}
-	parameters.ConfigPath.AddAsFlag(cmd, false)
+	flags.ConfigPath.AddAsFlag(cmd, false)
 	return cmd
 }
 
 // Handlers
 func setHandler(cmd *cobra.Command, args []string) error {
 	// Get properties
-	configPath, err := parameters.ConfigPath.GetValue()
+	configPath, err := flags.ConfigPath.GetValue()
 	if err != nil {
 		return err
 	}
-	reload, err := parameters.Reload.GetValue()
+	reload, err := flags.Reload.GetValue()
 	if err != nil {
 		return err
 	}
-	apply, err := parameters.Apply.GetValue()
+	apply, err := flags.Apply.GetValue()
 	if err != nil {
 		return err
 	}
-	values, err := parameters.Values.GetValue()
+	values, err := flags.Values.GetValue()
 	if err != nil {
 		return err
 	}
@@ -110,11 +110,11 @@ func setHandler(cmd *cobra.Command, args []string) error {
 
 func getHandler(cmd *cobra.Command, args []string) error {
 	// Get properties
-	configPath, err := parameters.ConfigPath.GetValue()
+	configPath, err := flags.ConfigPath.GetValue()
 	if err != nil {
 		return err
 	}
-	reload, err := parameters.Reload.GetValue()
+	reload, err := flags.Reload.GetValue()
 	if err != nil {
 		return err
 	}

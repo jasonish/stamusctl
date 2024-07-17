@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	// Custom
-	parameters "stamus-ctl/internal/handlers"
+	flags "stamus-ctl/internal/handlers"
 	handlers "stamus-ctl/internal/handlers/compose"
 )
 
@@ -23,16 +23,16 @@ func updateCmd() *cobra.Command {
 		},
 	}
 	// Add flags
-	parameters.Version.AddAsFlag(cmd, false)
-	parameters.Config.AddAsFlag(cmd, false)
+	flags.Version.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
 func updateHandler(cmd *cobra.Command, args []string) error {
 	// Call handler
 	params := handlers.UpdateHandlerParams{
-		Config:  *parameters.Config.Variable.String,
-		Version: *parameters.Version.Variable.String,
+		Config:  *flags.Config.Variable.String,
+		Version: *flags.Version.Variable.String,
 		Args:    args,
 	}
 	return handlers.UpdateHandler(params)

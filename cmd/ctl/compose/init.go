@@ -9,7 +9,7 @@ import (
 	// Custom
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/embeds"
-	parameters "stamus-ctl/internal/handlers"
+	flags "stamus-ctl/internal/handlers"
 	handlers "stamus-ctl/internal/handlers/compose"
 	"stamus-ctl/internal/utils"
 )
@@ -30,9 +30,9 @@ func initCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	parameters.OutputPath.AddAsFlag(cmd, false)
-	parameters.IsDefaultParam.AddAsFlag(cmd, false)
-	parameters.Values.AddAsFlag(cmd, false)
+	flags.OutputPath.AddAsFlag(cmd, false)
+	flags.IsDefaultParam.AddAsFlag(cmd, false)
+	flags.Values.AddAsFlag(cmd, false)
 	// Commands
 	cmd.AddCommand(SELKSCmd())
 	return cmd
@@ -67,13 +67,13 @@ func initSelksFolder(path string) {
 
 func SELKSHandler(cmd *cobra.Command, args []string) error {
 	selksInitParams := handlers.InitHandlerInputs{
-		IsDefault:        *parameters.IsDefaultParam.Variable.Bool,
+		IsDefault:        *flags.IsDefaultParam.Variable.Bool,
 		BackupFolderPath: app.DefaultSelksPath,
-		OutputPath:       *parameters.OutputPath.Variable.String,
+		OutputPath:       *flags.OutputPath.Variable.String,
 		Arbitrary:        utils.ExtractArgs(args),
 		Project:          "selks",
 		Version:          "latest",
-		Values:           *parameters.Values.Variable.String,
+		Values:           *flags.Values.Variable.String,
 	}
 	return handlers.InitHandler(true, selksInitParams)
 }
