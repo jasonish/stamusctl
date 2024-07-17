@@ -1,21 +1,23 @@
 package run
 
 import (
+	// Common
 	"context"
 	"os"
 	"os/signal"
 
+	// Custom
 	"stamus-ctl/cmd/daemon/run/compose"
 	docs "stamus-ctl/cmd/docs"
 	"stamus-ctl/internal/logging"
 
+	// External
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
-	ginprometheus "github.com/zsais/go-gin-prometheus"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
-
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	ginprometheus "github.com/zsais/go-gin-prometheus"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 func NewPrometheusServer(ctx context.Context) {
@@ -77,6 +79,7 @@ func RunCmd() *cobra.Command {
 			v1 := r.Group("/api/v1")
 			{
 				v1.GET("/ping", ping)
+				v1.POST("/upload", uploadHandler)
 				compose.NewCompose(v1)
 			}
 

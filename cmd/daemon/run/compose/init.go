@@ -9,7 +9,7 @@ import (
 	"stamus-ctl/pkg"
 )
 
-// Init godoc
+// InitHandler godoc
 // @Summary Initialize configuration
 // @Description Initializes configuration with provided parameters.
 // @Tags init
