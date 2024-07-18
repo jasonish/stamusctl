@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"stamus-ctl/cmd/ctl/compose"
+	"stamus-ctl/cmd/ctl/config"
 	"stamus-ctl/internal/logging"
 	"stamus-ctl/internal/models"
 
@@ -42,5 +43,6 @@ func rootCmd() *cobra.Command {
 	cmd.AddCommand(versionCmd())
 	cmd.AddCommand(loginCmd())
 	cmd.AddCommand(compose.ComposeCmd())
+	cmd.AddCommand(config.ConfigCmd())
 	return cmd
 }

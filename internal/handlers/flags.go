@@ -51,6 +51,12 @@ var Apply = models.Parameter{
 	Type:    "bool",
 	Default: models.CreateVariableBool(false),
 }
+var FromFile = models.Parameter{
+	Name:    "fromFile",
+	Usage:   "Uses the content of a file as parameter values",
+	Type:    "string",
+	Default: models.CreateVariableString(""),
+}
 
 // Update
 var Config = models.Parameter{

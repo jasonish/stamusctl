@@ -22,8 +22,6 @@ func NewCompose(router *gin.RouterGroup) {
 	{
 		compose.GET("/pingcompose", ping)
 		compose.POST("/init", initHandler)
-		compose.POST("/config", setHandler)
-		compose.GET("/config", getHandler)
 		compose.POST("/update", updateHandler)
 	}
 }

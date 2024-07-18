@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
+	"strings"
 )
 
 type InitHandlerInputs struct {
@@ -15,6 +18,7 @@ type InitHandlerInputs struct {
 	Version          string
 	Arbitrary        map[string]string
 	Values           string
+	FromFile         string
 }
 
 func InitHandler(isCli bool, params InitHandlerInputs) error {
@@ -38,7 +42,11 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 		return err
 	}
 	// Set parameters
-	err = setValuesFrom(params.Values, config.GetParams())
+	err = setValuesFrom(config.GetParams(), params.FromFile)
+	if err != nil {
+		return err
+	}
+	err = SetValues(params.Values, config.GetParams())
 	if err != nil {
 		return err
 	}
@@ -132,7 +140,8 @@ func setParameters(isCli bool, config *models.Config, params InitHandlerInputs) 
 	return nil
 }
 
-func setValuesFrom(valuesPath string, params *models.Parameters) error {
+// Set values from a file
+func SetValues(valuesPath string, params *models.Parameters) error {
 	if valuesPath != "" {
 		file, err := models.CreateFileInstanceFromPath(valuesPath)
 		if err != nil {
@@ -144,5 +153,31 @@ func setValuesFrom(valuesPath string, params *models.Parameters) error {
 		}
 		params.MergeValues(valuesConf.GetParams())
 	}
+	return nil
+}
+
+func setValuesFrom(params *models.Parameters, fromFiles string) error {
+	if fromFiles == "" {
+		return nil
+	}
+	// For each fromFile
+	args := strings.Split(fromFiles, " ")
+	values := make(map[string]*models.Variable)
+	for _, arg := range args {
+		// Split argument
+		split := strings.Split(arg, ":")
+		if len(split) != 2 {
+			return fmt.Errorf("Invalid argument: %s. Must be parameter.subparameter:./folder/file", arg)
+		}
+		// Get file content
+		content, err := os.ReadFile(split[1])
+		if err != nil {
+			return err
+		}
+		// Set value of parameter
+		temp := models.CreateVariableString(string(content))
+		values[split[0]] = &temp
+	}
+	params.SetValues(values)
 	return nil
 }

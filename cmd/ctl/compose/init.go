@@ -33,6 +33,7 @@ func initCmd() *cobra.Command {
 	flags.OutputPath.AddAsFlag(cmd, false)
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
+	flags.FromFile.AddAsFlag(cmd, false)
 	// Commands
 	cmd.AddCommand(SELKSCmd())
 	return cmd
@@ -66,14 +67,34 @@ func initSelksFolder(path string) {
 }
 
 func SELKSHandler(cmd *cobra.Command, args []string) error {
+	// Get flags
+	isDefault, err := flags.IsDefaultParam.GetValue()
+	if err != nil {
+		return err
+	}
+	outpuPath, err := flags.OutputPath.GetValue()
+	if err != nil {
+		return err
+	}
+	values, err := flags.Values.GetValue()
+	if err != nil {
+		return err
+	}
+	fromFile, err := flags.FromFile.GetValue()
+	if err != nil {
+		return err
+	}
+
+	// Call handler
 	selksInitParams := handlers.InitHandlerInputs{
-		IsDefault:        *flags.IsDefaultParam.Variable.Bool,
+		IsDefault:        isDefault.(bool),
 		BackupFolderPath: app.DefaultSelksPath,
-		OutputPath:       *flags.OutputPath.Variable.String,
+		OutputPath:       outpuPath.(string),
 		Arbitrary:        utils.ExtractArgs(args),
 		Project:          "selks",
 		Version:          "latest",
-		Values:           *flags.Values.Variable.String,
+		Values:           values.(string),
+		FromFile:         fromFile.(string),
 	}
 	return handlers.InitHandler(true, selksInitParams)
 }

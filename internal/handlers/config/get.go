@@ -1,62 +1,11 @@
-package handlers
+package config
 
 import (
+	"os"
+	"path/filepath"
 	"stamus-ctl/internal/models"
-	"stamus-ctl/internal/utils"
 	"strings"
 )
-
-type SetHandlerInputs struct {
-	Config string   // Path to the config folder
-	Values string   // Path to the values.yaml file
-	Reload bool     // Reload the configuration, don't keep arbitrary parameters
-	Apply  bool     // Apply the new configuration, reload the services
-	Args   []string // Cmd arguments
-}
-
-// func SetHandler(configPath string, args []string, reload bool, apply bool) error {
-func SetHandler(params SetHandlerInputs) error {
-	// Load the config
-	file, err := models.CreateFileInstance(params.Config, "values.yaml")
-	if err != nil {
-		return err
-	}
-	config, err := models.LoadConfigFrom(file, params.Reload)
-	if err != nil {
-		return err
-	}
-
-	// Extract and set parameters from args
-	paramsArgs := utils.ExtractArgs(params.Args)
-	config.GetParams().SetLooseValues(paramsArgs)
-	config.SetArbitrary(paramsArgs)
-	config.GetParams().ProcessOptionnalParams(false)
-	// Set values from file
-	err = setValuesFrom(params.Values, config.GetParams())
-	if err != nil {
-		return err
-	}
-	// Validate
-	err = config.GetParams().ValidateAll()
-	if err != nil {
-		return err
-	}
-
-	// Save the configuration
-	outputAsFile, err := models.CreateFileInstance(params.Config, "values.yaml")
-	if err != nil {
-		return err
-	}
-	config.SaveConfigTo(outputAsFile)
-	// Apply the configuration
-	if params.Apply {
-		err = HandleUp(params.Config)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
 
 // Get the grouped config values
 // Essentially, this function reads the config values file and groups the values
@@ -82,6 +31,20 @@ func GetGroupedConfig(configPath string, args []string, reload bool) (map[string
 	return groupedValues, nil
 }
 
+// Get the grouped content
+// Essentially, this function reads the config folder content and groups the folders and files
+func GetGroupedContent(configPath string, args []string) (map[string]interface{}, error) {
+	// List files
+	files, err := listFilesInFolder(configPath)
+	if err != nil {
+		return nil, err
+	}
+	// Group files
+	groupedFiles := groupStuff(files)
+	// Return
+	return groupedFiles, nil
+}
+
 // Group values
 // Utility function to group values from the config to nested maps
 func groupValues(config *models.Config, args []string) map[string]interface{} {
@@ -96,6 +59,15 @@ func groupValues(config *models.Config, args []string) map[string]interface{} {
 	return groupedValues
 }
 
+func groupStuff(stuff map[string]string) map[string]interface{} {
+	groupedStuff := make(map[string]interface{})
+	for key, value := range stuff {
+		parts := strings.Split(key, "/")
+		addToGroup(parts, value, groupedStuff)
+	}
+	return groupedStuff
+}
+
 func addToGroup(parts []string, value string, group map[string]interface{}) {
 	if len(parts) == 1 {
 		group[parts[0]] = value
@@ -105,4 +77,29 @@ func addToGroup(parts []string, value string, group map[string]interface{}) {
 		}
 		addToGroup(parts[1:], value, group[parts[0]].(map[string]interface{}))
 	}
+}
+
+// Get files as map in a folder
+func listFilesInFolder(folderPath string) (map[string]string, error) {
+	filesMap := make(map[string]string)
+	// Walk the folder
+	err := filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() {
+			relativePath, err := filepath.Rel(folderPath, path)
+			if err != nil {
+				return err
+			}
+			filesMap[relativePath] = info.Name()
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return filesMap, nil
 }

@@ -63,13 +63,25 @@ func (p *Parameter) GetValue() (any, error) {
 	if p.Variable.IsNil() && p.Default.IsNil() {
 		return nil, fmt.Errorf("Variable has not been set")
 	}
-	switch p.Type {
-	case "string":
-		return *p.Variable.String, nil
-	case "bool", "optional":
-		return *p.Variable.Bool, nil
-	case "int":
-		return *p.Variable.Int, nil
+	if !p.Variable.IsNil() {
+		switch p.Type {
+		case "string":
+			return *p.Variable.String, nil
+		case "bool", "optional":
+			return *p.Variable.Bool, nil
+		case "int":
+			return *p.Variable.Int, nil
+		}
+	}
+	if !p.Variable.IsNil() {
+		switch p.Type {
+		case "string":
+			return *&p.Default.String, nil
+		case "bool", "optional":
+			return *p.Default.Bool, nil
+		case "int":
+			return *p.Default.Int, nil
+		}
 	}
 	return nil, fmt.Errorf("Invalid type")
 }

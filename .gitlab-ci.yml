@@ -206,7 +206,7 @@ compose config set:
     script:
         - |
             STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
-            STAMUS_APP_NAME=stamusctl ./cli compose config set websocket.response=lel
+            STAMUS_APP_NAME=stamusctl ./cli config set websocket.response=lel
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
 
@@ -218,7 +218,7 @@ compose config reload:
     script:
         - |
             STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
-            STAMUS_APP_NAME=stamusctl ./cli compose config set websocket.port=6969
-            STAMUS_APP_NAME=stamusctl ./cli compose config set --reload
+            STAMUS_APP_NAME=stamusctl ./cli config set websocket.port=6969
+            STAMUS_APP_NAME=stamusctl ./cli config set --reload
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init

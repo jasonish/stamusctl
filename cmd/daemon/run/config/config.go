@@ -4,7 +4,7 @@ import (
 	// External
 	"github.com/gin-gonic/gin"
 	//Custom
-	handlers "stamus-ctl/internal/handlers/compose"
+	handlers "stamus-ctl/internal/handlers/config"
 	"stamus-ctl/pkg"
 )
 
