@@ -33,14 +33,11 @@ If not, you can:
 
 - `init` is used to initiate configuration files
   - `--folder ` to select folder to save configuration
+  - `--values` to use a `values.yaml` as configuration
+  - `--fromFile` to use a file as value for a specific key
+  - `--apply` to relaunch the configuration
   - `--default` to disable the interactive prompting
     - `[key]=[value]` are the args to set configuration values (ex: scirius.token=AwesomeToken)
-- `config` is used to modify configuration files
-  - `get` to display the current configuration values
-    - `[key]` to get specific configuration values (ex: scirius)
-  - `set` to modify configuration
-    - `--reload` to reset arbitrary values
-    - `[key]=[value]` to set configuration values (ex: scirius.token=AwesomeToken)
 - `up` to start current configuration
   - `--file` to select specific configuration
   - `--detach` to launch in detached mode
@@ -55,6 +52,20 @@ If not, you can:
   - `--pass` to input password
   - `--version` to input version
 
+### Config
+`stamusctl config` is the command used to manage the configuration files.
+
+- `config` is used to modify configuration files
+  - `get` to display the current configuration values
+    - `[key]` to get specific configuration values (ex: scirius)
+    - `content` to get configuration architecture
+      - `[key]` to get specific configuration files (ex: nginx)
+  - `set` to modify configuration
+    - `--reload` to reset arbitrary values
+    - `--apply` to relaunch the configuration
+    - `[key]=[value]` to set configuration values (ex: scirius.token=AwesomeToken)
+    - `content` to set configuration files
+      - `[host folder]:[configuration folder]` to set specific configuration files (ex: ./nginx:/nginx)
 
 ## Examples
 ```
@@ -65,10 +76,10 @@ stamusctl compose init
 stamusctl compose init --default scirius.token=AwesomeToken
 
 // Get current config
-stamusctl compose config get
+stamusctl config get
 
 // Set parameter in current config
-stamusctl compose config set scirius.token=AnotherAwesomeToken
+stamusctl config set scirius.token=AnotherAwesomeToken
 
 // Start current configuration
 stamusctl compose up -d
