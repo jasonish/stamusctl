@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 
@@ -236,5 +237,48 @@ func (p *Parameters) SetLooseValues(values map[string]string) error {
 		}
 	}
 
+	return nil
+}
+
+// Set values from a file (values.yaml)
+func (p *Parameters) SetValuesFromFile(valuesPath string) error {
+	if valuesPath != "" {
+		file, err := CreateFileInstanceFromPath(valuesPath)
+		if err != nil {
+			return err
+		}
+		valuesConf, err := LoadConfigFrom(file, false)
+		if err != nil {
+			return err
+		}
+		p.MergeValues(valuesConf.GetParams())
+	}
+	return nil
+}
+
+// Set specific values from files content
+func (p *Parameters) SetValuesFromFiles(fromFiles string) error {
+	if fromFiles == "" {
+		return nil
+	}
+	// For each fromFile
+	args := strings.Split(fromFiles, " ")
+	values := make(map[string]*Variable)
+	for _, arg := range args {
+		// Split argument
+		split := strings.Split(arg, ":")
+		if len(split) != 2 {
+			return fmt.Errorf("Invalid argument: %s. Must be parameter.subparameter:./folder/file", arg)
+		}
+		// Get file content
+		content, err := os.ReadFile(split[1])
+		if err != nil {
+			return err
+		}
+		// Set value of parameter
+		temp := CreateVariableString(string(content))
+		values[split[0]] = &temp
+	}
+	p.SetValues(values)
 	return nil
 }
