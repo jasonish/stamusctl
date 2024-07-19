@@ -92,7 +92,7 @@ func SetContentHandler(path string, args []string) error {
 }
 
 func copy(inputPath string, outputPath string) error {
-	fmt.Println("Setting content from %s to %s", inputPath, outputPath)
+	fmt.Println("Setting content from ", inputPath, " to ", outputPath)
 	// Check input path exists
 	info, err := os.Stat(inputPath)
 	if err != nil {
