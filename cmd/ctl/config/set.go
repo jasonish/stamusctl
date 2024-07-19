@@ -29,6 +29,7 @@ Example: set scirius.token=AwesomeToken`,
 	flags.Values.AddAsFlag(cmd, false)
 	flags.Reload.AddAsFlag(cmd, false)
 	flags.Apply.AddAsFlag(cmd, false)
+	flags.FromFile.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -69,13 +70,19 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	fromFile, err := flags.FromFile.GetValue()
+	if err != nil {
+		return err
+	}
+
 	// Set the values
 	params := config.SetHandlerInputs{
-		Config: configPath.(string),
-		Args:   args,
-		Reload: reload.(bool),
-		Apply:  apply.(bool),
-		Values: values.(string),
+		Config:   configPath.(string),
+		Args:     args,
+		Reload:   reload.(bool),
+		Apply:    apply.(bool),
+		Values:   values.(string),
+		FromFile: fromFile.(string),
 	}
 	err = config.SetHandler(params)
 	if err != nil {

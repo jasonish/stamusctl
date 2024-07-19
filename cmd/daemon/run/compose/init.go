@@ -41,6 +41,12 @@ func initHandler(c *gin.Context) {
 	if req.Version == "" {
 		req.Version = "latest"
 	}
+	fromFile := ""
+	if req.FromFile != nil {
+		for k, v := range req.FromFile {
+			fromFile += k + "=" + v + " "
+		}
+	}
 
 	// Call handler
 	parameters := handlers.InitHandlerInputs{
@@ -50,6 +56,8 @@ func initHandler(c *gin.Context) {
 		Arbitrary:        req.Values,
 		Project:          req.Project,
 		Version:          req.Version,
+		Values:           req.ValuesPath,
+		FromFile:         fromFile,
 	}
 	if err := handlers.InitHandler(false, parameters); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

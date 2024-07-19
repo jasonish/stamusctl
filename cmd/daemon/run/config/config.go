@@ -39,13 +39,21 @@ func setHandler(c *gin.Context) {
 	for k, v := range req.Values {
 		valuesAsStrings = append(valuesAsStrings, k+"="+v)
 	}
+	fromFile := ""
+	if req.FromFile != nil {
+		for k, v := range req.FromFile {
+			fromFile += k + "=" + v + " "
+		}
+	}
 
 	// Call handler
 	params := handlers.SetHandlerInputs{
-		Config: req.Project,
-		Reload: req.Reload,
-		Apply:  req.Apply,
-		Args:   valuesAsStrings,
+		Config:   req.Project,
+		Reload:   req.Reload,
+		Apply:    req.Apply,
+		Args:     valuesAsStrings,
+		Values:   req.ValuesPath,
+		FromFile: fromFile,
 	}
 	if err := handlers.SetHandler(params); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
