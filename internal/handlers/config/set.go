@@ -14,11 +14,12 @@ import (
 )
 
 type SetHandlerInputs struct {
-	Config string   // Path to the config folder
-	Values string   // Path to the values.yaml file
-	Reload bool     // Reload the configuration, don't keep arbitrary parameters
-	Apply  bool     // Apply the new configuration, reload the services
-	Args   []string // Cmd arguments
+	Config   string   // Path to the config folder
+	Values   string   // Path to the values.yaml file
+	Reload   bool     // Reload the configuration, don't keep arbitrary parameters
+	Apply    bool     // Apply the new configuration, reload the services
+	Args     []string // Cmd arguments
+	FromFile string   // Path to the file containing the values
 }
 
 // func SetHandler(configPath string, args []string, reload bool, apply bool) error {
@@ -39,7 +40,11 @@ func SetHandler(params SetHandlerInputs) error {
 	config.SetArbitrary(paramsArgs)
 	config.GetParams().ProcessOptionnalParams(false)
 	// Set values from file
-	err = compose.SetValues(params.Values, config.GetParams())
+	err = config.GetParams().SetValuesFromFiles(params.FromFile)
+	if err != nil {
+		return err
+	}
+	err = config.GetParams().SetValuesFromFile(params.Values)
 	if err != nil {
 		return err
 	}
@@ -87,7 +92,7 @@ func SetContentHandler(path string, args []string) error {
 }
 
 func copy(inputPath string, outputPath string) error {
-	log.Printf("Setting content from %s to %s", inputPath, outputPath)
+	fmt.Println("Setting content from %s to %s", inputPath, outputPath)
 	// Check input path exists
 	info, err := os.Stat(inputPath)
 	if err != nil {
