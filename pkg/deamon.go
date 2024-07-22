@@ -23,6 +23,7 @@ type SetRequest struct {
 type GetRequest struct {
 	Project string   `json:"project"` // Project name, default is "tmp"
 	Values  []string `json:"values"`  // Values to retrieve, default is all
+	Content bool     `json:"content"` // Get content or values, default is false
 }
 
 // Update

@@ -92,6 +92,16 @@ func getHandler(c *gin.Context) {
 	}
 
 	// Call handler
+	if req.Content {
+		filesMap, err := handlers.GetGroupedContent(req.Project, req.Values)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(200, filesMap)
+		return
+	}
+
 	groupedValues, err := handlers.GetGroupedConfig(req.Project, req.Values, false)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
