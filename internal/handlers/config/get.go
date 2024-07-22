@@ -39,6 +39,14 @@ func GetGroupedContent(configPath string, args []string) (map[string]interface{}
 	if err != nil {
 		return nil, err
 	}
+	// Filter files
+	for _, arg := range args {
+		for file := range files {
+			if !strings.Contains(file, arg) {
+				delete(files, file)
+			}
+		}
+	}
 	// Group files
 	groupedFiles := groupStuff(files)
 	// Return
