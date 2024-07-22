@@ -67,6 +67,16 @@ If not, you can:
     - `content` to set configuration files
       - `[host folder]:[configuration folder]` to set specific configuration files (ex: ./nginx:/nginx)
 
+### Login
+`stamusctl login` is the command used to login to image registries.
+This way, you can pull images from private registries.
+
+- `login` is used to login to image registries
+  - `--registry` to select registry
+  - `--user` to input user
+  - `--pass` to input password
+  
+
 ## Examples
 ```
 // Init via user prompt
