@@ -40,7 +40,6 @@ func newBody(body interface{}) io.Reader {
 // compareDirs compares the content of two directories
 func compareDirs(t *testing.T, dir1, dir2 string) {
 	folder1, err := getFolderContent(dir1)
-
 	assert.NoError(t, err, fmt.Sprintf("failed to read directory %s with error %s", dir1, err))
 	folder2, err := getFolderContent(dir2)
 	assert.NoError(t, err, fmt.Sprintf("failed to read directory %s with error %s", dir2, err))
@@ -49,7 +48,6 @@ func compareDirs(t *testing.T, dir1, dir2 string) {
 	assert.NoError(t, err, fmt.Sprintf("directories have different content with error %s", err))
 	err = compareFolderContent(folder2, folder1)
 	assert.NoError(t, err, fmt.Sprintf("directories have different content with error %s", err))
-
 }
 
 func getFolderContent(folder string) (map[string]string, error) {

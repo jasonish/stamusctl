@@ -160,6 +160,9 @@ deamon tests:
     script:
         - |
             apk add --no-cache gcc musl-dev make
+            chmod +x $(pwd)/scripts/move.sh
+            $(pwd)/scripts/move.sh
+            STAMUS_APP_NAME=stamusctl go run ./cmd compose init -h
             make deamon-test
 
 compose init:
