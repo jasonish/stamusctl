@@ -37,7 +37,6 @@ func NewConfigFrom(file File) (*Config, error) {
 	// Instanciate viper
 	viperInstance, err := InstanciateViper(file)
 	if err != nil {
-		log.Println("Error instanciating viper", err)
 		return nil, err
 	}
 	// Create the config
