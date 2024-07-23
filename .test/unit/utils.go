@@ -50,21 +50,6 @@ func compareDirs(t *testing.T, dir1, dir2 string) {
 	err = compareFolderContent(folder2, folder1)
 	assert.NoError(t, err, fmt.Sprintf("directories have different content with error %s", err))
 
-	asList := func(folder map[string]string) []string {
-		list := make([]string, 0, len(folder))
-		for k := range folder {
-			list = append(list, k)
-		}
-		return list
-	}
-
-	folder1List := asList(folder1)
-	folder2List := asList(folder2)
-
-	t.Log(folder1List)
-	t.Log(folder2List)
-
-	assert.Equal(t, false, true)
 }
 
 func getFolderContent(folder string) (map[string]string, error) {
