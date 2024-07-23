@@ -48,4 +48,7 @@ daemon-dev:
 test:
 	go test ./...
 
+deamon-test:
+	go test ./.test/unit
+
 .PHONY: all cli daemon test
