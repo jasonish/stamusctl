@@ -8,6 +8,7 @@ import (
 
 	// Custom
 	"stamus-ctl/cmd/daemon/run/compose"
+	"stamus-ctl/cmd/daemon/run/config"
 	docs "stamus-ctl/cmd/docs"
 	"stamus-ctl/internal/logging"
 
@@ -18,6 +19,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func NewPrometheusServer(ctx context.Context) {
@@ -62,37 +64,58 @@ func RunCmd() *cobra.Command {
 		Use:   "run",
 		Short: "Run daemon",
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			c := context.Background()
-			ctx, span := logging.Tracer.Start(c, "main")
-			defer span.End()
-			gin.SetMode(gin.ReleaseMode)
-			r := gin.New()
-
-			go NewPrometheusServer(ctx)
-
-			logging.LoggerWithSpanContext(span.SpanContext()).Info("Setup middleware")
-			r.Use(gin.Recovery())
-			r.Use(otelgin.Middleware("stamusd", otelgin.WithTracerProvider(logging.TracerProvider)))
-
-			logging.LoggerWithSpanContext(span.SpanContext()).Info("Setup routes")
-			v1 := r.Group("/api/v1")
-			{
-				v1.GET("/ping", ping)
-				v1.POST("/upload", uploadHandler)
-				compose.NewCompose(v1)
-			}
-
-			logging.LoggerWithSpanContext(span.SpanContext()).Info("Setup swagger")
-			docs.SwaggerInfo.BasePath = "/api/v1"
-			r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
-			logging.LoggerWithSpanContext(span.SpanContext()).Info("Starting daemon")
-			// r.RunUnix("./daemon.sock")
-			r.Run(":9000")
+			span := setupLogging()
+			logger := getLogger(span)
+			r := SetupRouter(logger)
+			logger("Starting daemon")
+			r.Run(":8080")
 			return nil
 		},
 	}
 
 	return cmd
+}
+
+func setupLogging() trace.Span {
+	c := context.Background()
+	ctx, span := logging.Tracer.Start(c, "main")
+	defer span.End()
+	go NewPrometheusServer(ctx)
+	return span
+}
+
+func getLogger(span trace.Span) func(string) {
+	return func(message string) {
+		logging.LoggerWithSpanContext(span.SpanContext()).Info(message)
+	}
+}
+
+func SetupRouter(logger func(string)) *gin.Engine {
+	// Gin setup
+	logger("Setup middleware")
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+
+	// Middleware
+	r.Use(gin.Recovery())
+	r.Use(otelgin.Middleware("stamusd", otelgin.WithTracerProvider(logging.TracerProvider)))
+
+	// Routes
+	logger("Setup routes")
+	v1 := r.Group("/api/v1")
+	{
+		v1.GET("/ping", ping)
+		v1.POST("/upload", uploadHandler)
+		compose.NewCompose(v1)
+		config.NewConfig(v1)
+	}
+
+	// Swagger
+	logger("Setup swagger")
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
+	// r.RunUnix("./daemon.sock")
+	return r
+
 }
