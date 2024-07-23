@@ -1,13 +1,10 @@
-package compose
+package config
 
 import "github.com/gin-gonic/gin"
 
 func NewConfig(router *gin.RouterGroup) {
-	compose := router.Group("/compose")
-	{
-		compose.POST("/config", setHandler)
-		compose.GET("/config", getHandler)
-	}
+	router.POST("/config", setHandler)
+	router.GET("/config", getHandler)
 }
 
 type ErrorResponse struct {
