@@ -289,13 +289,14 @@ func (f *Config) SetValuesFromFiles(fromFiles string) error {
 	}
 	// For each fromFile
 	args := strings.Split(fromFiles, " ")
+	args = removeEmptyStrings(args)
 	values := make(map[string]*Variable)
 	asMap := make(map[string]string)
 	for _, arg := range args {
 		// Split argument
 		split := strings.Split(arg, "=")
 		if len(split) != 2 {
-			return fmt.Errorf("Invalid argument: %s. Must be parameter.subparameter=./folder/file", arg)
+			return fmt.Errorf("Invalid argument: %s of %s. Must be parameter.subparameter=./folder/file", arg, args)
 		}
 		// Get file content
 		content, err := os.ReadFile(split[1])
