@@ -1,11 +1,20 @@
 package tests
 
 import (
+	// Custom
+	"bytes"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"testing"
 
+	// External
 	"github.com/stretchr/testify/assert"
-
+	// Internal
+	root "stamus-ctl/cmd/daemon/run"
 	"stamus-ctl/pkg"
 )
 
@@ -115,4 +124,88 @@ func TestConfigReload(t *testing.T) {
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 	// Compare
 	compareDirs(t, "./tmp", "../outputs/compose-init")
+}
+
+func TestUpload(t *testing.T) {
+	// Setup
+	TestComposeInit(nil)
+
+	// Prepare file to upload
+	filePath := "../inputs/values.yaml"
+	file, err := os.Open(filePath)
+	if t != nil {
+		assert.NoError(t, err)
+	}
+	defer file.Close()
+
+	// Create buffer / multipart writer
+	var buffer bytes.Buffer
+	writer := multipart.NewWriter(&buffer)
+	// Create form file field
+	part, err := writer.CreateFormFile("file", filepath.Base(filePath))
+	if t != nil {
+		assert.NoError(t, err)
+	}
+	// Write content into filed
+	_, err = io.Copy(part, file)
+	if t != nil {
+		assert.NoError(t, err)
+	}
+	// Close writer
+	err = writer.Close()
+	if t != nil {
+		assert.NoError(t, err)
+	}
+
+	// Create router
+	router := root.SetupRouter(func(string) {})
+	// Create request with buffer body and content type
+	req, err := http.NewRequest("POST", "/api/v1/upload?path=/", &buffer)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	if t != nil {
+		assert.NoError(t, err)
+	}
+	// Serve request
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	// Check response
+	if t != nil {
+		assert.Equal(t, 200, w.Code)
+		assert.Equal(t, "{\"message\":\"Uploaded file\"}", w.Body.String())
+	}
+}
+
+func TestValuesAsFile(t *testing.T) {
+	// Setup
+	TestUpload(nil)
+
+	// Test
+	setRequest := pkg.SetRequest{
+		ValuesPath: "./values.yaml",
+	}
+	res, _ := newRequest("POST", "/api/v1/config", setRequest)
+	assert.Equal(t, 200, res.Code)
+	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
+
+	// Compare
+	compareDirs(t, "./tmp", "../outputs/compose-init-arbitrary")
+}
+
+func TestValueAsFile(t *testing.T) {
+	// Setup
+	TestUpload(nil)
+
+	// Test
+	setRequest := pkg.SetRequest{
+		FromFile: map[string]string{
+			"websocket.response": "./values.yaml",
+		},
+	}
+	res, _ := newRequest("POST", "/api/v1/config", setRequest)
+	assert.Equal(t, 200, res.Code)
+	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
+
+	// Compare
+	compareDirs(t, "./tmp", "../outputs/compose-init-file")
 }
