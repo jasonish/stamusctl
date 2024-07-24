@@ -1,0 +1,51 @@
+services:
+  nginx:
+    image:nginx:1.14.2-alpine
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d/
+    ports:
+      - 80:80
+    depends_on:
+      - websocket
+  websocket:
+    container_name: websocket
+    environment:
+      - WEBSOCKET_PORT=8080
+      - RESPONSE=arkimeviewer: false
+db:
+    host: db
+dbexternal: false
+elk:
+    elastic:
+        memory: 3G
+        ml: false
+        path: elastic-data
+    kibana:
+        version: 7.16.1
+    logstash:
+        memory: 3G
+    version: 7.16.1
+evebox: false
+globals:
+    restartmode: unless-stopped
+    volumepath: .
+nginx: nginx
+registry: ghcr.io/stamusnetworks
+scirius:
+    debug: false
+    token: sss
+    version: selks
+stamusconfig: /root/Templates/.stamus/selks/0.0.2
+suricata:
+    interfaces: br-9a866343f450
+    logs:
+        file:
+            hostpath: suricata-logs
+            internalpath: /var/log/suricata
+
+    restart: always
+    build:
+      context: ./websocket
+      dockerfile: Dockerfile
