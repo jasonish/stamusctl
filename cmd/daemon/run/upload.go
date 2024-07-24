@@ -18,6 +18,8 @@ import (
 // @Tags example
 // @Accept multipart/form-data
 // @Produce json
+// @Param path query string true "Path to save file"
+// @Param project query string false "Project name"
 // @Param file formData file true "Upload file"
 // @Success 200 {object} map[string]string{ "message": "Uploaded file" }
 // @Failure 400 {object} map[string]string{ "error": "Error message" }
@@ -37,9 +39,6 @@ func uploadHandler(c *gin.Context) {
 		return
 	}
 	project := c.Query("project")
-	if project == "" {
-		project = "tmp"
-	}
 
 	// Handle file upload
 	file, err := c.FormFile("file")
