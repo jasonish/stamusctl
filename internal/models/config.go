@@ -166,7 +166,7 @@ func (f *Config) ExtractParams(isDeep bool) (*Parameters, []string, error) {
 	// Extract includes parameters
 	for _, include := range includesList {
 		// Create config instance for the include
-		file, err := CreateFileInstanceFromPath(defaultConfPath + include)
+		file, err := CreateFileInstanceFromPath(filepath.Join(f.file.Path, include))
 		if err != nil {
 			return nil, nil, err
 		}
