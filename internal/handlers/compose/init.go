@@ -39,11 +39,11 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 		return err
 	}
 	// Set parameters
-	err = config.GetParams().SetValuesFromFiles(params.FromFile)
+	err = config.SetValuesFromFiles(params.FromFile)
 	if err != nil {
 		return err
 	}
-	err = config.GetParams().SetValuesFromFile(params.Values)
+	err = config.SetValuesFromFile(params.Values)
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func instanciateConfigFromPath(folderPath string) (*models.Config, error) {
 func setParameters(isCli bool, config *models.Config, params InitHandlerInputs) error {
 	// Extract and set values from args
 	err := config.GetParams().SetLooseValues(params.Arbitrary)
-	config.SetArbitrary(params.Arbitrary)
+	config.GetArbitrary().SetArbitrary(params.Arbitrary)
 	if err != nil {
 		return err
 	}

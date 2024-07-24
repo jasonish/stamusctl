@@ -99,7 +99,7 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	paramsArgs := utils.ExtractArgs(args)
 	newConfig.GetParams().SetValues(existingConfig.GetParams().GetVariablesValues())
 	newConfig.GetParams().SetLooseValues(paramsArgs)
-	newConfig.SetArbitrary(paramsArgs)
+	newConfig.GetArbitrary().SetArbitrary(paramsArgs)
 	newConfig.GetParams().ProcessOptionnalParams(false)
 
 	// Ask for missing parameters

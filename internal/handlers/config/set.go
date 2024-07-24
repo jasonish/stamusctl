@@ -37,14 +37,14 @@ func SetHandler(params SetHandlerInputs) error {
 	// Extract and set parameters from args
 	paramsArgs := utils.ExtractArgs(params.Args)
 	config.GetParams().SetLooseValues(paramsArgs)
-	config.SetArbitrary(paramsArgs)
+	config.GetArbitrary().SetArbitrary(paramsArgs)
 	config.GetParams().ProcessOptionnalParams(false)
 	// Set values from file
-	err = config.GetParams().SetValuesFromFiles(params.FromFile)
+	err = config.SetValuesFromFiles(params.FromFile)
 	if err != nil {
 		return err
 	}
-	err = config.GetParams().SetValuesFromFile(params.Values)
+	err = config.SetValuesFromFile(params.Values)
 	if err != nil {
 		return err
 	}
