@@ -27,7 +27,7 @@ func init() {
 // It can be used to get or set values, validates them etc
 type Config struct {
 	file          File
-	arbitrary     map[string]any
+	arbitrary     *Arbitrary
 	parameters    *Parameters
 	viperInstance *viper.Viper
 }
@@ -43,7 +43,7 @@ func NewConfigFrom(file File) (*Config, error) {
 	conf := Config{
 		file:          file,
 		viperInstance: viperInstance,
-		arbitrary:     make(map[string]any),
+		arbitrary:     &Arbitrary{},
 	}
 	return &conf, nil
 }
@@ -76,18 +76,12 @@ func LoadConfigFrom(path File, reload bool) (*Config, error) {
 	// Set arbitrary
 	if !reload {
 		for key, value := range values {
-			originConf.SetArbitrary(map[string]string{key: value.asString()})
+			originConf.arbitrary.SetArbitrary(map[string]string{key: value.asString()})
 		}
 	}
 	// Merge
 	originConf.parameters.SetValues(values)
 	return originConf, nil
-}
-
-func (f *Config) SetArbitrary(arbitrary map[string]string) {
-	for key, value := range arbitrary {
-		f.arbitrary[key] = asLooseTyped(value)
-	}
 }
 
 // Return list of config files to include and list of parameters for current config
@@ -108,7 +102,7 @@ func (f *Config) extracKeys() ([]string, []string) {
 	}
 	// Convert map to list
 	parametersList := []string{}
-	for key, _ := range parametersMap {
+	for key := range parametersMap {
 		parametersList = append(parametersList, key)
 	}
 	return includes, parametersList
@@ -220,6 +214,10 @@ func (f *Config) GetParams() *Parameters {
 	return f.parameters
 }
 
+func (f *Config) GetArbitrary() *Arbitrary {
+	return f.arbitrary
+}
+
 // Copy everything from the f.path to the destination path
 func (f *Config) CopyToPath(dest string) error {
 	return cp.Copy(f.file.Path, dest)
@@ -240,7 +238,7 @@ func (f *Config) SaveConfigTo(dest File) error {
 		configData[key] = value
 	}
 	// Merge with arbitrary config values and cerate a nested map
-	for key, value := range f.arbitrary {
+	for key, value := range f.arbitrary.AsMap() {
 		data[key] = value
 	}
 	for key, value := range configData {
@@ -263,6 +261,61 @@ func (f *Config) SaveConfigTo(dest File) error {
 	}
 
 	return nil
+}
+
+// Set values from a file (values.yaml)
+func (f *Config) SetValuesFromFile(valuesPath string) error {
+	if valuesPath != "" {
+		log.Println("Loading values from", valuesPath)
+		file, err := CreateFileInstanceFromPath(valuesPath)
+		if err != nil {
+			return err
+		}
+		valuesConf, err := LoadConfigFrom(file, false)
+		if err != nil {
+			return err
+		}
+		log.Println("Values loaded", valuesConf.GetParams().GetValues())
+		f.GetParams().MergeValues(valuesConf.GetParams())
+		f.MergeArbitrary(valuesConf.GetArbitrary().AsMap())
+	}
+	return nil
+}
+
+// Set specific values from files content
+func (f *Config) SetValuesFromFiles(fromFiles string) error {
+	if fromFiles == "" {
+		return nil
+	}
+	// For each fromFile
+	args := strings.Split(fromFiles, " ")
+	values := make(map[string]*Variable)
+	asMap := make(map[string]string)
+	for _, arg := range args {
+		// Split argument
+		split := strings.Split(arg, "=")
+		if len(split) != 2 {
+			return fmt.Errorf("Invalid argument: %s. Must be parameter.subparameter=./folder/file", arg)
+		}
+		// Get file content
+		content, err := os.ReadFile(split[1])
+		if err != nil {
+			return err
+		}
+		// Set value of parameter
+		temp := CreateVariableString(string(content))
+		values[split[0]] = &temp
+		asMap[split[0]] = string(content)
+	}
+	f.GetParams().SetValues(values)
+	f.GetArbitrary().SetArbitrary(asMap)
+	return nil
+}
+
+func (f *Config) MergeArbitrary(arbitrary map[string]any) {
+	for key, value := range arbitrary {
+		f.arbitrary.Set(key, value)
+	}
 }
 
 // Cleans the config folder
@@ -324,7 +377,7 @@ func (f *Config) saveParamsTo(dest File) error {
 		paramsValues[key] = value
 	}
 	// Set the new values
-	for key, value := range f.arbitrary {
+	for key, value := range f.arbitrary.AsMap() {
 		conf.viperInstance.Set(key, value)
 	}
 	// conf.viperInstance.Set("stamusconfig", f.file.Path)
