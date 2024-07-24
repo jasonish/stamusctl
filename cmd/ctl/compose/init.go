@@ -21,7 +21,7 @@ const embed string = "selks"
 func initCmd() *cobra.Command {
 	// Setup
 	initSelksFolder(app.DefaultSelksPath)
-	// Create
+	// Command
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Init compose config file",
@@ -40,7 +40,9 @@ func initCmd() *cobra.Command {
 }
 
 func SELKSCmd() *cobra.Command {
-	// Create
+	// Setup
+	initSelksFolder(app.DefaultSelksPath)
+	// Command
 	cmd := &cobra.Command{
 		Use:   "selks",
 		Short: "Init SELKS container compose file",
@@ -48,6 +50,11 @@ func SELKSCmd() *cobra.Command {
 			return SELKSHandler(cmd, args)
 		},
 	}
+	// Flags
+	flags.OutputPath.AddAsFlag(cmd, false)
+	flags.IsDefaultParam.AddAsFlag(cmd, false)
+	flags.Values.AddAsFlag(cmd, false)
+	flags.FromFile.AddAsFlag(cmd, false)
 	return cmd
 
 }
