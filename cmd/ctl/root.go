@@ -42,6 +42,7 @@ func rootCmd() *cobra.Command {
 	// SubCommands
 	cmd.AddCommand(versionCmd())
 	cmd.AddCommand(loginCmd())
+	cmd.AddCommand(testCmd())
 	cmd.AddCommand(compose.ComposeCmd())
 	cmd.AddCommand(config.ConfigCmd())
 	return cmd
