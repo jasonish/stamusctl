@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/kylelemons/godebug/diff"
 	"github.com/stretchr/testify/assert"
 
 	root "stamus-ctl/cmd/daemon/run"
@@ -97,7 +98,7 @@ func compareFolderContent(folder1 map[string]string, folder2 map[string]string) 
 			return fmt.Errorf("file %s is missing in directory", name)
 		}
 		if content1 != content2 {
-			return fmt.Errorf("file content mismatch for %s\nContent1:\n%s\nContent2:\n%s", name, content1, content2)
+			return fmt.Errorf("file content mismatch for %s \nContent diff:\n%s", name, diff.Diff(content1, content2))
 		}
 	}
 	return nil
