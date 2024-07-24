@@ -176,13 +176,13 @@ func TestUpload(t *testing.T) {
 	}
 }
 
-func TestValuesAsFile(t *testing.T) {
+func TestValuesFromFile(t *testing.T) {
 	// Setup
 	TestUpload(nil)
 
 	// Test
 	setRequest := pkg.SetRequest{
-		ValuesPath: "./values.yaml",
+		ValuesPath: "../inputs/values.yaml",
 	}
 	res, _ := newRequest("POST", "/api/v1/config", setRequest)
 	assert.Equal(t, 200, res.Code)
@@ -199,7 +199,7 @@ func TestValueAsFile(t *testing.T) {
 	// Test
 	setRequest := pkg.SetRequest{
 		FromFile: map[string]string{
-			"websocket.response": "./values.yaml",
+			"websocket.response": "../inputs/values.yaml",
 		},
 	}
 	res, _ := newRequest("POST", "/api/v1/config", setRequest)

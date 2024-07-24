@@ -140,7 +140,7 @@ func (p *Parameters) GetVariablesValues(keys ...string) map[string]*Variable {
 // Returns an ordered slices of the parameters keys
 func (p *Parameters) GetOrdered() []string {
 	keys := make([]string, 0, len(*p))
-	for key, _ := range *p {
+	for key := range *p {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
@@ -189,7 +189,7 @@ func (p *Parameters) ProcessOptionnalParams(interactive bool) error {
 
 // Remove all concerned optional parameters
 func (p *Parameters) cleanOptionatedParams(optionalParam string) {
-	for paramKey, _ := range *p {
+	for paramKey := range *p {
 		if strings.HasPrefix(paramKey, optionalParam) && paramKey != optionalParam {
 			delete(*p, paramKey)
 		}
@@ -266,9 +266,9 @@ func (p *Parameters) SetValuesFromFiles(fromFiles string) error {
 	values := make(map[string]*Variable)
 	for _, arg := range args {
 		// Split argument
-		split := strings.Split(arg, ":")
+		split := strings.Split(arg, "=")
 		if len(split) != 2 {
-			return fmt.Errorf("Invalid argument: %s. Must be parameter.subparameter:./folder/file", arg)
+			return fmt.Errorf("Invalid argument: %s. Must be parameter.subparameter=./folder/file", arg)
 		}
 		// Get file content
 		content, err := os.ReadFile(split[1])
