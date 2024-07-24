@@ -199,7 +199,7 @@ func TestValueAsFile(t *testing.T) {
 	// Test
 	setRequest := pkg.SetRequest{
 		FromFile: map[string]string{
-			"websocket.response": "../inputs/values.yaml",
+			"websocket.response": "../inputs/values.json",
 		},
 	}
 	res, _ := newRequest("POST", "/api/v1/config", setRequest)

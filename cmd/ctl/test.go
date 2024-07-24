@@ -32,7 +32,7 @@ func testHandler(cmd *cobra.Command, args []string) error { // Get flags
 	if err != nil {
 		return err
 	}
-	outpuPath, err := flags.OutputPath.GetValue()
+	outputPath, err := flags.OutputPath.GetValue()
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func testHandler(cmd *cobra.Command, args []string) error { // Get flags
 	selksInitParams := handlers.InitHandlerInputs{
 		IsDefault:        isDefault.(bool),
 		BackupFolderPath: ".test/config",
-		OutputPath:       outpuPath.(string),
+		OutputPath:       outputPath.(string),
 		Arbitrary:        utils.ExtractArgs(args),
 		Project:          "",
 		Version:          "",
