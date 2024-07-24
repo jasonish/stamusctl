@@ -97,7 +97,7 @@ func compareFolderContent(folder1 map[string]string, folder2 map[string]string) 
 			return fmt.Errorf("file %s is missing in directory", name)
 		}
 		if content1 != content2 {
-			return fmt.Errorf("file content mismatch for %s", name)
+			return fmt.Errorf("file content mismatch for %s\nContent %s : \n%s\nContent %s : \n%s", name, folder1, content1, folder2, content2)
 		}
 	}
 	return nil
