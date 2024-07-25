@@ -3,7 +3,8 @@ nginx:
     image: nginx:1.14.2-alpine
 stamusconfig: /root/Templates/.stamus/selks/embedded/
 websocket:
-    response: |
+    response: pong
+    value: |
       {
           "arkimeviewer": "false",
           "db": {

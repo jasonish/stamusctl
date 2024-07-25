@@ -275,7 +275,6 @@ func (f *Config) SetValuesFromFile(valuesPath string) error {
 		if err != nil {
 			return err
 		}
-		log.Println("Values loaded", valuesConf.GetParams().GetValues())
 		f.GetParams().MergeValues(valuesConf.GetParams())
 		f.MergeArbitrary(valuesConf.GetArbitrary().AsMap())
 	}

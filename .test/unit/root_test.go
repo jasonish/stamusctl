@@ -199,7 +199,7 @@ func TestValueAsFile(t *testing.T) {
 	// Test
 	setRequest := pkg.SetRequest{
 		FromFile: map[string]string{
-			"websocket.response": "../inputs/values.json",
+			"websocket.value": "../inputs/values.json",
 		},
 	}
 	res, _ := newRequest("POST", "/api/v1/config", setRequest)
@@ -208,4 +208,13 @@ func TestValueAsFile(t *testing.T) {
 
 	// Compare
 	compareDirs(t, "./tmp", "../outputs/compose-init-file")
+
+	// Read inputs/values.json file content
+	content, err := os.ReadFile("../inputs/values.json")
+	if t != nil {
+		assert.NoError(t, err)
+	}
+	// content to string
+	t.Log(string(content))
+
 }
