@@ -104,12 +104,11 @@ build daemon:
         paths:
             - stamusd
     script:
-        - |
-            apk add --no-cache gcc musl-dev make
-            go install github.com/swaggo/swag/cmd/swag@latest
-            swag init -g root.go -o cmd/docs -d cmd/daemon/run/
-            make daemon
-            mv dist/stamusd .
+        - apk add --no-cache gcc musl-dev make
+        - go install github.com/swaggo/swag/cmd/swag@latest
+        - swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/
+        - make daemon
+        - mv dist/stamusd .
 
 build test:
     image: golang:alpine

@@ -13,7 +13,7 @@ WORKDIR /src/stamus-ctl
 RUN go mod download
 
 COPY . /src/stamus-ctl
-RUN swag init -g root.go -o cmd/docs -d cmd/daemon/run/
+RUN swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/
 RUN CGO_ENABLED=1 make cli
 
 FROM scratch
