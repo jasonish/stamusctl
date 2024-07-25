@@ -1,0 +1,11 @@
+FROM golang:latest
+
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
+
+COPY . /code/
+
+WORKDIR /code/cmd/daemon
+
+ENTRYPOINT [ "swag", "init" ]
+CMD [ "--pd", "-g", "root.go" ]

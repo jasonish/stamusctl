@@ -1,0 +1,140 @@
+definitions:
+  compose.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  compose.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  pkg.InitRequest:
+    properties:
+      default:
+        description: Use default settings, default is false
+        type: boolean
+      folder:
+        description: Folder where to save configuration files, default is "tmp"
+        type: string
+      from_file:
+        additionalProperties:
+          type: string
+        description: Values keys and paths to files containing the content used as
+          value
+        type: object
+      project:
+        description: Project name, default is "selks"
+        type: string
+      values:
+        additionalProperties:
+          type: string
+        description: Values to set, key is the name of the value, value is the value
+        type: object
+      values_path:
+        description: Path to a values.yaml file
+        type: string
+      version:
+        description: Target version, default is latest
+        type: string
+    type: object
+  pkg.UpdateRequest:
+    properties:
+      project:
+        description: Project name, default is tmp
+        type: string
+      values:
+        additionalProperties:
+          type: string
+        description: Values to set, key is the name of the value, value is the value
+        type: object
+      version:
+        description: Version to update to, default is latest
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /compose/init:
+    post:
+      consumes:
+      - application/json
+      description: Initializes configuration with provided parameters.
+      parameters:
+      - description: Initialization parameters
+        in: body
+        name: arbitraries
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.InitRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Initialization successful
+          schema:
+            $ref: '#/definitions/compose.SuccessResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/compose.ErrorResponse'
+      summary: Initialize configuration
+      tags:
+      - init
+  /compose/pingcompose:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping example
+      tags:
+      - example
+  /compose/update:
+    post:
+      consumes:
+      - application/json
+      description: Update configuration with provided parameters.
+      parameters:
+      - description: Update parameters
+        in: body
+        name: arbitraries
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Initialization successful
+          schema:
+            $ref: '#/definitions/compose.SuccessResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/compose.ErrorResponse'
+      summary: Update configuration
+      tags:
+      - init
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping example
+      tags:
+      - example
+swagger: "2.0"

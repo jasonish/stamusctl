@@ -1,0 +1,211 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/compose/init": {
+            "post": {
+                "description": "Initializes configuration with provided parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "init"
+                ],
+                "summary": "Initialize configuration",
+                "parameters": [
+                    {
+                        "description": "Initialization parameters",
+                        "name": "arbitraries",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.InitRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Initialization successful",
+                        "schema": {
+                            "$ref": "#/definitions/compose.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/compose.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/compose/pingcompose": {
+            "get": {
+                "description": "do ping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "example"
+                ],
+                "summary": "ping example",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/compose/update": {
+            "post": {
+                "description": "Update configuration with provided parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "init"
+                ],
+                "summary": "Update configuration",
+                "parameters": [
+                    {
+                        "description": "Update parameters",
+                        "name": "arbitraries",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.UpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Initialization successful",
+                        "schema": {
+                            "$ref": "#/definitions/compose.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/compose.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "do ping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "example"
+                ],
+                "summary": "ping example",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "compose.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "compose.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.InitRequest": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "description": "Use default settings, default is false",
+                    "type": "boolean"
+                },
+                "folder": {
+                    "description": "Folder where to save configuration files, default is \"tmp\"",
+                    "type": "string"
+                },
+                "from_file": {
+                    "description": "Values keys and paths to files containing the content used as value",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "project": {
+                    "description": "Project name, default is \"selks\"",
+                    "type": "string"
+                },
+                "values": {
+                    "description": "Values to set, key is the name of the value, value is the value",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "values_path": {
+                    "description": "Path to a values.yaml file",
+                    "type": "string"
+                },
+                "version": {
+                    "description": "Target version, default is latest",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.UpdateRequest": {
+            "type": "object",
+            "properties": {
+                "project": {
+                    "description": "Project name, default is tmp",
+                    "type": "string"
+                },
+                "values": {
+                    "description": "Values to set, key is the name of the value, value is the value",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "version": {
+                    "description": "Version to update to, default is latest",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

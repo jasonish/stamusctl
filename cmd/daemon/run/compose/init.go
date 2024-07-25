@@ -15,11 +15,10 @@ import (
 // @Tags init
 // @Accept json
 // @Produce json
-// @Param arbitraries body InitRequest true "Initialization parameters"
+// @Param arbitraries body pkg.InitRequest true "Initialization parameters"
 // @Success 200 {object} SuccessResponse "Initialization successful"
 // @Failure 400 {object} ErrorResponse "Bad request with explanation"
 // @Router /compose/init [post]
-
 func initHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.InitRequest

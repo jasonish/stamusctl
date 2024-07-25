@@ -13,11 +13,10 @@ import (
 // @Tags init
 // @Accept json
 // @Produce json
-// @Param arbitraries body UpdateRequest true "Update parameters"
+// @Param arbitraries body pkg.UpdateRequest true "Update parameters"
 // @Success 200 {object} SuccessResponse "Initialization successful"
 // @Failure 400 {object} ErrorResponse "Bad request with explanation"
 // @Router /compose/update [post]
-
 func updateHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.UpdateRequest

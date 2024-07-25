@@ -7,9 +7,9 @@ import (
 	"os/signal"
 
 	// Custom
+	docs "stamus-ctl/cmd/daemon/docs"
 	"stamus-ctl/cmd/daemon/run/compose"
 	"stamus-ctl/cmd/daemon/run/config"
-	docs "stamus-ctl/cmd/docs"
 	"stamus-ctl/internal/logging"
 
 	// External
