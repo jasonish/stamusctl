@@ -21,21 +21,20 @@ import (
 // @Param path query string true "Path to save file"
 // @Param project query string false "Project name"
 // @Param file formData file true "Upload file"
-// @Success 200 {object} map[string]string{ "message": "Uploaded file" }
-// @Failure 400 {object} map[string]string{ "error": "Error message" }
-// @Failure 500 {object} map[string]string{ "error": "Error message" }
+// @Success 200 {string} string "Uploaded file"
+// @Failure 400 {string} string "Error message"
+// @Failure 500 {string} string "Error message"
 // @Router /upload [post]
-
 func uploadHandler(c *gin.Context) {
 	logging.LoggerWithRequest(c.Request).Info("Upload")
 
 	// Validate request
 	if c.Request.ContentLength == 0 {
-		c.JSON(400, gin.H{"error": "No file uploaded"})
+		c.String(400, "No file uploaded")
 		return
 	}
 	if c.Query("path") == "" {
-		c.JSON(400, gin.H{"error": "No path provided"})
+		c.String(400, "No path provided")
 		return
 	}
 	project := c.Query("project")
@@ -43,25 +42,23 @@ func uploadHandler(c *gin.Context) {
 	// Handle file upload
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(400, gin.H{"error": "File upload error: " + err.Error()})
+		c.String(400, "File upload error: "+err.Error())
 		return
 	}
 
 	// Create directory if it doesn't exist
 	err = os.MkdirAll(filepath.Join(project, c.Query("path")), 0755)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Directory creation error: " + err.Error()})
+		c.String(500, "Directory creation error: "+err.Error())
 		return
 	}
 
 	// Save file to path
 	err = c.SaveUploadedFile(file, filepath.Join(project, c.Query("path"), file.Filename))
 	if err != nil {
-		c.JSON(500, gin.H{"error": "File save error: " + err.Error()})
+		c.String(500, "File save error: "+err.Error())
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"message": "Uploaded file",
-	})
+	c.String(200, "Uploaded file")
 }

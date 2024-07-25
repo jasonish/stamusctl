@@ -14,12 +14,11 @@ import (
 // @Tags set
 // @Accept json
 // @Produce json
-// @Param set body SetRequest true "Set parameters"
+// @Param set body pkg.SetRequest true "Set parameters"
 // @Success 200 {object} SuccessResponse "Configuration set successfully"
 // @Failure 400 {object} ErrorResponse "Bad request with explanation"
 // @Failure 500 {object} ErrorResponse "Internal server error with explanation"
 // @Router /compose/config [post]
-
 func setHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.SetRequest
@@ -63,6 +62,8 @@ func setHandler(c *gin.Context) {
 
 }
 
+type GetResponse map[string]interface{}
+
 // getHandler godoc
 // @Summary Get configuration
 // @Description Retrieves configuration for a given project.
@@ -73,9 +74,6 @@ func setHandler(c *gin.Context) {
 // @Failure 404 {object} ErrorResponse "Bad request with explanation"
 // @Failure 500 {object} ErrorResponse "Internal server error with explanation"
 // @Router /compose/config [get]
-
-type GetResponse map[string]interface{}
-
 func getHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.GetRequest

@@ -15,6 +15,91 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/compose/config": {
+            "get": {
+                "description": "Retrieves configuration for a given project.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "get"
+                ],
+                "summary": "Get configuration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project name",
+                        "name": "project",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Configuration retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/config.GetResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Bad request with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/config.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/config.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Sets configuration with provided parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "set"
+                ],
+                "summary": "Set configuration",
+                "parameters": [
+                    {
+                        "description": "Set parameters",
+                        "name": "set",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.SetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Configuration set successfully",
+                        "schema": {
+                            "$ref": "#/definitions/config.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/config.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/config.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/compose/init": {
             "post": {
                 "description": "Initializes configuration with provided parameters.",
@@ -140,6 +225,63 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/upload": {
+            "post": {
+                "description": "Handles file uploads",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "example"
+                ],
+                "summary": "Upload file example",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Path to save file",
+                        "name": "path",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Project name",
+                        "name": "project",
+                        "in": "query"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Upload file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Uploaded file",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -152,6 +294,26 @@ const docTemplate = `{
             }
         },
         "compose.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "config.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "config.GetResponse": {
+            "type": "object",
+            "additionalProperties": true
+        },
+        "config.SuccessResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -194,6 +356,41 @@ const docTemplate = `{
                 },
                 "version": {
                     "description": "Target version, default is latest",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.SetRequest": {
+            "type": "object",
+            "properties": {
+                "apply": {
+                    "description": "Apply the new configuration, relaunch it, default is false",
+                    "type": "boolean"
+                },
+                "from_file": {
+                    "description": "Values keys and paths to files containing the content used as value",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "project": {
+                    "description": "Project name, default is \"tmp\"",
+                    "type": "string"
+                },
+                "reload": {
+                    "description": "Reload the configuration, don't keep arbitrary parameters",
+                    "type": "boolean"
+                },
+                "values": {
+                    "description": "Values to set, key is the name of the value, value is the value",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "values_path": {
+                    "description": "Path to a values.yaml file",
                     "type": "string"
                 }
             }
