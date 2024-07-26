@@ -23,6 +23,8 @@ func NewCompose(router *gin.RouterGroup) {
 		compose.GET("/pingcompose", ping)
 		compose.POST("/init", initHandler)
 		compose.POST("/update", updateHandler)
+		compose.POST("/up", upHandler)
+		compose.POST("/ps", psHandler)
 	}
 }
 

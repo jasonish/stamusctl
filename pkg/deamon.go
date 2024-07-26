@@ -1,5 +1,7 @@
 package pkg
 
+import "github.com/docker/docker/api/types"
+
 // Init
 type InitRequest struct {
 	IsDefault  bool              `json:"default"`     // Use default settings, default is false
@@ -31,4 +33,12 @@ type UpdateRequest struct {
 	Version string            `json:"version"` // Version to update to, default is latest
 	Project string            `json:"project"` // Project name, default is tmp
 	Values  map[string]string `json:"values"`  // Values to set, key is the name of the value, value is the value
+}
+
+// Wrapper
+type UpRequest struct {
+	Project string `json:"project"` // Project name, default is tmp
+}
+type PsResponse struct {
+	Containers []types.Container `json:"containers"`
 }

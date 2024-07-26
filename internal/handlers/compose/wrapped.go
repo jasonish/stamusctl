@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"stamus-ctl/internal/models"
@@ -13,6 +14,9 @@ import (
 	"github.com/docker/compose/v2/cmd/compatibility"
 	commands "github.com/docker/compose/v2/cmd/compose"
 	"github.com/docker/compose/v2/pkg/compose"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -29,7 +33,7 @@ var composeFlags = models.ComposeFlags{
 	),
 	"ps": models.CreateComposeFlags(
 		[]string{"file"},
-		[]string{"services", "quiet"},
+		[]string{"services", "quiet", "format"},
 	),
 }
 var composeCmds map[string]*cobra.Command = make(map[string]*cobra.Command)
@@ -116,6 +120,21 @@ func HandleDown(configPath string, removeOrphans bool, volumes bool) error {
 	cmd.AddCommand(command)
 	// Run command
 	return cmd.Execute()
+}
+
+func HandlePs() ([]types.Container, error) {
+	// Create docker client
+	apiClient, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return nil, err
+	}
+	defer apiClient.Close()
+	// Get containers
+	containers, err := apiClient.ContainerList(context.Background(), container.ListOptions{All: true})
+	if err != nil {
+		return nil, err
+	}
+	return containers, nil
 }
 
 // Modify the file flag to be hidden and add a folder flag
