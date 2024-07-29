@@ -1,6 +1,7 @@
 stages:
     - build
     - test
+    - deploy
 
 sast:
     stage: test
@@ -231,3 +232,13 @@ compose config reload:
             STAMUS_APP_NAME=stamusctl ./cli config set --reload
             chmod +x $(pwd)/scripts/compare.sh
             $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
+
+refresh-app-of-apps:
+    stage: deploy
+    variables:
+        APP: stamusd
+        BRANCH: $CI_COMMIT_BRANCH
+        SHA: $CI_COMMIT_SHORT_SHA
+        PROJECT: $CI_PROJECT_NAME
+        NAMESPACE: $CI_PROJECT_NAMESPACE
+    trigger: lanath/app-of-apps
