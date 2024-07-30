@@ -10,22 +10,20 @@ include:
     - template: Security/SAST.gitlab-ci.yml
 
 unit tests:
-    image: golang:alpine
+    image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
     stage: smoke
     script:
-        - |
-            apk add --no-cache gcc musl-dev make
-            make test
+        - apk add --no-cache gcc musl-dev make
+        - make test
 
 daemon tests:
-    image: golang:alpine
+    image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
     stage: smoke
     script:
-        - |
-            apk add --no-cache gcc musl-dev make
-            $(pwd)/scripts/move.sh
-            STAMUS_APP_NAME=stamusctl go run ./cmd compose init -h
-            make daemon-test
+        - apk add --no-cache gcc musl-dev make
+        - $(pwd)/scripts/move.sh
+        - STAMUS_APP_NAME=stamusctl go run ./cmd compose init -h
+        - make daemon-test
 
 kaniko cli:
     stage: build
@@ -36,16 +34,15 @@ kaniko cli:
     needs:
         - unit tests
     script:
-        - |
-            echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-            /kaniko/executor \
-            --context "${CI_PROJECT_DIR}" \
-            --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.cli" \
-            --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}" \
-            --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}" \
-            --cache=true \
-            --cache-copy-layers=true \
-            --cache-ttl=72h
+        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+        - /kaniko/executor
+          --context "${CI_PROJECT_DIR}"
+          --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.cli"
+          --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
+          --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}"
+          --cache=true
+          --cache-copy-layers=true
+          --cache-ttl=72h
 
 kaniko cli main:
     stage: build
@@ -58,16 +55,15 @@ kaniko cli main:
     needs:
         - unit tests
     script:
-        - |
-            echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-            /kaniko/executor \
-            --context "${CI_PROJECT_DIR}" \
-            --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.cli" \
-            --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_SHORT_SHA}" \
-            --destination "${CI_REGISTRY_IMAGE}/cli:latest" \
-            --cache=true \
-            --cache-copy-layers=true \
-            --cache-ttl=72h
+        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+        - /kaniko/executor
+          --context "${CI_PROJECT_DIR}"
+          --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.cli"
+          --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_SHORT_SHA}"
+          --destination "${CI_REGISTRY_IMAGE}/cli:latest"
+          --cache=true
+          --cache-copy-layers=true
+          --cache-ttl=72h
 
 kaniko daemon:
     stage: build
@@ -78,16 +74,15 @@ kaniko daemon:
     needs:
         - daemon tests
     script:
-        - |
-            echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-            /kaniko/executor \
-            --context "${CI_PROJECT_DIR}" \
-            --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.daemon" \
-            --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}" \
-            --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}" \
-            --cache=true \
-            --cache-copy-layers=true \
-            --cache-ttl=72h
+        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+        - /kaniko/executor
+          --context "${CI_PROJECT_DIR}"
+          --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.daemon"
+          --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
+          --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}"
+          --cache=true
+          --cache-copy-layers=true
+          --cache-ttl=72h
 
 kaniko daemon main:
     stage: build
@@ -100,19 +95,18 @@ kaniko daemon main:
     needs:
         - daemon tests
     script:
-        - |
-            echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-            /kaniko/executor \
-            --context "${CI_PROJECT_DIR}" \
-            --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.daemon" \
-            --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_SHORT_SHA}" \
-            --destination "${CI_REGISTRY_IMAGE}/daemon:latest" \
-            --cache=true \
-            --cache-copy-layers=true \
-            --cache-ttl=72h
+        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+        - /kaniko/executor
+          --context "${CI_PROJECT_DIR}"
+          --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.daemon"
+          --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_SHORT_SHA}"
+          --destination "${CI_REGISTRY_IMAGE}/daemon:latest"
+          --cache=true
+          --cache-copy-layers=true
+          --cache-ttl=72h
 
 build cli:
-    image: golang:alpine
+    image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
     stage: build
     artifacts:
         expire_in: 1 day
@@ -121,13 +115,12 @@ build cli:
     needs:
         - unit tests
     script:
-        - |
-            apk add --no-cache gcc musl-dev make
-            make cli
-            mv dist/stamusctl .
+        - apk add --no-cache gcc musl-dev make
+        - make cli
+        - mv dist/stamusctl .
 
 build daemon:
-    image: golang:alpine
+    image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
     stage: build
     artifacts:
         expire_in: 1 day
@@ -143,7 +136,7 @@ build daemon:
         - mv dist/stamusd .
 
 build test:
-    image: golang:alpine
+    image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
     stage: build
     artifacts:
         expire_in: 1 day
@@ -153,13 +146,12 @@ build test:
     needs:
         - unit tests
     script:
-        - |
-            apk add --no-cache gcc musl-dev make
-            chmod +x $(pwd)/scripts/move.sh
-            $(pwd)/scripts/move.sh
-            make test-cli
-            mv .test/outputs outputs
-            mv dist/stamusctl cli
+        - apk add --no-cache gcc musl-dev make
+        - chmod +x $(pwd)/scripts/move.sh
+        - $(pwd)/scripts/move.sh
+        - make test-cli
+        - mv .test/outputs outputs
+        - mv dist/stamusctl cli
 
 test cli:
     image: busybox
@@ -169,8 +161,7 @@ test cli:
     dependencies:
         - build cli
     script:
-        - |
-            STAMUS_APP_NAME=stamusctl ./stamusctl
+        - STAMUS_APP_NAME=stamusctl ./stamusctl
 
 test daemon:
     image: busybox
@@ -180,8 +171,7 @@ test daemon:
     dependencies:
         - build daemon
     script:
-        - |
-            STAMUS_APP_NAME=stamusd ./stamusd
+        - STAMUS_APP_NAME=stamusd ./stamusd
 
 compose init:
     image: busybox
@@ -191,10 +181,9 @@ compose init:
     dependencies:
         - build test
     script:
-        - |
-            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
-            chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
+        - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
 
 compose init set:
     image: busybox
@@ -204,10 +193,9 @@ compose init set:
     dependencies:
         - build test
     script:
-        - |
-            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.response=lel
-            chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
+        - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.response=lel
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
 
 compose init optional:
     image: busybox
@@ -217,10 +205,9 @@ compose init optional:
     dependencies:
         - build test
     script:
-        - |
-            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx=false
-            chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-optional
+        - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx=false
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-optional
 
 compose init arbitrary:
     image: busybox
@@ -230,10 +217,9 @@ compose init arbitrary:
     dependencies:
         - build test
     script:
-        - |
-            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.port=6969
-            chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-arbitrary
+        - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.port=6969
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-arbitrary
 
 compose config set:
     image: busybox
@@ -243,11 +229,10 @@ compose config set:
     dependencies:
         - build test
     script:
-        - |
-            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
-            STAMUS_APP_NAME=stamusctl ./cli config set websocket.response=lel
-            chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
+        - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
+        - STAMUS_APP_NAME=stamusctl ./cli config set websocket.response=lel
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
 
 compose config reload:
     image: busybox
@@ -257,12 +242,11 @@ compose config reload:
     dependencies:
         - build test
     script:
-        - |
-            STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
-            STAMUS_APP_NAME=stamusctl ./cli config set websocket.port=6969
-            STAMUS_APP_NAME=stamusctl ./cli config set --reload
-            chmod +x $(pwd)/scripts/compare.sh
-            $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
+        - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
+        - STAMUS_APP_NAME=stamusctl ./cli config set websocket.port=6969
+        - STAMUS_APP_NAME=stamusctl ./cli config set --reload
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
 
 refresh-app-of-apps:
     stage: deploy
