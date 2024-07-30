@@ -4,6 +4,15 @@ stages:
     - test
     - deploy
 
+.go-cache:
+    variables:
+        GOPATH: $CI_PROJECT_DIR/.go
+    before_script:
+        - mkdir -p .go
+    cache:
+        paths:
+            - .go/pkg/mod/
+
 sast:
     stage: test
 include:
@@ -11,16 +20,16 @@ include:
 
 unit tests:
     image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
+    extends: .go-cache
     stage: smoke
     script:
-        - apk add --no-cache gcc musl-dev make
         - make test
 
 daemon tests:
     image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
+    extends: .go-cache
     stage: smoke
     script:
-        - apk add --no-cache gcc musl-dev make
         - $(pwd)/scripts/move.sh
         - STAMUS_APP_NAME=stamusctl go run ./cmd compose init -h
         - make daemon-test
@@ -107,6 +116,7 @@ kaniko daemon main:
 
 build cli:
     image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
+    extends: .go-cache
     stage: build
     artifacts:
         expire_in: 1 day
@@ -115,12 +125,12 @@ build cli:
     needs:
         - unit tests
     script:
-        - apk add --no-cache gcc musl-dev make
         - make cli
         - mv dist/stamusctl .
 
 build daemon:
     image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
+    extends: .go-cache
     stage: build
     artifacts:
         expire_in: 1 day
@@ -129,7 +139,6 @@ build daemon:
     needs:
         - daemon tests
     script:
-        - apk add --no-cache gcc musl-dev make
         - go install github.com/swaggo/swag/cmd/swag@latest
         - swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/
         - make daemon
@@ -137,6 +146,7 @@ build daemon:
 
 build test:
     image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
+    extends: .go-cache
     stage: build
     artifacts:
         expire_in: 1 day
@@ -146,7 +156,6 @@ build test:
     needs:
         - unit tests
     script:
-        - apk add --no-cache gcc musl-dev make
         - chmod +x $(pwd)/scripts/move.sh
         - $(pwd)/scripts/move.sh
         - make test-cli
