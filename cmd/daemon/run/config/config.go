@@ -70,7 +70,7 @@ type GetResponse map[string]interface{}
 // @Tags get
 // @Produce json
 // @Param set body pkg.GetRequest true "Get parameters"
-// @Success 200 {object} pkg.GetResponse "Configuration retrieved successfully"
+// @Success 200 {object} GetResponse "Configuration retrieved successfully"
 // @Failure 404 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
 // @Router /config [get]
