@@ -1,4 +1,5 @@
 stages:
+    - smoke
     - build
     - test
     - deploy
@@ -8,12 +9,32 @@ sast:
 include:
     - template: Security/SAST.gitlab-ci.yml
 
+unit tests:
+    image: golang:alpine
+    stage: smoke
+    script:
+        - |
+            apk add --no-cache gcc musl-dev make
+            make test
+
+daemon tests:
+    image: golang:alpine
+    stage: smoke
+    script:
+        - |
+            apk add --no-cache gcc musl-dev make
+            $(pwd)/scripts/move.sh
+            STAMUS_APP_NAME=stamusctl go run ./cmd compose init -h
+            make daemon-test
+
 kaniko cli:
     stage: build
     before_script: []
     image:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
+    needs:
+        - unit tests
     script:
         - |
             echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -34,6 +55,8 @@ kaniko cli main:
     image:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
+    needs:
+        - unit tests
     script:
         - |
             echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -52,6 +75,8 @@ kaniko daemon:
     image:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
+    needs:
+        - daemon tests
     script:
         - |
             echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -72,6 +97,8 @@ kaniko daemon main:
     image:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
+    needs:
+        - daemon tests
     script:
         - |
             echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -91,6 +118,8 @@ build cli:
         expire_in: 1 day
         paths:
             - stamusctl
+    needs:
+        - unit tests
     script:
         - |
             apk add --no-cache gcc musl-dev make
@@ -104,6 +133,8 @@ build daemon:
         expire_in: 1 day
         paths:
             - stamusd
+    needs:
+        - daemon tests
     script:
         - apk add --no-cache gcc musl-dev make
         - go install github.com/swaggo/swag/cmd/swag@latest
@@ -119,6 +150,8 @@ build test:
         paths:
             - outputs
             - cli
+    needs:
+        - unit tests
     script:
         - |
             apk add --no-cache gcc musl-dev make
@@ -131,6 +164,8 @@ build test:
 test cli:
     image: busybox
     stage: test
+    needs:
+        - build cli
     dependencies:
         - build cli
     script:
@@ -140,33 +175,19 @@ test cli:
 test daemon:
     image: busybox
     stage: test
+    needs:
+        - build daemon
     dependencies:
         - build daemon
     script:
         - |
             STAMUS_APP_NAME=stamusd ./stamusd
 
-unit tests:
-    image: golang:alpine
-    stage: test
-    script:
-        - |
-            apk add --no-cache gcc musl-dev make
-            make test
-
-daemon tests:
-    image: golang:alpine
-    stage: test
-    script:
-        - |
-            apk add --no-cache gcc musl-dev make
-            $(pwd)/scripts/move.sh
-            STAMUS_APP_NAME=stamusctl go run ./cmd compose init -h
-            make daemon-test
-
 compose init:
     image: busybox
     stage: test
+    needs:
+        - build test
     dependencies:
         - build test
     script:
@@ -178,6 +199,8 @@ compose init:
 compose init set:
     image: busybox
     stage: test
+    needs:
+        - build test
     dependencies:
         - build test
     script:
@@ -189,6 +212,8 @@ compose init set:
 compose init optional:
     image: busybox
     stage: test
+    needs:
+        - build test
     dependencies:
         - build test
     script:
@@ -200,6 +225,8 @@ compose init optional:
 compose init arbitrary:
     image: busybox
     stage: test
+    needs:
+        - build test
     dependencies:
         - build test
     script:
@@ -211,6 +238,8 @@ compose init arbitrary:
 compose config set:
     image: busybox
     stage: test
+    needs:
+        - build test
     dependencies:
         - build test
     script:
@@ -223,6 +252,8 @@ compose config set:
 compose config reload:
     image: busybox
     stage: test
+    needs:
+        - build test
     dependencies:
         - build test
     script:
@@ -235,6 +266,8 @@ compose config reload:
 
 refresh-app-of-apps:
     stage: deploy
+    needs:
+        - test daemon
     variables:
         APP: stamusd
         BRANCH: $CI_COMMIT_BRANCH
