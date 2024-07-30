@@ -2,11 +2,15 @@ package handlers
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"stamus-ctl/internal/models"
+	"stamus-ctl/pkg"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/docker/cli/cli-plugins/plugin"
 	"github.com/docker/cli/cli/command"
@@ -34,6 +38,10 @@ var composeFlags = models.ComposeFlags{
 	"ps": models.CreateComposeFlags(
 		[]string{"file"},
 		[]string{"services", "quiet", "format"},
+	),
+	"logs": models.CreateComposeFlags(
+		[]string{"file"},
+		[]string{"timestamps", "tail", "since", "until"},
 	),
 }
 var composeCmds map[string]*cobra.Command = make(map[string]*cobra.Command)
@@ -135,6 +143,121 @@ func HandlePs() ([]types.Container, error) {
 		return nil, err
 	}
 	return containers, nil
+}
+
+func HandleConfigRestart(configPath string) error {
+	err := HandleDown(configPath, false, false)
+	if err != nil {
+		return err
+	}
+	return HandleUp(configPath)
+}
+
+func HandleContainersRestart(containers []string) error {
+	// Create docker client
+	apiClient, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return err
+	}
+	defer apiClient.Close()
+	// Sync
+	wg := sync.WaitGroup{}
+	wg.Add(len(containers))
+	returned := make(chan error)
+	defer close(returned)
+	// Restart containers
+	for _, containerID := range containers {
+		go func(containerID string) {
+			defer wg.Done()
+			err := RestartContainer(containerID)
+			if err != nil {
+				returned <- err
+			}
+		}(containerID)
+	}
+	// Resync
+	wg.Wait()
+	if len(returned) != 0 {
+		var toReturn error
+		for err := range returned {
+			toReturn = fmt.Errorf("%s\n%s", toReturn, err)
+		}
+		return toReturn
+	}
+	return nil
+}
+
+func RestartContainer(containerID string) error {
+	// Create docker client
+	apiClient, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return err
+	}
+	defer apiClient.Close()
+	// Restart container
+	return apiClient.ContainerRestart(context.Background(), containerID, container.StopOptions{})
+}
+
+func HandleLogs(logParams pkg.LogsRequest) (pkg.LogsResponse, error) {
+	// Get containers
+	containers, err := HandlePs()
+	if err != nil {
+		return pkg.LogsResponse{}, err
+	}
+	// Filter containers
+	if logParams.Containers != nil && len(logParams.Containers) > 0 {
+		filteredContainers := []types.Container{}
+		for _, container := range containers {
+			for _, id := range logParams.Containers {
+				if container.ID == id {
+					filteredContainers = append(filteredContainers, container)
+					break
+				}
+			}
+		}
+		containers = filteredContainers
+	}
+	// Create docker client
+	apiClient, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		return pkg.LogsResponse{}, err
+	}
+	defer apiClient.Close()
+	// Get logs
+	response := pkg.LogsResponse{}
+	for _, current := range containers {
+		reader, err := apiClient.ContainerLogs(context.Background(), current.ID, container.LogsOptions{
+			Since:      logParams.Since,
+			Until:      logParams.Until,
+			Tail:       logParams.Tail,
+			Timestamps: logParams.Timestamps,
+			ShowStdout: true,
+			ShowStderr: true,
+			Details:    true,
+		})
+		if err != nil {
+			return pkg.LogsResponse{}, err
+		}
+		defer reader.Close()
+		// Read logs
+		buffer, err := io.ReadAll(reader)
+		if err != nil {
+			return pkg.LogsResponse{}, err
+		}
+		// Clean logs
+		rawLogs := string(buffer)
+		rawLogs = strings.ReplaceAll(rawLogs, "\u0000", "")
+		rawLogs = strings.ReplaceAll(rawLogs, "\u0001", "")
+		rawLogs = strings.ReplaceAll(rawLogs, "\u0002", "")
+		logs := strings.Split(rawLogs, "\n")
+		// Create response
+		response.Containers = append(response.Containers, pkg.ContainerLogs{
+			Container: current,
+			Logs:      logs,
+		})
+	}
+
+	return response, nil
 }
 
 // Modify the file flag to be hidden and add a folder flag
