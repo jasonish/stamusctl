@@ -143,7 +143,6 @@ build daemon:
     needs:
         - daemon tests
     script:
-        - go install github.com/swaggo/swag/cmd/swag@latest
         - swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/
         - make daemon
         - mv dist/stamusd .
