@@ -3,7 +3,6 @@ default:
         - scirius
 
 stages:
-    - setup
     - smoke
     - build
     - test
@@ -23,26 +22,10 @@ stages:
 # include:
 #     - template: Security/SAST.gitlab-ci.yml
 
-install deps:
-    image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
-    extends: .go-cache
-    stage: setup
-    artifacts:
-        untracked: true
-        when: on_success
-        access: all
-        expire_in: '1 days'
-    script:
-        - go mod download
-        - go install github.com/swaggo/swag/cmd/swag@latest
-        - make cli
-
 unit tests:
     image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
     extends: .go-cache
     stage: smoke
-    dependencies:
-        - install deps
     script:
         - make test
 
@@ -50,8 +33,6 @@ daemon tests:
     image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
     extends: .go-cache
     stage: smoke
-    dependencies:
-        - install deps
     script:
         - $(pwd)/scripts/move.sh
         - STAMUS_APP_NAME=stamusctl go run ./cmd compose init -h
@@ -64,7 +45,6 @@ kaniko cli:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
     needs:
-        - install deps
         - unit tests
     script:
         - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -86,7 +66,6 @@ kaniko cli main:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
     needs:
-        - install deps
         - unit tests
     script:
         - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -106,7 +85,6 @@ kaniko daemon:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
     needs:
-        - install deps
         - daemon tests
     script:
         - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -128,7 +106,6 @@ kaniko daemon main:
         name: gcr.io/kaniko-project/executor:v1.14.0-debug
         entrypoint: ['']
     needs:
-        - install deps
         - daemon tests
     script:
         - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -150,10 +127,7 @@ build cli:
         paths:
             - stamusctl
     needs:
-        - install deps
         - unit tests
-    dependencies:
-        - install deps
     script:
         - make cli
         - mv dist/stamusctl .
@@ -167,10 +141,7 @@ build daemon:
         paths:
             - stamusd
     needs:
-        - install deps
         - daemon tests
-    dependencies:
-        - install deps
     script:
         - go install github.com/swaggo/swag/cmd/swag@latest
         - swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/
@@ -187,10 +158,7 @@ build test:
             - outputs
             - cli
     needs:
-        - install deps
         - unit tests
-    dependencies:
-        - install deps
     script:
         - chmod +x $(pwd)/scripts/move.sh
         - $(pwd)/scripts/move.sh
@@ -202,10 +170,8 @@ test cli:
     image: busybox
     stage: test
     needs:
-        - install deps
         - build cli
     dependencies:
-        - install deps
         - build cli
     script:
         - STAMUS_APP_NAME=stamusctl ./stamusctl
@@ -214,10 +180,8 @@ test daemon:
     image: busybox
     stage: test
     needs:
-        - install deps
         - build daemon
     dependencies:
-        - install deps
         - build daemon
     script:
         - STAMUS_APP_NAME=stamusd ./stamusd
@@ -226,10 +190,8 @@ compose init:
     image: busybox
     stage: test
     needs:
-        - install deps
         - build test
     dependencies:
-        - install deps
         - build test
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
@@ -240,10 +202,8 @@ compose init set:
     image: busybox
     stage: test
     needs:
-        - install deps
         - build test
     dependencies:
-        - install deps
         - build test
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.response=lel
@@ -254,10 +214,8 @@ compose init optional:
     image: busybox
     stage: test
     needs:
-        - install deps
         - build test
     dependencies:
-        - install deps
         - build test
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx=false
@@ -268,10 +226,8 @@ compose init arbitrary:
     image: busybox
     stage: test
     needs:
-        - install deps
         - build test
     dependencies:
-        - install deps
         - build test
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.port=6969
@@ -282,10 +238,8 @@ compose config set:
     image: busybox
     stage: test
     needs:
-        - install deps
         - build test
     dependencies:
-        - install deps
         - build test
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
@@ -297,10 +251,8 @@ compose config reload:
     image: busybox
     stage: test
     needs:
-        - install deps
         - build test
     dependencies:
-        - install deps
         - build test
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
