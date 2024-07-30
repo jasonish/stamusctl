@@ -16,8 +16,8 @@ import (
 // @Accept json
 // @Produce json
 // @Param arbitraries body pkg.InitRequest true "Initialization parameters"
-// @Success 200 {object} SuccessResponse "Initialization successful"
-// @Failure 400 {object} ErrorResponse "Bad request with explanation"
+// @Success 200 {object} pkg.SuccessResponse "Initialization successful"
+// @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Router /compose/init [post]
 func initHandler(c *gin.Context) {
 	// Extract request body
@@ -28,8 +28,8 @@ func initHandler(c *gin.Context) {
 	}
 
 	// Validate request
-	if req.Folder == "" {
-		req.Folder = "tmp"
+	if req.Config.Value == "" {
+		req.Config.Value = "tmp"
 	}
 	if req.Values == nil {
 		req.Values = make(map[string]string)
@@ -51,7 +51,7 @@ func initHandler(c *gin.Context) {
 	parameters := handlers.InitHandlerInputs{
 		IsDefault:        req.IsDefault,
 		BackupFolderPath: app.DefaultSelksPath,
-		OutputPath:       req.Folder,
+		OutputPath:       req.Config.Value,
 		Arbitrary:        req.Values,
 		Project:          req.Project,
 		Version:          req.Version,

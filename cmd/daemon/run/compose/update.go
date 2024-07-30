@@ -14,8 +14,8 @@ import (
 // @Accept json
 // @Produce json
 // @Param arbitraries body pkg.UpdateRequest true "Update parameters"
-// @Success 200 {object} SuccessResponse "Initialization successful"
-// @Failure 400 {object} ErrorResponse "Bad request with explanation"
+// @Success 200 {object} pkg.SuccessResponse "Initialization successful"
+// @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Router /compose/update [post]
 func updateHandler(c *gin.Context) {
 	// Extract request body
@@ -26,8 +26,8 @@ func updateHandler(c *gin.Context) {
 	}
 
 	// Validate parameters
-	if req.Project == "" {
-		req.Project = "tmp"
+	if req.Config.Value == "" {
+		req.Config.Value = "tmp"
 	}
 	if req.Version == "" {
 		req.Version = "latest"
@@ -42,7 +42,7 @@ func updateHandler(c *gin.Context) {
 
 	// Call handler
 	params := handlers.UpdateHandlerParams{
-		Config:  req.Project,
+		Config:  req.Config.Value,
 		Version: req.Version,
 		Args:    valuesVal,
 	}

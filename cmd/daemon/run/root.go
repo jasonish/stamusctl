@@ -10,6 +10,7 @@ import (
 	docs "stamus-ctl/cmd/daemon/docs"
 	"stamus-ctl/cmd/daemon/run/compose"
 	"stamus-ctl/cmd/daemon/run/config"
+	"stamus-ctl/cmd/daemon/run/troubleshoot"
 	"stamus-ctl/internal/logging"
 
 	// External
@@ -108,6 +109,7 @@ func SetupRouter(logger func(string)) *gin.Engine {
 		v1.POST("/upload", uploadHandler)
 		compose.NewCompose(v1)
 		config.NewConfig(v1)
+		troubleshoot.NewTroubleshoot(v1)
 	}
 
 	// Swagger

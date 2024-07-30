@@ -15,10 +15,10 @@ import (
 // @Accept json
 // @Produce json
 // @Param set body pkg.SetRequest true "Set parameters"
-// @Success 200 {object} SuccessResponse "Configuration set successfully"
-// @Failure 400 {object} ErrorResponse "Bad request with explanation"
-// @Failure 500 {object} ErrorResponse "Internal server error with explanation"
-// @Router /compose/config [post]
+// @Success 200 {object} pkg.SuccessResponse "Configuration set successfully"
+// @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
+// @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
+// @Router /config [post]
 func setHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.SetRequest
@@ -28,8 +28,8 @@ func setHandler(c *gin.Context) {
 	}
 
 	// Validate request
-	if req.Project == "" {
-		req.Project = "tmp"
+	if req.Config.Value == "" {
+		req.Config.Value = "tmp"
 	}
 	if req.Values == nil {
 		req.Values = make(map[string]string)
@@ -47,7 +47,7 @@ func setHandler(c *gin.Context) {
 
 	// Call handler
 	params := handlers.SetHandlerInputs{
-		Config:   req.Project,
+		Config:   req.Config.Value,
 		Reload:   req.Reload,
 		Apply:    req.Apply,
 		Args:     valuesAsStrings,
@@ -69,11 +69,11 @@ type GetResponse map[string]interface{}
 // @Description Retrieves configuration for a given project.
 // @Tags get
 // @Produce json
-// @Param project query string true "Project name"
-// @Success 200 {object} GetResponse "Configuration retrieved successfully"
-// @Failure 404 {object} ErrorResponse "Bad request with explanation"
-// @Failure 500 {object} ErrorResponse "Internal server error with explanation"
-// @Router /compose/config [get]
+// @Param set body pkg.GetRequest true "Get parameters"
+// @Success 200 {object} pkg.GetResponse "Configuration retrieved successfully"
+// @Failure 404 {object} pkg.ErrorResponse "Bad request with explanation"
+// @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
+// @Router /config [get]
 func getHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.GetRequest
@@ -83,8 +83,8 @@ func getHandler(c *gin.Context) {
 	}
 
 	// Validate request
-	if req.Project == "" {
-		req.Project = "tmp"
+	if req.Config.Value == "" {
+		req.Config.Value = "tmp"
 	}
 	if req.Values == nil {
 		req.Values = []string{}
@@ -92,7 +92,7 @@ func getHandler(c *gin.Context) {
 
 	// Call handler
 	if req.Content {
-		filesMap, err := handlers.GetGroupedContent(req.Project, req.Values)
+		filesMap, err := handlers.GetGroupedContent(req.Config.Value, req.Values)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
@@ -101,7 +101,7 @@ func getHandler(c *gin.Context) {
 		return
 	}
 
-	groupedValues, err := handlers.GetGroupedConfig(req.Project, req.Values, false)
+	groupedValues, err := handlers.GetGroupedConfig(req.Config.Value, req.Values, false)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

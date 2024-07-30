@@ -24,14 +24,9 @@ func NewCompose(router *gin.RouterGroup) {
 		compose.POST("/init", initHandler)
 		compose.POST("/update", updateHandler)
 		compose.POST("/up", upHandler)
+		compose.POST("/down", downHandler)
 		compose.POST("/ps", psHandler)
+		compose.POST("/restart/config", restartConfigHandler)
+		compose.POST("/restart/containers", restartContainersHandler)
 	}
-}
-
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-type SuccessResponse struct {
-	Message string `json:"message"`
 }
