@@ -9,5 +9,6 @@ func NewTroubleshoot(router *gin.RouterGroup) {
 	{
 		troubleshoot.POST("/containers", logsHandler)
 		troubleshoot.POST("/kernel", kernelHandler)
+		troubleshoot.POST("/reboot", rebootHandler)
 	}
 }
