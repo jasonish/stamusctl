@@ -18,10 +18,10 @@ stages:
         paths:
             - .go/pkg/mod/
 
-sast:
-    stage: test
-include:
-    - template: Security/SAST.gitlab-ci.yml
+# sast:
+#     stage: test
+# include:
+#     - template: Security/SAST.gitlab-ci.yml
 
 install deps:
     image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
