@@ -2,8 +2,11 @@
 
 ## Description
 stamusctl is a Command-Line Interface application written in GoLang by Stamus Networks that provides various functionalities to:
-- manage Stamus stack configuration files
+- manage Stamus stack configuration
 - deploy Stamus stack
+
+stamusd is a deamon that provides a REST API with functionalities similar to stamusctl.
+You can find its documentation [here](./cmd/daemon/docs/swagger.json).
 
 ## Installation
 To install stamusctl, you can:
@@ -75,7 +78,7 @@ This way, you can pull images from private registries.
   - `--registry` to select registry
   - `--user` to input user
   - `--pass` to input password
-  
+
 
 ## Examples
 ```
