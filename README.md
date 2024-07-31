@@ -5,7 +5,7 @@ stamusctl is a Command-Line Interface application written in GoLang by Stamus Ne
 - manage Stamus stack configuration
 - deploy Stamus stack
 
-stamusd is a deamon that provides a REST API with functionalities similar to stamusctl.
+stamusd is a daemon that provides a REST API with functionalities similar to stamusctl.
 You can find its documentation [here](./cmd/daemon/docs/swagger.json).
 
 ## Installation

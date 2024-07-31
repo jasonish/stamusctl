@@ -243,7 +243,7 @@ services:
       timeout: 1m
       retries: 3
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # This bind-mout allows using the hosts docker deamon instead of created one inside the container
+      - /var/run/docker.sock:/var/run/docker.sock # This bind-mout allows using the hosts docker daemon instead of created one inside the container
 
       # Those volumes will contain the cron jobs
       - {{.globals.volumepath}}/cron-jobs/1min:/etc/periodic/1min/:ro
