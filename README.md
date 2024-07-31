@@ -17,7 +17,17 @@ To install stamusctl, you can:
 ```
 git clone https://git.stamus-networks.com/devel/stamus-ctl
 ```
-and follow [golang documentation](https://go.dev/doc/tutorial/compile-install)
+and follow [golang documentation](https://go.dev/doc/tutorial/compile-install).
+
+To build the `stamusctl` binary, you can:
+```shell
+STAMUS_APP_NAME=stamusctl go build -o ./stamusctl ./cmd
+```
+
+To build the `stamusd` binary, you can:
+```shell
+go build -o ./stamusd ./cmd
+```
 
 ## Usage
 If you have the binary in your path, you can:
