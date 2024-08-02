@@ -36,7 +36,7 @@ func GetChoices(name string) ([]Variable, error) {
 // Get the list of network interfaces
 // Depending on the mode (prod or test), it will either use the host or a busybox container
 func getInterfaces() ([]Variable, error) {
-	if app.Mode == "prod" {
+	if app.Mode.IsProd() {
 		return getInterfacesBusybox()
 	} else {
 		return getInterfacesHost()

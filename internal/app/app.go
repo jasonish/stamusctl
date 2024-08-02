@@ -10,20 +10,20 @@ import (
 	"github.com/adrg/xdg"
 )
 
-// Constants
+// Variables
 var (
 	Name             = ""
-	Mode             = "prod"
+	Mode             = ModeStruct("prod")
 	ConfigFolder     = "/"
 	TemplatesFolder  = "/"
 	DefaultSelksPath = "/"
 	LatestSelksPath  = "/"
 )
 
+// Constants
 const (
 	binaryNameEnv = "STAMUSCTL_NAME"
-
-	CtlName = "stamusctl"
+	CtlName       = "stamusctl"
 )
 
 func CatchException() {
@@ -45,7 +45,7 @@ func init() {
 
 	// Mode
 	if val := os.Getenv("BUILD_MODE"); val != "" {
-		Mode = val
+		Mode.set(val)
 	}
 
 	// Folders
