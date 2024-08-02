@@ -36,6 +36,10 @@ func (c *ComposeFlags) Contains(command string) bool {
 	return ok
 }
 
+func (c *ComposeFlags) Get(command string) []*Flags {
+	return []*Flags{(*c)[command]}
+}
+
 func contains(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
