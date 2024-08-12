@@ -57,15 +57,15 @@ func (m *mocked) RestartContainers(containers []string) error {
 	return nil
 }
 
-func (m *mocked) Ps() []types.Container {
+func (m *mocked) Ps() ([]types.Container, error) {
 	var containers []types.Container
 	for _, container := range *m {
 		containers = append(containers, container)
 	}
-	return containers
+	return containers, nil
 }
 
-func (m *mocked) Logs() pkg.LogsResponse {
+func (m *mocked) Logs() (pkg.LogsResponse, error) {
 	var logs []pkg.ContainerLogs
 	for _, container := range *m {
 		logs = append(logs, pkg.ContainerLogs{
@@ -73,7 +73,7 @@ func (m *mocked) Logs() pkg.LogsResponse {
 			Logs:      []string{"log1", "log2"},
 		})
 	}
-	return pkg.LogsResponse{Containers: logs}
+	return pkg.LogsResponse{Containers: logs}, nil
 }
 
 func getServices(path string) ([]string, error) {

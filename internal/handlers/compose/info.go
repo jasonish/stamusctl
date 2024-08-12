@@ -19,7 +19,7 @@ import (
 
 func HandlePs() ([]types.Container, error) {
 	if app.Mode.IsTest() {
-		return mocker.Mocked.Ps(), nil
+		return mocker.Mocked.Ps()
 	}
 	return handlePs()
 }
@@ -41,7 +41,7 @@ func handlePs() ([]types.Container, error) {
 
 func HandleLogs(logParams pkg.LogsRequest) (pkg.LogsResponse, error) {
 	if app.Mode.IsTest() {
-		return mocker.Mocked.Logs(), nil
+		return mocker.Mocked.Logs()
 	}
 	return handleLogs(logParams)
 }

@@ -16,8 +16,7 @@ import (
 
 func HandleUp(configPath string) error {
 	if app.Mode.IsTest() {
-		mocker.Mocked.Up(configPath)
-		return nil
+		return mocker.Mocked.Up(configPath)
 	}
 	return handleUp(configPath)
 }
@@ -41,8 +40,7 @@ func handleUp(configPath string) error {
 
 func HandleDown(configPath string, removeOrphans bool, volumes bool) error {
 	if app.Mode.IsTest() {
-		mocker.Mocked.Down(configPath)
-		return nil
+		return mocker.Mocked.Down(configPath)
 	}
 	return handleDown(configPath, removeOrphans, volumes)
 }

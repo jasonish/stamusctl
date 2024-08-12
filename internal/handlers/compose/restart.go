@@ -17,8 +17,7 @@ import (
 
 func HandleConfigRestart(configPath string) error {
 	if app.Mode.IsTest() {
-		mocker.Mocked.Restart(configPath)
-		return nil
+		return mocker.Mocked.Restart(configPath)
 	}
 	return handleConfigRestart(configPath)
 }
@@ -34,8 +33,7 @@ func handleConfigRestart(configPath string) error {
 
 func HandleContainersRestart(containers []string) error {
 	if app.Mode.IsTest() {
-		mocker.Mocked.RestartContainers(containers)
-		return nil
+		return mocker.Mocked.RestartContainers(containers)
 	}
 	return handleContainersRestart(containers)
 }
