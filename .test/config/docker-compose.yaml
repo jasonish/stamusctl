@@ -1,7 +1,7 @@
 services:
   {{- if .nginx}}
   nginx:
-    image: {{- .nginx.image}}
+    image: {{.nginx.image}}
     container_name: nginx
     restart: always
     volumes:
