@@ -71,7 +71,8 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 	// Filter commands
 	for _, c := range cmdDocker.Commands() {
 		command := strings.Split(c.Use, " ")[0]
-		if composeFlags.Contains(command) {
+		if composeFlags.Contains(command) && ComposeCmds[command] == nil {
+			ComposeCmds[command] = c
 			// Filter flags
 			flags := composeFlags[command].ExtractFlags(cmdDocker.Flags(), c.Flags())
 			c.ResetFlags()
@@ -92,7 +93,6 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 func modifyFileFlag(c *cobra.Command, command string) {
 	c.Flags().Lookup("file").Hidden = true
 	// Save the command
-	ComposeCmds[command] = c
 	currentRunE := c.RunE
 	// Modify cmd function
 	c.RunE = makeCustomRunner(currentRunE, command)
