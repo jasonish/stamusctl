@@ -110,6 +110,10 @@ definitions:
         type: integer
       hostConfig:
         properties:
+          annotations:
+            additionalProperties:
+              type: string
+            type: object
           networkMode:
             type: string
         type: object
@@ -295,6 +299,10 @@ definitions:
         type: integer
       hostConfig:
         properties:
+          annotations:
+            additionalProperties:
+              type: string
+            type: object
           networkMode:
             type: string
         type: object
@@ -436,7 +444,7 @@ paths:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Similar to docker compose down
       tags:
-      - down
+      - compose
   /compose/init:
     post:
       consumes:
@@ -462,22 +470,7 @@ paths:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Initialize configuration
       tags:
-      - init
-  /compose/pingcompose:
-    get:
-      consumes:
-      - application/json
-      description: do ping
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: ping example
-      tags:
-      - example
+      - compose
   /compose/ps:
     post:
       description: Will return data about the containers running in the system.
@@ -494,7 +487,7 @@ paths:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Similar to docker compose ps
       tags:
-      - ps
+      - compose
   /compose/restart/config:
     post:
       consumes:
@@ -520,7 +513,7 @@ paths:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Similar to docker restart
       tags:
-      - ""
+      - compose
   /compose/restart/containers:
     post:
       consumes:
@@ -546,7 +539,7 @@ paths:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Similar to docker restart
       tags:
-      - ""
+      - compose
   /compose/up:
     post:
       consumes:
@@ -573,7 +566,7 @@ paths:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Similar to docker compose up
       tags:
-      - up
+      - compose
   /compose/update:
     post:
       consumes:
@@ -599,7 +592,7 @@ paths:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Update configuration
       tags:
-      - init
+      - compose
   /config:
     get:
       description: Retrieves configuration for a given project.

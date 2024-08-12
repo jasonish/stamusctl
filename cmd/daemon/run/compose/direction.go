@@ -12,7 +12,7 @@ import (
 // UpHandler godoc
 // @Summary Similar to docker compose up
 // @Description Given a configuration, it will start the services defined in the configuration.
-// @Tags up
+// @Tags compose
 // @Accept json
 // @Produce json
 // @Param arbitraries body pkg.Config true "Configuration to start"
@@ -44,7 +44,7 @@ func upHandler(c *gin.Context) {
 // UpHandler godoc
 // @Summary Similar to docker compose down
 // @Description Given a configuration, it will stop the services defined in the configuration.
-// @Tags down
+// @Tags compose
 // @Accept json
 // @Produce json
 // @Param arbitraries body pkg.Config true "Configuration to stop"

@@ -14,7 +14,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "down"
+                    "compose"
                 ],
                 "summary": "Similar to docker compose down",
                 "parameters": [
@@ -54,7 +54,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "init"
+                    "compose"
                 ],
                 "summary": "Initialize configuration",
                 "parameters": [
@@ -84,29 +84,6 @@
                 }
             }
         },
-        "/compose/pingcompose": {
-            "get": {
-                "description": "do ping",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "example"
-                ],
-                "summary": "ping example",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/compose/ps": {
             "post": {
                 "description": "Will return data about the containers running in the system.",
@@ -114,7 +91,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "ps"
+                    "compose"
                 ],
                 "summary": "Similar to docker compose ps",
                 "responses": {
@@ -143,7 +120,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    ""
+                    "compose"
                 ],
                 "summary": "Similar to docker restart",
                 "parameters": [
@@ -183,7 +160,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    ""
+                    "compose"
                 ],
                 "summary": "Similar to docker restart",
                 "parameters": [
@@ -223,7 +200,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "up"
+                    "compose"
                 ],
                 "summary": "Similar to docker compose up",
                 "parameters": [
@@ -263,7 +240,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "init"
+                    "compose"
                 ],
                 "summary": "Update configuration",
                 "parameters": [
@@ -611,6 +588,12 @@
                 "hostConfig": {
                     "type": "object",
                     "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
                         "networkMode": {
                             "type": "string"
                         }
@@ -876,6 +859,12 @@
                 "hostConfig": {
                     "type": "object",
                     "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
                         "networkMode": {
                             "type": "string"
                         }

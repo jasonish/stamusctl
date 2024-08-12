@@ -12,7 +12,7 @@ import (
 // restartConfigHandler godoc
 // @Summary Similar to docker restart
 // @Description Will restart the containers defined
-// @Tags
+// @Tags compose
 // @Accept json
 // @Produce json
 // @Param arbitraries body pkg.Config true "Configuration to restart"
@@ -44,7 +44,7 @@ func restartConfigHandler(c *gin.Context) {
 // RestartContainerHandler godoc
 // @Summary Similar to docker restart
 // @Description Will restart the containers defined
-// @Tags
+// @Tags compose
 // @Accept json
 // @Produce json
 // @Param arbitraries body pkg.Containers true "Containers to restart"

@@ -12,7 +12,7 @@ import (
 // InitHandler godoc
 // @Summary Initialize configuration
 // @Description Initializes configuration with provided parameters.
-// @Tags init
+// @Tags compose
 // @Accept json
 // @Produce json
 // @Param arbitraries body pkg.InitRequest true "Initialization parameters"

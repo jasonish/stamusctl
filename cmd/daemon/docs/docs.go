@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "down"
+                    "compose"
                 ],
                 "summary": "Similar to docker compose down",
                 "parameters": [
@@ -65,7 +65,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "init"
+                    "compose"
                 ],
                 "summary": "Initialize configuration",
                 "parameters": [
@@ -95,29 +95,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/compose/pingcompose": {
-            "get": {
-                "description": "do ping",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "example"
-                ],
-                "summary": "ping example",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/compose/ps": {
             "post": {
                 "description": "Will return data about the containers running in the system.",
@@ -125,7 +102,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "ps"
+                    "compose"
                 ],
                 "summary": "Similar to docker compose ps",
                 "responses": {
@@ -154,7 +131,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    ""
+                    "compose"
                 ],
                 "summary": "Similar to docker restart",
                 "parameters": [
@@ -194,7 +171,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    ""
+                    "compose"
                 ],
                 "summary": "Similar to docker restart",
                 "parameters": [
@@ -234,7 +211,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "up"
+                    "compose"
                 ],
                 "summary": "Similar to docker compose up",
                 "parameters": [
@@ -274,7 +251,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "init"
+                    "compose"
                 ],
                 "summary": "Update configuration",
                 "parameters": [
@@ -622,6 +599,12 @@ const docTemplate = `{
                 "hostConfig": {
                     "type": "object",
                     "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
                         "networkMode": {
                             "type": "string"
                         }
@@ -887,6 +870,12 @@ const docTemplate = `{
                 "hostConfig": {
                     "type": "object",
                     "properties": {
+                        "annotations": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        },
                         "networkMode": {
                             "type": "string"
                         }

@@ -10,7 +10,7 @@ import (
 // Init godoc
 // @Summary Update configuration
 // @Description Update configuration with provided parameters.
-// @Tags init
+// @Tags compose
 // @Accept json
 // @Produce json
 // @Param arbitraries body pkg.UpdateRequest true "Update parameters"

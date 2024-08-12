@@ -10,7 +10,7 @@ import (
 // PsHandler godoc
 // @Summary Similar to docker compose ps
 // @Description Will return data about the containers running in the system.
-// @Tags ps
+// @Tags compose
 // @Produce json
 // @Success 200 {object} pkg.PsResponse "List of containers with their status"
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
