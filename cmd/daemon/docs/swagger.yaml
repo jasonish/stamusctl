@@ -1,35 +1,188 @@
 definitions:
-  compose.ErrorResponse:
-    properties:
-      error:
-        type: string
-    type: object
-  compose.SuccessResponse:
-    properties:
-      message:
-        type: string
-    type: object
-  config.ErrorResponse:
-    properties:
-      error:
-        type: string
-    type: object
   config.GetResponse:
     additionalProperties: true
     type: object
-  config.SuccessResponse:
+  mount.Propagation:
+    enum:
+    - rprivate
+    - private
+    - rshared
+    - shared
+    - rslave
+    - slave
+    type: string
+    x-enum-varnames:
+    - PropagationRPrivate
+    - PropagationPrivate
+    - PropagationRShared
+    - PropagationShared
+    - PropagationRSlave
+    - PropagationSlave
+  mount.Type:
+    enum:
+    - bind
+    - volume
+    - tmpfs
+    - npipe
+    - cluster
+    type: string
+    x-enum-varnames:
+    - TypeBind
+    - TypeVolume
+    - TypeTmpfs
+    - TypeNamedPipe
+    - TypeCluster
+  network.EndpointIPAMConfig:
     properties:
-      message:
+      ipv4Address:
         type: string
+      ipv6Address:
+        type: string
+      linkLocalIPs:
+        items:
+          type: string
+        type: array
+    type: object
+  network.EndpointSettings:
+    properties:
+      aliases:
+        description: Aliases holds the list of extra, user-specified DNS names for
+          this endpoint.
+        items:
+          type: string
+        type: array
+      dnsnames:
+        description: |-
+          DNSNames holds all the (non fully qualified) DNS names associated to this endpoint. First entry is used to
+          generate PTR records.
+        items:
+          type: string
+        type: array
+      driverOpts:
+        additionalProperties:
+          type: string
+        type: object
+      endpointID:
+        type: string
+      gateway:
+        type: string
+      globalIPv6Address:
+        type: string
+      globalIPv6PrefixLen:
+        type: integer
+      ipaddress:
+        type: string
+      ipamconfig:
+        allOf:
+        - $ref: '#/definitions/network.EndpointIPAMConfig'
+        description: Configurations
+      ipprefixLen:
+        type: integer
+      ipv6Gateway:
+        type: string
+      links:
+        items:
+          type: string
+        type: array
+      macAddress:
+        description: |-
+          MacAddress may be used to specify a MAC address when the container is created.
+          Once the container is running, it becomes operational data (it may contain a
+          generated address).
+        type: string
+      networkID:
+        description: Operational data
+        type: string
+    type: object
+  pkg.Config:
+    properties:
+      config:
+        description: Config name, default is tmp
+        type: string
+    type: object
+  pkg.ContainerLogs:
+    properties:
+      Id:
+        type: string
+      command:
+        type: string
+      created:
+        type: integer
+      hostConfig:
+        properties:
+          networkMode:
+            type: string
+        type: object
+      image:
+        type: string
+      imageID:
+        type: string
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      logs:
+        description: Logs from the container
+        items:
+          type: string
+        type: array
+      mounts:
+        items:
+          $ref: '#/definitions/types.MountPoint'
+        type: array
+      names:
+        items:
+          type: string
+        type: array
+      networkSettings:
+        $ref: '#/definitions/types.SummaryNetworkSettings'
+      ports:
+        items:
+          $ref: '#/definitions/types.Port'
+        type: array
+      sizeRootFs:
+        type: integer
+      sizeRw:
+        type: integer
+      state:
+        type: string
+      status:
+        type: string
+    type: object
+  pkg.Containers:
+    properties:
+      containers:
+        items:
+          type: string
+        type: array
+    type: object
+  pkg.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  pkg.GetRequest:
+    properties:
+      config:
+        description: Config name, default is tmp
+        type: string
+      content:
+        description: Get content or values, default is false
+        type: boolean
+      values:
+        description: Values to retrieve, default is all
+        items:
+          type: string
+        type: array
     type: object
   pkg.InitRequest:
     properties:
+      config:
+        description: Config name, default is tmp
+        type: string
       default:
         description: Use default settings, default is false
         type: boolean
-      folder:
-        description: Folder where to save configuration files, default is "tmp"
-        type: string
       from_file:
         additionalProperties:
           type: string
@@ -51,20 +204,56 @@ definitions:
         description: Target version, default is latest
         type: string
     type: object
+  pkg.LogsRequest:
+    properties:
+      containers:
+        description: Containers ids to show logs from, default is all
+        items:
+          type: string
+        type: array
+      since:
+        description: Show logs since (e.g. 2013-01-02T13:23:37Z) or relative (e.g.
+          42m for 42 minutes)
+        type: string
+      tail:
+        description: Number of lines to show from the end, default is all
+        type: string
+      timestamps:
+        description: Show timestamps, default is false
+        type: boolean
+      until:
+        description: Show logs until(e.g. 2013-01-02T13:23:37Z) or relative (e.g.
+          42m for 42 minutes)
+        type: string
+    type: object
+  pkg.LogsResponse:
+    properties:
+      containers:
+        items:
+          $ref: '#/definitions/pkg.ContainerLogs'
+        type: array
+    type: object
+  pkg.PsResponse:
+    properties:
+      containers:
+        items:
+          $ref: '#/definitions/types.Container'
+        type: array
+    type: object
   pkg.SetRequest:
     properties:
       apply:
         description: Apply the new configuration, relaunch it, default is false
         type: boolean
+      config:
+        description: Config name, default is tmp
+        type: string
       from_file:
         additionalProperties:
           type: string
         description: Values keys and paths to files containing the content used as
           value
         type: object
-      project:
-        description: Project name, default is "tmp"
-        type: string
       reload:
         description: Reload the configuration, don't keep arbitrary parameters
         type: boolean
@@ -77,10 +266,15 @@ definitions:
         description: Path to a values.yaml file
         type: string
     type: object
+  pkg.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
   pkg.UpdateRequest:
     properties:
-      project:
-        description: Project name, default is tmp
+      config:
+        description: Config name, default is tmp
         type: string
       values:
         additionalProperties:
@@ -91,18 +285,331 @@ definitions:
         description: Version to update to, default is latest
         type: string
     type: object
+  types.Container:
+    properties:
+      Id:
+        type: string
+      command:
+        type: string
+      created:
+        type: integer
+      hostConfig:
+        properties:
+          networkMode:
+            type: string
+        type: object
+      image:
+        type: string
+      imageID:
+        type: string
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      mounts:
+        items:
+          $ref: '#/definitions/types.MountPoint'
+        type: array
+      names:
+        items:
+          type: string
+        type: array
+      networkSettings:
+        $ref: '#/definitions/types.SummaryNetworkSettings'
+      ports:
+        items:
+          $ref: '#/definitions/types.Port'
+        type: array
+      sizeRootFs:
+        type: integer
+      sizeRw:
+        type: integer
+      state:
+        type: string
+      status:
+        type: string
+    type: object
+  types.MountPoint:
+    properties:
+      destination:
+        description: |-
+          Destination is the path relative to the container root (`/`) where the
+          Source is mounted inside the container.
+        type: string
+      driver:
+        description: Driver is the volume driver used to create the volume (if it
+          is a volume).
+        type: string
+      mode:
+        description: |-
+          Mode is a comma separated list of options supplied by the user when
+          creating the bind/volume mount.
+
+          The default is platform-specific (`"z"` on Linux, empty on Windows).
+        type: string
+      name:
+        description: |-
+          Name is the name reference to the underlying data defined by `Source`
+          e.g., the volume name.
+        type: string
+      propagation:
+        allOf:
+        - $ref: '#/definitions/mount.Propagation'
+        description: |-
+          Propagation describes how mounts are propagated from the host into the
+          mount point, and vice-versa. Refer to the Linux kernel documentation
+          for details:
+          https://www.kernel.org/doc/Documentation/filesystems/sharedsubtree.txt
+
+          This field is not used on Windows.
+      rw:
+        description: RW indicates whether the mount is mounted writable (read-write).
+        type: boolean
+      source:
+        description: |-
+          Source is the source location of the mount.
+
+          For volumes, this contains the storage location of the volume (within
+          `/var/lib/docker/volumes/`). For bind-mounts, and `npipe`, this contains
+          the source (host) part of the bind-mount. For `tmpfs` mount points, this
+          field is empty.
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/mount.Type'
+        description: |-
+          Type is the type of mount, see `Type<foo>` definitions in
+          github.com/docker/docker/api/types/mount.Type
+    type: object
+  types.Port:
+    properties:
+      IP:
+        description: Host IP address that the container's port is mapped to
+        type: string
+      PrivatePort:
+        description: |-
+          Port on the container
+          Required: true
+        type: integer
+      PublicPort:
+        description: Port exposed on the host
+        type: integer
+      Type:
+        description: |-
+          type
+          Required: true
+        type: string
+    type: object
+  types.SummaryNetworkSettings:
+    properties:
+      networks:
+        additionalProperties:
+          $ref: '#/definitions/network.EndpointSettings'
+        type: object
+    type: object
 info:
   contact: {}
 paths:
-  /compose/config:
+  /compose/down:
+    post:
+      consumes:
+      - application/json
+      description: Given a configuration, it will stop the services defined in the
+        configuration.
+      parameters:
+      - description: Configuration to stop
+        in: body
+        name: arbitraries
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.Config'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Down successful
+          schema:
+            $ref: '#/definitions/pkg.SuccessResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Similar to docker compose down
+      tags:
+      - down
+  /compose/init:
+    post:
+      consumes:
+      - application/json
+      description: Initializes configuration with provided parameters.
+      parameters:
+      - description: Initialization parameters
+        in: body
+        name: arbitraries
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.InitRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Initialization successful
+          schema:
+            $ref: '#/definitions/pkg.SuccessResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Initialize configuration
+      tags:
+      - init
+  /compose/pingcompose:
+    get:
+      consumes:
+      - application/json
+      description: do ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: ping example
+      tags:
+      - example
+  /compose/ps:
+    post:
+      description: Will return data about the containers running in the system.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of containers with their status
+          schema:
+            $ref: '#/definitions/pkg.PsResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Similar to docker compose ps
+      tags:
+      - ps
+  /compose/restart/config:
+    post:
+      consumes:
+      - application/json
+      description: Will restart the containers defined
+      parameters:
+      - description: Configuration to restart
+        in: body
+        name: arbitraries
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.Config'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            $ref: '#/definitions/pkg.SuccessResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Similar to docker restart
+      tags:
+      - ""
+  /compose/restart/containers:
+    post:
+      consumes:
+      - application/json
+      description: Will restart the containers defined
+      parameters:
+      - description: Containers to restart
+        in: body
+        name: arbitraries
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.Containers'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            $ref: '#/definitions/pkg.SuccessResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Similar to docker restart
+      tags:
+      - ""
+  /compose/up:
+    post:
+      consumes:
+      - application/json
+      description: Given a configuration, it will start the services defined in the
+        configuration.
+      parameters:
+      - description: Configuration to start
+        in: body
+        name: arbitraries
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.Config'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Up successful
+          schema:
+            $ref: '#/definitions/pkg.SuccessResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Similar to docker compose up
+      tags:
+      - up
+  /compose/update:
+    post:
+      consumes:
+      - application/json
+      description: Update configuration with provided parameters.
+      parameters:
+      - description: Update parameters
+        in: body
+        name: arbitraries
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Initialization successful
+          schema:
+            $ref: '#/definitions/pkg.SuccessResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Update configuration
+      tags:
+      - init
+  /config:
     get:
       description: Retrieves configuration for a given project.
       parameters:
-      - description: Project name
-        in: query
-        name: project
+      - description: Get parameters
+        in: body
+        name: set
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/pkg.GetRequest'
       produces:
       - application/json
       responses:
@@ -113,11 +620,11 @@ paths:
         "404":
           description: Bad request with explanation
           schema:
-            $ref: '#/definitions/config.ErrorResponse'
+            $ref: '#/definitions/pkg.ErrorResponse'
         "500":
           description: Internal server error with explanation
           schema:
-            $ref: '#/definitions/config.ErrorResponse'
+            $ref: '#/definitions/pkg.ErrorResponse'
       summary: Get configuration
       tags:
       - get
@@ -138,85 +645,18 @@ paths:
         "200":
           description: Configuration set successfully
           schema:
-            $ref: '#/definitions/config.SuccessResponse'
+            $ref: '#/definitions/pkg.SuccessResponse'
         "400":
           description: Bad request with explanation
           schema:
-            $ref: '#/definitions/config.ErrorResponse'
+            $ref: '#/definitions/pkg.ErrorResponse'
         "500":
           description: Internal server error with explanation
           schema:
-            $ref: '#/definitions/config.ErrorResponse'
+            $ref: '#/definitions/pkg.ErrorResponse'
       summary: Set configuration
       tags:
       - set
-  /compose/init:
-    post:
-      consumes:
-      - application/json
-      description: Initializes configuration with provided parameters.
-      parameters:
-      - description: Initialization parameters
-        in: body
-        name: arbitraries
-        required: true
-        schema:
-          $ref: '#/definitions/pkg.InitRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Initialization successful
-          schema:
-            $ref: '#/definitions/compose.SuccessResponse'
-        "400":
-          description: Bad request with explanation
-          schema:
-            $ref: '#/definitions/compose.ErrorResponse'
-      summary: Initialize configuration
-      tags:
-      - init
-  /compose/pingcompose:
-    get:
-      consumes:
-      - application/json
-      description: do ping
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: ping example
-      tags:
-      - example
-  /compose/update:
-    post:
-      consumes:
-      - application/json
-      description: Update configuration with provided parameters.
-      parameters:
-      - description: Update parameters
-        in: body
-        name: arbitraries
-        required: true
-        schema:
-          $ref: '#/definitions/pkg.UpdateRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Initialization successful
-          schema:
-            $ref: '#/definitions/compose.SuccessResponse'
-        "400":
-          description: Bad request with explanation
-          schema:
-            $ref: '#/definitions/compose.ErrorResponse'
-      summary: Update configuration
-      tags:
-      - init
   /ping:
     get:
       consumes:
