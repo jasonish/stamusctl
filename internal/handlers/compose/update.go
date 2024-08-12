@@ -115,7 +115,7 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	}
 
 	// Run post-run script
-	runOutput, err = runArbitraryScript(postrunPath)
+	_, err = runArbitraryScript(postrunPath)
 	if err != nil {
 		return err
 	}
