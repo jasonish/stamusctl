@@ -60,7 +60,7 @@ func handleDown(configPath string, removeOrphans bool, volumes bool) error {
 	command.Flags().Lookup("volumes").Value.Set(strconv.FormatBool(volumes))
 	// Create root command
 	var cmd *cobra.Command = &cobra.Command{Use: "compose"}
-	cmd.SetArgs([]string{"up"})
+	cmd.SetArgs([]string{"down"})
 	cmd.AddCommand(command)
 	// Run command
 	return cmd.Execute()
