@@ -3,7 +3,7 @@ package docker
 import (
 	"stamus-ctl/internal/logging"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 )
 
 func DeleteDockerImageByName(name string) (bool, error) {
@@ -15,7 +15,7 @@ func DeleteDockerImageByName(name string) (bool, error) {
 		return false, err
 	}
 
-	if _, err = cli.ImageRemove(ctx, id, types.ImageRemoveOptions{}); err != nil {
+	if _, err = cli.ImageRemove(ctx, id, image.RemoveOptions{}); err != nil {
 		return false, err
 	}
 

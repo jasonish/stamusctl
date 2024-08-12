@@ -7,7 +7,6 @@ import (
 
 	"stamus-ctl/internal/logging"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/image"
 )
 
@@ -35,7 +34,7 @@ func GetImagesName(images []image.Summary) []string {
 }
 
 func GetInstalledImagesName() ([]string, error) {
-	images, _ := cli.ImageList(ctx, types.ImageListOptions{All: true})
+	images, _ := cli.ImageList(ctx, image.ListOptions{All: true})
 
 	names := GetImagesName(images)
 	for _, image := range images {
@@ -52,7 +51,7 @@ func IsImageAlreadyInstalled(name string) (bool, error) {
 }
 
 func GetImageIdFromName(name string) (string, error) {
-	images, _ := cli.ImageList(ctx, types.ImageListOptions{All: true})
+	images, _ := cli.ImageList(ctx, image.ListOptions{All: true})
 	for _, image := range images {
 		shortName := ImageName(image)
 

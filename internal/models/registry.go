@@ -11,8 +11,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
 	cp "github.com/otiai10/copy"
@@ -44,8 +44,8 @@ func (r *RegistryInfo) ValidateAllRegistry() error {
 	return nil
 }
 
-func (r *RegistryInfo) PullConfig(destPath string, image string) error {
-	imageUrl := r.Registry + image
+func (r *RegistryInfo) PullConfig(destPath string, imageName string) error {
+	imageUrl := r.Registry + imageName
 
 	// Create docker client
 	ctx := context.Background()
@@ -67,7 +67,7 @@ func (r *RegistryInfo) PullConfig(destPath string, image string) error {
 	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 
 	// Pull image
-	out, err := cli.ImagePull(ctx, imageUrl, types.ImagePullOptions{
+	out, err := cli.ImagePull(ctx, imageUrl, image.PullOptions{
 		RegistryAuth: authStr,
 	})
 	if err != nil {

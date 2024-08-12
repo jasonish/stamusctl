@@ -6,7 +6,7 @@ import (
 
 	"stamus-ctl/internal/logging"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 )
 
 func PullImageIfNotExisted(registry string, name string) (bool, error) {
@@ -29,7 +29,7 @@ func PullImageIfNotExisted(registry string, name string) (bool, error) {
 		fmt.Sprintf("Pulling %s done\n", name),
 	)
 
-	reader, err := cli.ImagePull(ctx, registry+name, types.ImagePullOptions{})
+	reader, err := cli.ImagePull(ctx, registry+name, image.PullOptions{})
 
 	if err != nil {
 		logging.SpinnerStop(s)

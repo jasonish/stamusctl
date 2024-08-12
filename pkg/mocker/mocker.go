@@ -119,7 +119,8 @@ func createContainer(service string) types.Container {
 		State:      "running",
 		Status:     "Up 1 second",
 		HostConfig: struct {
-			NetworkMode string `json:",omitempty"`
+			NetworkMode string            `json:",omitempty"`
+			Annotations map[string]string `json:",omitempty"`
 		}{
 			NetworkMode: "default",
 		},
