@@ -14,6 +14,7 @@ import (
 // @Produce json
 // @Success 200 {object} pkg.SuccessResponse "Kernel logs"
 // @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
+// @Router /troubleshoot/kernel [post]
 func kernelHandler(c *gin.Context) {
 	// Execute the `dmesg` command
 	cmd := exec.Command("dmesg")

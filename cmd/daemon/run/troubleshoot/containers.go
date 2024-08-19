@@ -17,6 +17,7 @@ import (
 // @Success 200 {object} pkg.LogsResponse "Containers logs"
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
+// @Router /troubleshoot/containers [post]
 func logsHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.LogsRequest

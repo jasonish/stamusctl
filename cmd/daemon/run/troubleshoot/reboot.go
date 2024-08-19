@@ -12,6 +12,7 @@ import (
 // @Description Will reboot the system
 // @Tags reboot
 // @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
+// @Router /troubleshoot/reboot [post]
 func rebootHandler(c *gin.Context) {
 	// Reboot the system
 	err := syscall.Reboot(syscall.LINUX_REBOOT_CMD_RESTART)
