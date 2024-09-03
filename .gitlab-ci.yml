@@ -63,6 +63,21 @@ kaniko cli:
           --cache-copy-layers=true
           --cache-ttl=72h
 
+docker cli:
+    stage: build
+    before_script: []
+    image:
+        name: gcr.io/kaniko-project/executor:v1.14.0-debug
+        entrypoint: ['']
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - unit tests
+    script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build "${CI_PROJECT_DIR}" -t ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA} -f "${CI_PROJECT_DIR}/docker/Dockerfile.cli"
+        - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+
 kaniko cli main:
     stage: build
     before_script: []
