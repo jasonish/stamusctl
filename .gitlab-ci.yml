@@ -66,9 +66,7 @@ kaniko cli:
 docker cli:
     stage: build
     before_script: []
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
+    image: docker:24.0.5
     services:
         - docker:24.0.5-dind
     needs:
