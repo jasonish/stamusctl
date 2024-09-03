@@ -78,8 +78,12 @@ docker cli:
         - unit tests
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - docker build "${CI_PROJECT_DIR}" -t ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA} -f "${CI_PROJECT_DIR}/docker/Dockerfile.cli"
+        - docker build "${CI_PROJECT_DIR}"
+          -t ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+          -t ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}
+          -f "${CI_PROJECT_DIR}/docker/Dockerfile.cli"
         - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+        - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}
 
 kaniko cli main:
     stage: build
@@ -120,6 +124,28 @@ kaniko daemon:
           --cache=true
           --cache-copy-layers=true
           --cache-ttl=72h
+
+docker daemon:
+    stage: build
+    before_script: []
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - unit tests
+    script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build "${CI_PROJECT_DIR}"
+          -t ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+          -t ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}
+          -f "${CI_PROJECT_DIR}/docker/Dockerfile.daemon"
+        - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+        - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}
 
 kaniko daemon main:
     stage: build
