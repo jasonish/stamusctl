@@ -248,8 +248,7 @@ compose init:
     image: busybox
     stage: test
     tags:
-        - k8s
-        - small
+        - k8s-small
     needs:
         - build test
     dependencies:
@@ -263,8 +262,7 @@ compose init set:
     image: busybox
     stage: test
     tags:
-        - k8s
-        - small
+        - k8s-small
     needs:
         - build test
     dependencies:
@@ -278,8 +276,7 @@ compose init optional:
     image: busybox
     stage: test
     tags:
-        - k8s
-        - small
+        - k8s-small
     needs:
         - build test
     dependencies:
@@ -293,8 +290,7 @@ compose init arbitrary:
     image: busybox
     stage: test
     tags:
-        - k8s
-        - small
+        - k8s-small
     needs:
         - build test
     dependencies:
@@ -308,8 +304,7 @@ compose config set:
     image: busybox
     stage: test
     tags:
-        - k8s
-        - small
+        - k8s-small
     needs:
         - build test
     dependencies:
@@ -324,8 +319,7 @@ compose config reload:
     image: busybox
     stage: test
     tags:
-        - k8s
-        - small
+        - k8s-small
     needs:
         - build test
     dependencies:
