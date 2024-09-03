@@ -339,9 +339,6 @@ compose config reload:
 
 refresh-app-of-apps:
     stage: deploy
-    tags:
-        - k8s
-        - small
     needs:
         - test daemon
     variables:
