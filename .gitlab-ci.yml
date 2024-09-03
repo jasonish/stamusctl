@@ -227,6 +227,8 @@ build test:
 test cli:
     image: busybox
     stage: test
+    tags:
+        - k8s-small
     needs:
         - build cli
     dependencies:
@@ -237,6 +239,8 @@ test cli:
 test daemon:
     image: busybox
     stage: test
+    tags:
+        - k8s-small
     needs:
         - build daemon
     dependencies:
