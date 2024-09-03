@@ -1,6 +1,6 @@
 default:
     tags:
-        - scirius
+        - k8s
 
 stages:
     - smoke
