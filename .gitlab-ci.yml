@@ -247,6 +247,9 @@ test daemon:
 compose init:
     image: busybox
     stage: test
+    tags:
+        - k8s
+        - small
     needs:
         - build test
     dependencies:
@@ -259,6 +262,9 @@ compose init:
 compose init set:
     image: busybox
     stage: test
+    tags:
+        - k8s
+        - small
     needs:
         - build test
     dependencies:
@@ -271,6 +277,9 @@ compose init set:
 compose init optional:
     image: busybox
     stage: test
+    tags:
+        - k8s
+        - small
     needs:
         - build test
     dependencies:
@@ -283,6 +292,9 @@ compose init optional:
 compose init arbitrary:
     image: busybox
     stage: test
+    tags:
+        - k8s
+        - small
     needs:
         - build test
     dependencies:
@@ -295,6 +307,9 @@ compose init arbitrary:
 compose config set:
     image: busybox
     stage: test
+    tags:
+        - k8s
+        - small
     needs:
         - build test
     dependencies:
@@ -308,6 +323,9 @@ compose config set:
 compose config reload:
     image: busybox
     stage: test
+    tags:
+        - k8s
+        - small
     needs:
         - build test
     dependencies:
@@ -321,6 +339,9 @@ compose config reload:
 
 refresh-app-of-apps:
     stage: deploy
+    tags:
+        - k8s
+        - small
     needs:
         - test daemon
     variables:
