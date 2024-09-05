@@ -7,6 +7,7 @@ stages:
     - build
     - test
     - deploy
+    - integration
 
 .go-cache:
     variables:
@@ -346,3 +347,17 @@ refresh-app-of-apps:
         PROJECT: $CI_PROJECT_NAME
         NAMESPACE: $CI_PROJECT_NAMESPACE
     trigger: lanath/app-of-apps
+
+int compose init:
+    stage: integration
+    image: docker:24.0.5
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    script:
+        - STAMUS_APP_NAME=stamusctl ./cli compose init --default stamus.token=1234y suricata.interface=veth0
+        - STAMUS_APP_NAME=stamusctl ./cli compose up -d
+        - docker ps -a
