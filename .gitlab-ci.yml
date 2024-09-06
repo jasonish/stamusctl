@@ -66,7 +66,6 @@ kaniko cli:
 
 docker cli:
     stage: build
-    before_script: []
     image: docker:24.0.5
     variables:
         DOCKER_HOST: tcp://docker:2376
@@ -77,6 +76,8 @@ docker cli:
         - docker:24.0.5-dind
     needs:
         - unit tests
+    before_script:
+        - until docker info; do sleep 1; done
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker build "${CI_PROJECT_DIR}"
@@ -128,7 +129,6 @@ kaniko daemon:
 
 docker daemon:
     stage: build
-    before_script: []
     image: docker:24.0.5
     variables:
         DOCKER_HOST: tcp://docker:2376
@@ -139,6 +139,8 @@ docker daemon:
         - docker:24.0.5-dind
     needs:
         - unit tests
+    before_script:
+        - until docker info; do sleep 1; done
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker build "${CI_PROJECT_DIR}"
@@ -346,18 +348,51 @@ refresh-app-of-apps:
         SHA: $CI_COMMIT_SHORT_SHA
         PROJECT: $CI_PROJECT_NAME
         NAMESPACE: $CI_PROJECT_NAMESPACE
-    trigger: lanath/app-of-apps
+    trigger:
+        project: lanath/app-of-apps
+        strategy: depend
 
 int compose init:
     stage: integration
     image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
     services:
         - docker:24.0.5-dind
     needs:
         - build cli
     dependencies:
         - build cli
+    before_script:
+        - until docker info; do sleep 1; done
     script:
-        - STAMUS_APP_NAME=stamusctl ./cli compose init --default stamus.token=1234y suricata.interface=veth0
-        - STAMUS_APP_NAME=stamusctl ./cli compose up -d
+        - ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
+        - cd tmp
+        - docker compose up -d
+        - docker ps -a
+        - cd ..
+        - ./stamusctl compose ps
+
+int compose init stmusctl compose up:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
+        - ./stamusctl compose up -d
         - docker ps -a
