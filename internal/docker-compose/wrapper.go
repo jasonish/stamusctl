@@ -12,6 +12,7 @@ import (
 	"github.com/docker/compose/v2/cmd/compatibility"
 	commands "github.com/docker/compose/v2/cmd/compose"
 	"github.com/docker/compose/v2/pkg/compose"
+	"github.com/docker/go-connections/tlsconfig"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -51,8 +52,15 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 		os.Args = append([]string{"docker"}, compatibility.Convert(os.Args[2:])...)
 	}
 	// Create docker client
+	TLSOptions := tlsconfig.Options{
+		CAFile:   filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/ca.pem"),
+		CertFile: filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/cert.pem"),
+		KeyFile:  filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/key.pem"),
+	}
 	cliOptions := func(cli *command.DockerCli) error {
-		op := &flags.ClientOptions{}
+		op := &flags.ClientOptions{
+			TLSOptions: &TLSOptions,
+		}
 		cli.Initialize(op)
 		return nil
 	}
