@@ -52,10 +52,13 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 		os.Args = append([]string{"docker"}, compatibility.Convert(os.Args[2:])...)
 	}
 	// Create docker client
-	TLSOptions := tlsconfig.Options{
-		CAFile:   filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/ca.pem"),
-		CertFile: filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/cert.pem"),
-		KeyFile:  filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/key.pem"),
+	TLSOptions := tlsconfig.Options{}
+	if os.Getenv("DOCKER_CERT_PATH") != "" {
+		TLSOptions = tlsconfig.Options{
+			CAFile:   filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/ca.pem"),
+			CertFile: filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/cert.pem"),
+			KeyFile:  filepath.Join(os.Getenv("DOCKER_CERT_PATH"), "/key.pem"),
+		}
 	}
 	cliOptions := func(cli *command.DockerCli) error {
 		op := &flags.ClientOptions{
