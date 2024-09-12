@@ -15,6 +15,7 @@ var (
 	Name             = ""
 	Mode             = ModeStruct("prod")
 	ConfigFolder     = "/"
+	ConfigsFolder    = "/"
 	TemplatesFolder  = "/"
 	DefaultSelksPath = "/"
 	LatestSelksPath  = "/"
@@ -63,5 +64,6 @@ func init() {
 	// Derived paths
 	DefaultSelksPath = TemplatesFolder + "selks/embedded/"
 	LatestSelksPath = TemplatesFolder + "selks/latest/"
+	ConfigsFolder = ConfigFolder + "configs/"
 
 }
