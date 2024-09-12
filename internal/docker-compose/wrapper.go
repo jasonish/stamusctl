@@ -1,11 +1,18 @@
 package compose
 
 import (
+	// Core
+	"fmt"
 	"os"
 	"path/filepath"
+	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
 	"strings"
 
+	// Internal
+	stamusFlags "stamus-ctl/internal/handlers"
+
+	// External
 	"github.com/docker/cli/cli-plugins/plugin"
 	"github.com/docker/cli/cli/command"
 	"github.com/docker/cli/cli/flags"
@@ -100,6 +107,12 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 	return cmds, mappedCmds
 }
 
+var (
+	ConfigFlagName    = stamusFlags.Config.Name
+	ConfigFlagUsage   = stamusFlags.Config.Usage
+	ConfigFlagDefault = *stamusFlags.Config.Default.String
+)
+
 // Modify the file flag to be hidden and add a folder flag
 func modifyFileFlag(c *cobra.Command, command string) {
 	c.Flags().Lookup("file").Hidden = true
@@ -108,8 +121,8 @@ func modifyFileFlag(c *cobra.Command, command string) {
 	// Modify cmd function
 	c.RunE = makeCustomRunner(currentRunE, command)
 	// Add custom folder flag
-	folderFlag := *pflag.NewFlagSet("folder", pflag.ContinueOnError)
-	folderFlag.String("folder", "tmp", "Folder where the config is located")
+	folderFlag := *pflag.NewFlagSet(ConfigFlagName, pflag.ContinueOnError)
+	folderFlag.String(ConfigFlagName, ConfigFlagDefault, ConfigFlagName)
 	c.Flags().AddFlagSet(&folderFlag)
 }
 
@@ -119,8 +132,16 @@ func makeCustomRunner(
 	command string,
 ) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		// Validate folder flag
+		asString := cmd.Flags().Lookup(ConfigFlagName).Value.String()
+		asVar := models.Variable{
+			String: &asString,
+		}
+		if !stamusFlags.Config.ValidateFunc(asVar) {
+			return fmt.Errorf("invalid config name")
+		}
 		// Get folder flag value
-		flagValue := filepath.Join(cmd.Flags().Lookup("folder").Value.String(), "/docker-compose.yaml")
+		flagValue := filepath.Join(app.ConfigsFolder, cmd.Flags().Lookup(ConfigFlagName).Value.String(), "/docker-compose.yaml")
 		// Set file flag
 		fileFlag := GetComposeCmd(command).Flags().Lookup("file")
 		fileFlag.Value.Set(flagValue)
