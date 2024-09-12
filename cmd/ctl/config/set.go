@@ -2,6 +2,7 @@ package config
 
 import (
 	// Custom
+	"fmt"
 	flags "stamus-ctl/internal/handlers"
 	config "stamus-ctl/internal/handlers/config"
 
@@ -25,7 +26,7 @@ Example: set scirius.token=AwesomeToken`,
 	// Subcommands
 	cmd.AddCommand(setContentCmd())
 	// Flags
-	flags.ConfigPath.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.Reload.AddAsFlag(cmd, false)
 	flags.Apply.AddAsFlag(cmd, false)
@@ -54,9 +55,13 @@ Example: config content /nginx:/etc/nginx /nginx.conf:/etc/nginx/nginx.conf,
 // Handlers
 func setHandler(cmd *cobra.Command, args []string) error {
 	// Get properties
-	configPath, err := flags.ConfigPath.GetValue()
+	configPath, err := flags.Config.GetValue()
 	if err != nil {
 		return err
+	}
+	isValidConfig := flags.Config.IsValid()
+	if !isValidConfig {
+		return fmt.Errorf("Invalid output path")
 	}
 	reload, err := flags.Reload.GetValue()
 	if err != nil {

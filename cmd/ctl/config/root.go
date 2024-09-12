@@ -44,7 +44,7 @@ func ConfigCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	flags.ConfigPath.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 
 	// Add Commands
 	cmd.AddCommand(getCmd())

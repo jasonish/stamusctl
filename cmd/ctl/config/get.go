@@ -24,7 +24,7 @@ Example: get scirius`,
 	// Subcommands
 	cmd.AddCommand(getContentCmd())
 	// Flags
-	flags.ConfigPath.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -39,16 +39,20 @@ func getContentCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	flags.ConfigPath.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
 // Handlers
 func getHandler(cmd *cobra.Command, args []string) error {
 	// Get properties
-	configPath, err := flags.ConfigPath.GetValue()
+	configPath, err := flags.Config.GetValue()
 	if err != nil {
 		return err
+	}
+	isValidConfig := flags.Config.IsValid()
+	if !isValidConfig {
+		return fmt.Errorf("Invalid output path")
 	}
 	reload, err := flags.Reload.GetValue()
 	if err != nil {
@@ -66,9 +70,13 @@ func getHandler(cmd *cobra.Command, args []string) error {
 
 func getContent(cmd *cobra.Command, args []string) error {
 	// Get properties
-	configPath, err := flags.ConfigPath.GetValue()
+	configPath, err := flags.Config.GetValue()
 	if err != nil {
 		return err
+	}
+	isValidConfig := flags.Config.IsValid()
+	if !isValidConfig {
+		return fmt.Errorf("Invalid output path")
 	}
 	// Call handler
 	groupedContent, err := config.GetGroupedContent(configPath.(string), args)
@@ -80,8 +88,6 @@ func getContent(cmd *cobra.Command, args []string) error {
 	printColoredGroupedValues(groupedContent, "")
 	return nil
 }
-
-// Utilities
 
 // From the grouped values, print the values in a readable format
 func printGroupedValues(group map[string]interface{}, prefix string) {

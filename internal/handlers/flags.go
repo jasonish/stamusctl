@@ -1,14 +1,23 @@
 package handlers
 
-import "stamus-ctl/internal/models"
+import (
+	"stamus-ctl/internal/models"
+	"stamus-ctl/internal/utils"
+)
+
+// Constants
+const (
+	DefaultConfig = "tmp"
+)
 
 // Init
-var OutputPath = models.Parameter{
-	Name:      "folder",
-	Shorthand: "f",
-	Type:      "string",
-	Default:   models.CreateVariableString("tmp"),
-	Usage:     "Declare the folder where to save configuration files",
+var Config = models.Parameter{
+	Name:         "config",
+	Shorthand:    "c",
+	Type:         "string",
+	Default:      models.CreateVariableString(DefaultConfig),
+	Usage:        "Configuration name",
+	ValidateFunc: utils.ValidatePath,
 }
 var IsDefaultParam = models.Parameter{
 	Name:      "default",
@@ -26,13 +35,6 @@ var Values = models.Parameter{
 }
 
 // Config
-var ConfigPath = models.Parameter{
-	Name:      "folder",
-	Shorthand: "f",
-	Usage:     "Declare the folder where the configuration is saved",
-	Type:      "string",
-	Default:   models.CreateVariableString("tmp"),
-}
 var Format = models.Parameter{
 	Name:    "format",
 	Usage:   "Format of the output (go template)",
@@ -59,13 +61,6 @@ var FromFile = models.Parameter{
 }
 
 // Update
-var Config = models.Parameter{
-	Name:      "folder",
-	Shorthand: "f",
-	Type:      "string",
-	Default:   models.CreateVariableString("tmp"),
-	Usage:     "Configuration to update",
-}
 var Version = models.Parameter{
 	Name:      "version",
 	Shorthand: "v",

@@ -1,12 +1,13 @@
 package compose
 
 import (
-	// Common
+	// Core
+	"fmt"
 
 	// External
-
 	"github.com/spf13/cobra"
-	// Custom
+
+	// Internal
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/embeds"
 	flags "stamus-ctl/internal/handlers"
@@ -30,7 +31,7 @@ func initCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	flags.OutputPath.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
@@ -51,7 +52,7 @@ func SELKSCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	flags.OutputPath.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
@@ -79,9 +80,13 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	outpuPath, err := flags.OutputPath.GetValue()
+	outpuPath, err := flags.Config.GetValue()
 	if err != nil {
 		return err
+	}
+	isValidOutput := flags.Config.IsValid()
+	if !isValidOutput {
+		return fmt.Errorf("Invalid output path")
 	}
 	values, err := flags.Values.GetValue()
 	if err != nil {

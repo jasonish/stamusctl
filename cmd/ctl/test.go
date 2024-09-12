@@ -1,10 +1,11 @@
 package ctl
 
 import (
+	// Core
+	"fmt"
 	// External
 	"github.com/spf13/cobra"
 	// Custom
-
 	flags "stamus-ctl/internal/handlers"
 	handlers "stamus-ctl/internal/handlers/compose"
 	"stamus-ctl/internal/utils"
@@ -21,7 +22,7 @@ func testCmd() *cobra.Command {
 	}
 	// Flags
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
-	flags.OutputPath.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
 	return cmd
@@ -32,9 +33,13 @@ func testHandler(cmd *cobra.Command, args []string) error { // Get flags
 	if err != nil {
 		return err
 	}
-	outputPath, err := flags.OutputPath.GetValue()
+	outputPath, err := flags.Config.GetValue()
 	if err != nil {
 		return err
+	}
+	isValidOutput := flags.Config.IsValid()
+	if !isValidOutput {
+		return fmt.Errorf("invalid output path")
 	}
 	values, err := flags.Values.GetValue()
 	if err != nil {
