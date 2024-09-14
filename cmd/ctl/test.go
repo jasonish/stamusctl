@@ -6,6 +6,7 @@ import (
 	// External
 	"github.com/spf13/cobra"
 	// Custom
+
 	flags "stamus-ctl/internal/handlers"
 	handlers "stamus-ctl/internal/handlers/compose"
 	"stamus-ctl/internal/utils"
@@ -33,13 +34,9 @@ func testHandler(cmd *cobra.Command, args []string) error { // Get flags
 	if err != nil {
 		return err
 	}
-	outputPath, err := flags.Config.GetValue()
-	if err != nil {
-		return err
-	}
 	isValidOutput := flags.Config.IsValid()
 	if !isValidOutput {
-		return fmt.Errorf("invalid output path")
+		return fmt.Errorf("invalid config name")
 	}
 	values, err := flags.Values.GetValue()
 	if err != nil {
@@ -54,7 +51,6 @@ func testHandler(cmd *cobra.Command, args []string) error { // Get flags
 	selksInitParams := handlers.InitHandlerInputs{
 		IsDefault:        isDefault.(bool),
 		BackupFolderPath: ".test/config",
-		OutputPath:       outputPath.(string),
 		Arbitrary:        utils.ExtractArgs(args),
 		Project:          "",
 		Version:          "",
