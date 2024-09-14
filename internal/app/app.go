@@ -12,13 +12,14 @@ import (
 
 // Variables
 var (
-	Name             = ""
-	Mode             = ModeStruct("prod")
-	ConfigFolder     = "/"
-	ConfigsFolder    = "/"
-	TemplatesFolder  = "/"
-	DefaultSelksPath = "/"
-	LatestSelksPath  = "/"
+	Name              = ""
+	Mode              = ModeStruct("prod")
+	ConfigFolder      = "/"
+	ConfigsFolder     = "/"
+	TemplatesFolder   = "/"
+	DefaultSelksPath  = "/"
+	LatestSelksPath   = "/"
+	DefaultConfigName = "tmp"
 )
 
 // Constants
@@ -66,4 +67,8 @@ func init() {
 	LatestSelksPath = TemplatesFolder + "selks/latest/"
 	ConfigsFolder = ConfigFolder + "configs/"
 
+}
+
+func GetConfigsFolder(name string) string {
+	return filepath.Join(ConfigsFolder, name)
 }
