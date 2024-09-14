@@ -2,6 +2,10 @@ package stamus
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
+	"slices"
+	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
 )
 
@@ -14,7 +18,6 @@ type Logins map[User]Token
 
 type Config struct {
 	Registries Registries `json:"registries"`
-	Configs    []string   `json:"configs"`
 	Current    string     `json:"current"`
 }
 
@@ -33,7 +36,12 @@ func (r *Registries) AsList() []models.RegistryInfo {
 	return registryInfos
 }
 
-func (conf Config) setStamusConfig() error {
+func (c *Config) Save() error {
+	// Save config
+	return c.setStamusConfig()
+}
+
+func (conf *Config) setStamusConfig() error {
 	// Open or create
 	file, err := getOrCreateStamusConfigFile()
 	if err != nil {
@@ -67,15 +75,47 @@ func (c *Config) SetRegistry(registry Registry, user User, token Token) {
 	c.Registries[Registry(registry)][User(user)] = Token(token)
 }
 
-func (c *Config) SetConfig(config string) {
-	c.Configs = append(c.Configs, config)
-	uniqueConfigs := make([]string, 0, len(c.Configs))
-	seen := make(map[string]bool)
-	for _, c := range c.Configs {
-		if !seen[c] {
-			uniqueConfigs = append(uniqueConfigs, c)
-			seen[c] = true
+func (c *Config) GetCurrent() string {
+	if c.Current == "" {
+		return app.DefaultConfigName
+	}
+	return c.Current
+}
+func (c *Config) SetCurrent(config string) error {
+	// Get configs
+	configs, err := GetConfigsList()
+	if err != nil {
+		return err
+	}
+	// Check if config exists
+	if !slices.Contains(configs, config) {
+		return fmt.Errorf("config %s does not exist in %s", config, configs)
+	}
+	// Set current config
+	c.Current = config
+	return nil
+}
+
+func GetConfigsList() ([]string, error) {
+	// Get list of configs in app.ConfigsFolder
+	entries, err := os.ReadDir(app.ConfigsFolder)
+	if err != nil {
+		// Create folder if it does not exist
+		if os.IsNotExist(err) {
+			err = os.MkdirAll(app.ConfigsFolder, 0755)
+			if err != nil {
+				return nil, err
+			}
+			return GetConfigsList()
+		}
+		return nil, err
+	}
+	// Get the list of configs
+	configs := []string{}
+	for _, e := range entries {
+		if e.IsDir() {
+			configs = append(configs, e.Name())
 		}
 	}
-	c.Configs = uniqueConfigs
+	return configs, nil
 }

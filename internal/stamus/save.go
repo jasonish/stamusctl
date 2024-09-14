@@ -22,7 +22,7 @@ func SaveLogin(registryInfo models.RegistryInfo) error {
 	return nil
 }
 
-func SaveConfig(name string) error {
+func SetCurrent(name string) error {
 	// Get config content
 	Config, err := GetStamusConfig()
 	if err != nil {
@@ -30,10 +30,11 @@ func SaveConfig(name string) error {
 	}
 
 	// Save in struct
-	Config.SetConfig(name)
+	err = Config.SetCurrent(name)
+	if err != nil {
+		return err
+	}
 
 	// Save config
-	Config.setStamusConfig()
-
-	return nil
+	return Config.setStamusConfig()
 }

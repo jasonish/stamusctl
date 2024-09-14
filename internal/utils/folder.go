@@ -2,10 +2,12 @@ package utils
 
 import (
 	// Common
-	"log"
+
 	"os"
-	"stamus-ctl/internal/models"
 	"strings"
+
+	// Internal
+	"stamus-ctl/internal/models"
 )
 
 // Check if the folder exists
@@ -23,7 +25,6 @@ func FolderExists(path string) (bool, error) {
 var forbiddenChars = []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|", "$", "."}
 
 func ValidatePath(path models.Variable) bool {
-	log.Println("Validating path", path)
 	if *path.String == "" {
 		return false
 	}
