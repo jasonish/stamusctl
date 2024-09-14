@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"path/filepath"
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
@@ -10,7 +11,6 @@ import (
 type InitHandlerInputs struct {
 	IsDefault        bool
 	BackupFolderPath string
-	OutputPath       string
 	Project          string
 	Version          string
 	Arbitrary        map[string]string
@@ -19,6 +19,8 @@ type InitHandlerInputs struct {
 }
 
 func InitHandler(isCli bool, params InitHandlerInputs) error {
+	a, b := stamus.GetConfigsList()
+	log.Println("got stamus conf", a, b)
 	// Get registry info
 	image := "/" + params.Project + ":" + params.Version
 	destPath := filepath.Join(app.TemplatesFolder, params.Project)
@@ -58,11 +60,18 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 		return err
 	}
 	// Save the configuration
-	outputFile, err := models.CreateFileInstance(params.OutputPath, "values.yaml")
+	stamusConfig, err := stamus.GetStamusConfig()
 	if err != nil {
 		return err
 	}
-	config.SaveConfigTo(outputFile)
+	outputFile, err := models.CreateFileInstance(stamusConfig.GetCurrent(), "values.yaml")
+	if err != nil {
+		return err
+	}
+	err = config.SaveConfigTo(outputFile)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -51,7 +51,6 @@ func initHandler(c *gin.Context) {
 	parameters := handlers.InitHandlerInputs{
 		IsDefault:        req.IsDefault,
 		BackupFolderPath: app.DefaultSelksPath,
-		OutputPath:       req.Config.Value,
 		Arbitrary:        req.Values,
 		Project:          req.Project,
 		Version:          req.Version,

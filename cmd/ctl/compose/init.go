@@ -80,13 +80,9 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	outpuPath, err := flags.Config.GetValue()
-	if err != nil {
-		return err
-	}
 	isValidOutput := flags.Config.IsValid()
 	if !isValidOutput {
-		return fmt.Errorf("Invalid output path")
+		return fmt.Errorf("invalid output path")
 	}
 	values, err := flags.Values.GetValue()
 	if err != nil {
@@ -101,7 +97,6 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	selksInitParams := handlers.InitHandlerInputs{
 		IsDefault:        isDefault.(bool),
 		BackupFolderPath: app.DefaultSelksPath,
-		OutputPath:       outpuPath.(string),
 		Arbitrary:        utils.ExtractArgs(args),
 		Project:          "selks",
 		Version:          "latest",
