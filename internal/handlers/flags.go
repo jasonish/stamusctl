@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"stamus-ctl/internal/models"
-	"stamus-ctl/internal/utils"
 )
 
 // Constants
@@ -11,14 +10,6 @@ const (
 )
 
 // Init
-var Config = models.Parameter{
-	Name:         "config",
-	Shorthand:    "c",
-	Type:         "string",
-	Default:      models.CreateVariableString(DefaultConfig),
-	Usage:        "Configuration name",
-	ValidateFunc: utils.ValidatePath,
-}
 var IsDefaultParam = models.Parameter{
 	Name:      "default",
 	Shorthand: "d",

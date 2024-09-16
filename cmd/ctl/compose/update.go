@@ -24,14 +24,12 @@ func updateCmd() *cobra.Command {
 	}
 	// Add flags
 	flags.Version.AddAsFlag(cmd, false)
-	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
 func updateHandler(cmd *cobra.Command, args []string) error {
 	// Call handler
 	params := handlers.UpdateHandlerParams{
-		Config:  *flags.Config.Variable.String,
 		Version: *flags.Version.Variable.String,
 		Args:    args,
 	}
