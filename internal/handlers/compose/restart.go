@@ -7,7 +7,9 @@ import (
 	"sync"
 
 	// Internal
+
 	"stamus-ctl/internal/app"
+	"stamus-ctl/internal/stamus"
 	"stamus-ctl/pkg/mocker"
 
 	// External
@@ -15,20 +17,24 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func HandleConfigRestart(configPath string) error {
+func HandleConfigRestart() error {
 	if app.Mode.IsTest() {
-		return mocker.Mocked.Restart(configPath)
+		conf, err := stamus.GetCurrent()
+		if err != nil {
+			return err
+		}
+		return mocker.Mocked.Restart(conf)
 	}
-	return handleConfigRestart(configPath)
+	return handleConfigRestart()
 }
 
 // HandleConfigRestart restarts the containers defined in the container composition file
-func handleConfigRestart(configPath string) error {
-	err := HandleDown(configPath, false, false)
+func handleConfigRestart() error {
+	err := HandleDown(false, false)
 	if err != nil {
 		return err
 	}
-	return HandleUp(configPath)
+	return HandleUp()
 }
 
 func HandleContainersRestart(containers []string) error {

@@ -11,23 +11,28 @@ import (
 	// Internal
 	"stamus-ctl/internal/app"
 	compose "stamus-ctl/internal/docker-compose"
+	"stamus-ctl/internal/stamus"
 	"stamus-ctl/pkg/mocker"
 )
 
-func HandleUp(configPath string) error {
-	if app.Mode.IsTest() {
-		return mocker.Mocked.Up(configPath)
+func HandleUp() error {
+	conf, err := stamus.GetCurrent()
+	if err != nil {
+		return err
 	}
-	return handleUp(configPath)
+	if app.Mode.IsTest() {
+		return mocker.Mocked.Up(conf)
+	}
+	return handleUp(conf)
 }
 
 // HandleUp handles the up command, similar to the up command in docker-compose
-func handleUp(configPath string) error {
+func handleUp(configName string) error {
 	// Get command
 	command := compose.GetComposeCmd("up")
 	// Set flags
-	command.Flags().Lookup("folder").DefValue = configPath
-	command.Flags().Lookup("folder").Value.Set(configPath)
+	command.Flags().Lookup("config").DefValue = configName
+	command.Flags().Lookup("config").Value.Set(configName)
 	command.Flags().Lookup("detach").DefValue = "true"
 	command.Flags().Lookup("detach").Value.Set("true")
 	// Create root command
@@ -38,20 +43,24 @@ func handleUp(configPath string) error {
 	return cmd.Execute()
 }
 
-func HandleDown(configPath string, removeOrphans bool, volumes bool) error {
-	if app.Mode.IsTest() {
-		return mocker.Mocked.Down(configPath)
+func HandleDown(removeOrphans bool, volumes bool) error {
+	conf, err := stamus.GetCurrent()
+	if err != nil {
+		return err
 	}
-	return handleDown(configPath, removeOrphans, volumes)
+	if app.Mode.IsTest() {
+		return mocker.Mocked.Down(conf)
+	}
+	return handleDown(conf, removeOrphans, volumes)
 }
 
 // HandleDown handles the down command, similar to the down command in docker-compose
-func handleDown(configPath string, removeOrphans bool, volumes bool) error {
+func handleDown(configName string, removeOrphans bool, volumes bool) error {
 	// Get command
 	command := compose.GetComposeCmd("down")
 	// Set flags
-	command.Flags().Lookup("folder").DefValue = configPath
-	command.Flags().Lookup("folder").Value.Set(configPath)
+	command.Flags().Lookup("config").DefValue = configName
+	command.Flags().Lookup("config").Value.Set(configName)
 	command.Flags().Lookup("remove-orphans").DefValue = strconv.FormatBool(removeOrphans)
 	command.Flags().Lookup("remove-orphans").Value.Set(strconv.FormatBool(removeOrphans))
 	command.Flags().Lookup("volumes").DefValue = strconv.FormatBool(volumes)
