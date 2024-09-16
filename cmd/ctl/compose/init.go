@@ -1,9 +1,6 @@
 package compose
 
 import (
-	// Core
-	"fmt"
-
 	// External
 	"github.com/spf13/cobra"
 
@@ -31,7 +28,6 @@ func initCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	flags.Config.AddAsFlag(cmd, false)
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
@@ -52,7 +48,6 @@ func SELKSCmd() *cobra.Command {
 		},
 	}
 	// Flags
-	flags.Config.AddAsFlag(cmd, false)
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
@@ -79,10 +74,6 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	isDefault, err := flags.IsDefaultParam.GetValue()
 	if err != nil {
 		return err
-	}
-	isValidOutput := flags.Config.IsValid()
-	if !isValidOutput {
-		return fmt.Errorf("invalid output path")
 	}
 	values, err := flags.Values.GetValue()
 	if err != nil {

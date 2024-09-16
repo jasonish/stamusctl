@@ -9,7 +9,6 @@ import (
 	// Custom
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/embeds"
-	flags "stamus-ctl/internal/handlers"
 	"stamus-ctl/internal/utils"
 )
 
@@ -43,11 +42,9 @@ func ConfigCmd() *cobra.Command {
 			return getHandler(cmd, args)
 		},
 	}
-	// Flags
-	flags.Config.AddAsFlag(cmd, false)
-
 	// Add Commands
 	cmd.AddCommand(getCmd())
 	cmd.AddCommand(setCmd())
+	cmd.AddCommand(listCmd())
 	return cmd
 }

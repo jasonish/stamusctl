@@ -28,9 +28,6 @@ func initHandler(c *gin.Context) {
 	}
 
 	// Validate request
-	if req.Config.Value == "" {
-		req.Config.Value = "tmp"
-	}
 	if req.Values == nil {
 		req.Values = make(map[string]string)
 	}
