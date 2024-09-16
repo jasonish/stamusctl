@@ -38,6 +38,9 @@ type GetRequest struct {
 	Values  []string `json:"values"`  // Values to retrieve, default is all
 	Content bool     `json:"content"` // Get content or values, default is false
 }
+type GetListResponse struct {
+	Configs []string `json:"configs"` // List of available configurations on the system
+}
 
 // Update
 type UpdateRequest struct {

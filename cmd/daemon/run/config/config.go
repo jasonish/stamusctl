@@ -91,6 +91,26 @@ func setCurrentHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "ok"})
 }
 
+// setCurrentHandler godoc
+// @Summary Set current configuration
+// @Description Sets configuration with provided parameters.
+// @Tags set
+// @Accept json
+// @Produce json
+// @Success 200 {object} pkg.GetListResponse "Configuration list"
+// @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
+// @Router /config [post]
+func getConfigListHandler(c *gin.Context) {
+	// Call handler
+	list, err := handlers.GetConfigsList()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	resp := pkg.GetListResponse{Configs: list}
+	c.JSON(200, resp)
+}
+
 type GetResponse map[string]interface{}
 
 // getHandler godoc
