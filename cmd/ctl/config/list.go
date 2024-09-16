@@ -39,7 +39,7 @@ func listHandler() error {
 		log.Println("Error getting current configuration")
 		return err
 	}
-	log.Println(" List of configurations")
+	fmt.Println(" List of configurations")
 	// Print list
 	for _, config := range list {
 		if current == config {
