@@ -33,7 +33,6 @@ func upHandler(c *gin.Context) {
 // @Tags compose
 // @Accept json
 // @Produce json
-// @Param arbitraries body pkg.Config true "Configuration to stop"
 // @Success 200 {object} pkg.SuccessResponse "Down successful"
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Router /compose/down [post]
