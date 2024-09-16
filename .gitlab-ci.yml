@@ -263,7 +263,7 @@ compose init:
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
+        - $(pwd)/scripts/compare.sh /root/.config/.stamus/configs/tmp ./outputs/compose-init
 
 compose init set:
     image: busybox
@@ -277,7 +277,7 @@ compose init set:
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.response=lel
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
+        - $(pwd)/scripts/compare.sh /root/.config/.stamus/configs/tmp ./outputs/compose-init-set
 
 compose init optional:
     image: busybox
@@ -291,7 +291,7 @@ compose init optional:
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx=false
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-optional
+        - $(pwd)/scripts/compare.sh /root/.config/.stamus/configs/tmp ./outputs/compose-init-optional
 
 compose init arbitrary:
     image: busybox
@@ -305,7 +305,7 @@ compose init arbitrary:
     script:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx websocket.port=6969
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-arbitrary
+        - $(pwd)/scripts/compare.sh /root/.config/.stamus/configs/tmp ./outputs/compose-init-arbitrary
 
 compose config set:
     image: busybox
@@ -320,7 +320,7 @@ compose config set:
         - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx
         - STAMUS_APP_NAME=stamusctl ./cli config set websocket.response=lel
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init-set
+        - $(pwd)/scripts/compare.sh /root/.config/.stamus/configs/tmp ./outputs/compose-init-set
 
 compose config reload:
     image: busybox
@@ -336,7 +336,7 @@ compose config reload:
         - STAMUS_APP_NAME=stamusctl ./cli config set websocket.port=6969
         - STAMUS_APP_NAME=stamusctl ./cli config set --reload
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh ./tmp ./outputs/compose-init
+        - $(pwd)/scripts/compare.sh /root/.config/.stamus/configs/tmp ./outputs/compose-init
 
 refresh-app-of-apps:
     stage: deploy
