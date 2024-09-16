@@ -22,7 +22,7 @@ func FolderExists(path string) (bool, error) {
 	return true, nil
 }
 
-var forbiddenChars = []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|", "$", "."}
+var forbiddenChars = []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|", "$", ".", " ", "\t", "\n", "\r"}
 
 func ValidatePath(path models.Variable) bool {
 	if *path.String == "" {
