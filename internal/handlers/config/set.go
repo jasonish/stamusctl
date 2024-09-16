@@ -1,20 +1,25 @@
 package config
 
 import (
+	// Core
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
-	compose "stamus-ctl/internal/handlers/compose"
-	"stamus-ctl/internal/models"
-	"stamus-ctl/internal/utils"
 	"strings"
 
+	// Internal
+	"stamus-ctl/internal/app"
+	compose "stamus-ctl/internal/handlers/compose"
+	"stamus-ctl/internal/models"
+	"stamus-ctl/internal/stamus"
+	"stamus-ctl/internal/utils"
+
+	// External
 	cp "github.com/otiai10/copy"
 )
 
 type SetHandlerInputs struct {
-	Config   string   // Path to the config folder
 	Values   string   // Path to the values.yaml file
 	Reload   bool     // Reload the configuration, don't keep arbitrary parameters
 	Apply    bool     // Apply the new configuration, reload the services
@@ -25,7 +30,11 @@ type SetHandlerInputs struct {
 // func SetHandler(configPath string, args []string, reload bool, apply bool) error {
 func SetHandler(params SetHandlerInputs) error {
 	// Load the config
-	file, err := models.CreateFileInstance(params.Config, "values.yaml")
+	conf, err := stamus.GetCurrent()
+	if err != nil {
+		return err
+	}
+	file, err := models.CreateFileInstance(app.GetConfigsFolder(conf), "values.yaml")
 	if err != nil {
 		return err
 	}
@@ -33,7 +42,6 @@ func SetHandler(params SetHandlerInputs) error {
 	if err != nil {
 		return err
 	}
-
 	// Extract and set parameters from args
 	paramsArgs := utils.ExtractArgs(params.Args)
 	config.GetParams().SetLooseValues(paramsArgs)
@@ -55,14 +63,14 @@ func SetHandler(params SetHandlerInputs) error {
 	}
 
 	// Save the configuration
-	outputAsFile, err := models.CreateFileInstance(params.Config, "values.yaml")
+	outputAsFile, err := models.CreateFileInstance(app.GetConfigsFolder(conf), "values.yaml")
 	if err != nil {
 		return err
 	}
 	config.SaveConfigTo(outputAsFile)
 	// Apply the configuration
 	if params.Apply {
-		err = compose.HandleUp(params.Config)
+		err = compose.HandleUp()
 		if err != nil {
 			return err
 		}
@@ -71,13 +79,18 @@ func SetHandler(params SetHandlerInputs) error {
 }
 
 // For each argument, copy the input path to the output path
-func SetContentHandler(path string, args []string) error {
+func SetContentHandler(args []string) error {
+	conf, err := stamus.GetCurrent()
+	if err != nil {
+		return err
+	}
+	path := app.GetConfigsFolder(conf)
 	// For each argument
 	for _, arg := range args {
 		// Split argument
 		split := strings.Split(arg, ":")
 		if len(split) != 2 {
-			return fmt.Errorf("Invalid argument: %s", arg)
+			return fmt.Errorf("invalid argument: %s", arg)
 		}
 		// Get paths
 		inputPath := split[0]
@@ -116,7 +129,7 @@ func copy(inputPath string, outputPath string) error {
 	info, err := os.Stat(inputPath)
 	if err != nil {
 		log.Println(info, err)
-		return fmt.Errorf("Input path does not exist: %s", inputPath)
+		return fmt.Errorf("input path does not exist: %s", inputPath)
 	}
 
 	err = cp.Copy(inputPath, outputPath)

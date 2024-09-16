@@ -28,9 +28,6 @@ func setHandler(c *gin.Context) {
 	}
 
 	// Validate request
-	if req.Config.Value == "" {
-		req.Config.Value = "tmp"
-	}
 	if req.Values == nil {
 		req.Values = make(map[string]string)
 	}
@@ -47,7 +44,6 @@ func setHandler(c *gin.Context) {
 
 	// Call handler
 	params := handlers.SetHandlerInputs{
-		Config:   req.Config.Value,
 		Reload:   req.Reload,
 		Apply:    req.Apply,
 		Args:     valuesAsStrings,
@@ -83,16 +79,13 @@ func getHandler(c *gin.Context) {
 	}
 
 	// Validate request
-	if req.Config.Value == "" {
-		req.Config.Value = "tmp"
-	}
 	if req.Values == nil {
 		req.Values = []string{}
 	}
 
 	// Call handler
 	if req.Content {
-		filesMap, err := handlers.GetGroupedContent(req.Config.Value, req.Values)
+		filesMap, err := handlers.GetGroupedContent(req.Values)
 		if err != nil {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
@@ -101,7 +94,7 @@ func getHandler(c *gin.Context) {
 		return
 	}
 
-	groupedValues, err := handlers.GetGroupedConfig(req.Config.Value, req.Values, false)
+	groupedValues, err := handlers.GetGroupedConfig(req.Values, false)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

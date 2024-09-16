@@ -2,9 +2,10 @@ package config
 
 import (
 	// Custom
-	"fmt"
+
 	flags "stamus-ctl/internal/handlers"
 	config "stamus-ctl/internal/handlers/config"
+	"stamus-ctl/internal/stamus"
 
 	// External
 	"github.com/spf13/cobra"
@@ -15,18 +16,18 @@ func setCmd() *cobra.Command {
 	// Command
 	cmd := &cobra.Command{
 		Use:   "set [keys=values...]",
-		Short: "Set config file parameters",
-		Long: `Set config file parameters
-Input keys and values of parameters to set.
-Example: set scirius.token=AwesomeToken`,
+		Short: "Set config related stuff",
+		Long: `To set current config values, input keys and values of parameters to set.
+Example: set scirius.token=AwesomeToken
+Or, use subcommands to set content or current configuration.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return setHandler(cmd, args)
 		},
 	}
 	// Subcommands
 	cmd.AddCommand(setContentCmd())
+	cmd.AddCommand(setCurrentCmd())
 	// Flags
-	flags.Config.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.Reload.AddAsFlag(cmd, false)
 	flags.Apply.AddAsFlag(cmd, false)
@@ -47,22 +48,24 @@ Example: config content /nginx:/etc/nginx /nginx.conf:/etc/nginx/nginx.conf,
 			return setContentHandler(cmd, args)
 		},
 	}
-	// Flags
-	flags.Config.AddAsFlag(cmd, false)
+	return cmd
+}
+
+func setCurrentCmd() *cobra.Command {
+	// Command
+	cmd := &cobra.Command{
+		Use:   "current",
+		Short: "Set the current configuration to use",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return setCurrentHandler(args[0])
+		},
+	}
 	return cmd
 }
 
 // Handlers
 func setHandler(cmd *cobra.Command, args []string) error {
 	// Get properties
-	configPath, err := flags.Config.GetValue()
-	if err != nil {
-		return err
-	}
-	isValidConfig := flags.Config.IsValid()
-	if !isValidConfig {
-		return fmt.Errorf("Invalid output path")
-	}
 	reload, err := flags.Reload.GetValue()
 	if err != nil {
 		return err
@@ -82,7 +85,6 @@ func setHandler(cmd *cobra.Command, args []string) error {
 
 	// Set the values
 	params := config.SetHandlerInputs{
-		Config:   configPath.(string),
 		Args:     args,
 		Reload:   reload.(bool),
 		Apply:    apply.(bool),
@@ -97,12 +99,10 @@ func setHandler(cmd *cobra.Command, args []string) error {
 }
 
 func setContentHandler(cmd *cobra.Command, args []string) error {
-	// Get flags
-	configPath, err := flags.Config.GetValue()
-	if err != nil {
-		return err
-	}
-
 	// Call handler
-	return config.SetContentHandler(configPath.(string), args)
+	return config.SetContentHandler(args)
+}
+
+func setCurrentHandler(name string) error {
+	return stamus.SetCurrent(name)
 }

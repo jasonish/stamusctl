@@ -1,11 +1,16 @@
 package config
 
 import (
+	// Core
 	"fmt"
+
+	// External
+	"github.com/spf13/cobra"
+
+	// Internal
+
 	flags "stamus-ctl/internal/handlers"
 	config "stamus-ctl/internal/handlers/config"
-
-	"github.com/spf13/cobra"
 )
 
 // Command
@@ -23,8 +28,6 @@ Example: get scirius`,
 	}
 	// Subcommands
 	cmd.AddCommand(getContentCmd())
-	// Flags
-	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -33,33 +36,23 @@ func getContentCmd() *cobra.Command {
 	// Command
 	cmd := &cobra.Command{
 		Use:   "content",
-		Short: "Get folder content architecture",
+		Short: "Get config content architecture",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return getContent(cmd, args)
 		},
 	}
-	// Flags
-	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
 // Handlers
 func getHandler(cmd *cobra.Command, args []string) error {
 	// Get properties
-	configPath, err := flags.Config.GetValue()
-	if err != nil {
-		return err
-	}
-	isValidConfig := flags.Config.IsValid()
-	if !isValidConfig {
-		return fmt.Errorf("Invalid output path")
-	}
 	reload, err := flags.Reload.GetValue()
 	if err != nil {
 		return err
 	}
 	// Load the config values
-	groupedValues, err := config.GetGroupedConfig(configPath.(string), args, reload.(bool))
+	groupedValues, err := config.GetGroupedConfig(args, reload.(bool))
 	if err != nil {
 		return err
 	}
@@ -69,21 +62,11 @@ func getHandler(cmd *cobra.Command, args []string) error {
 }
 
 func getContent(cmd *cobra.Command, args []string) error {
-	// Get properties
-	configPath, err := flags.Config.GetValue()
-	if err != nil {
-		return err
-	}
-	isValidConfig := flags.Config.IsValid()
-	if !isValidConfig {
-		return fmt.Errorf("Invalid output path")
-	}
 	// Call handler
-	groupedContent, err := config.GetGroupedContent(configPath.(string), args)
+	groupedContent, err := config.GetGroupedContent(args)
 	if err != nil {
 		return err
 	}
-
 	// Print the content
 	printColoredGroupedValues(groupedContent, "")
 	return nil
