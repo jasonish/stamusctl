@@ -11,29 +11,16 @@ import (
 
 // restartConfigHandler godoc
 // @Summary Similar to docker restart
-// @Description Will restart the containers defined
+// @Description Will restart the containers defined in the current configuration
 // @Tags compose
 // @Accept json
 // @Produce json
-// @Param arbitraries body pkg.Config true "Configuration to restart"
 // @Success 200 {object} pkg.SuccessResponse "Success message"
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Router /compose/restart/config [post]
 func restartConfigHandler(c *gin.Context) {
-	// Extract request body
-	var req pkg.Config
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Validate request
-	if req.Value == "" {
-		req.Value = "tmp"
-	}
-
 	// Call handler
-	err := handlers.HandleConfigRestart(req.Value)
+	err := handlers.HandleConfigRestart()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

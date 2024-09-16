@@ -3,7 +3,6 @@ package compose
 import (
 	// Internal
 	handlers "stamus-ctl/internal/handlers/compose"
-	"stamus-ctl/pkg"
 
 	// External
 	"github.com/gin-gonic/gin"
@@ -11,29 +10,16 @@ import (
 
 // UpHandler godoc
 // @Summary Similar to docker compose up
-// @Description Given a configuration, it will start the services defined in the configuration.
+// @Description Starts the services defined in the current configuration.
 // @Tags compose
 // @Accept json
 // @Produce json
-// @Param arbitraries body pkg.Config true "Configuration to start"
 // @Success 200 {object} pkg.SuccessResponse "Up successful"
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Router /compose/up [post]
 func upHandler(c *gin.Context) {
-	// Extract request body
-	var req pkg.Config
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Validate request
-	if req.Value == "" {
-		req.Value = "tmp"
-	}
-
 	// Call handler
-	err := handlers.HandleUp(req.Value)
+	err := handlers.HandleUp()
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -43,7 +29,7 @@ func upHandler(c *gin.Context) {
 
 // UpHandler godoc
 // @Summary Similar to docker compose down
-// @Description Given a configuration, it will stop the services defined in the configuration.
+// @Description Stops the services defined in the current configuration.
 // @Tags compose
 // @Accept json
 // @Produce json
@@ -52,20 +38,8 @@ func upHandler(c *gin.Context) {
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Router /compose/down [post]
 func downHandler(c *gin.Context) {
-	// Extract request body
-	var req pkg.Config
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Validate request
-	if req.Value == "" {
-		req.Value = "tmp"
-	}
-
 	// Call handler
-	err := handlers.HandleDown(req.Value, false, false)
+	err := handlers.HandleDown(false, false)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

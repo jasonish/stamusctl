@@ -26,9 +26,6 @@ func updateHandler(c *gin.Context) {
 	}
 
 	// Validate parameters
-	if req.Config.Value == "" {
-		req.Config.Value = "tmp"
-	}
 	if req.Version == "" {
 		req.Version = "latest"
 	}
@@ -42,7 +39,6 @@ func updateHandler(c *gin.Context) {
 
 	// Call handler
 	params := handlers.UpdateHandlerParams{
-		Config:  req.Config.Value,
 		Version: req.Version,
 		Args:    valuesVal,
 	}
