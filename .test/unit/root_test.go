@@ -1,9 +1,7 @@
 package tests
 
 import (
-	// Custom
-
-	"os"
+	// Core
 	"testing"
 
 	// External
@@ -91,9 +89,6 @@ func TestComposeInitArbitrary(t *testing.T) {
 	current, err := stamus.GetCurrent()
 	assert.NoError(t, err)
 	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-arbitrary")
-
-	err := os.RemoveAll(app)
-	assert.NoError(t, err)
 }
 
 func TestConfigSet(t *testing.T) {
