@@ -19,17 +19,21 @@ import (
 )
 
 type UpdateHandlerParams struct {
+	Config  string
 	Args    []string
 	Version string
 }
 
 func UpdateHandler(params UpdateHandlerParams) error {
 	// Unpack params
-	conf, err := stamus.GetCurrent()
-	if err != nil {
-		return err
+	var configPath string
+	if params.Config == "" {
+		conf, err := stamus.GetCurrent()
+		if err != nil {
+			return err
+		}
+		configPath = app.GetConfigsFolder(conf)
 	}
-	configPath := app.GetConfigsFolder(conf)
 	args := params.Args
 	versionVal := params.Version
 
