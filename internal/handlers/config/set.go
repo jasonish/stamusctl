@@ -91,6 +91,25 @@ func SetContentHandler(path string, args []string) error {
 	return nil
 }
 
+func SetCurrent(name string) error {
+	// Get the configuration
+	config, err := stamus.GetStamusConfig()
+	if err != nil {
+		return err
+	}
+	// Set the current
+	err = config.SetCurrent(name)
+	if err != nil {
+		return err
+	}
+	// Save
+	err = config.Save()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func copy(inputPath string, outputPath string) error {
 	fmt.Println("Setting content from ", inputPath, " to ", outputPath)
 	// Check input path exists
