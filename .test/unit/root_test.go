@@ -8,8 +8,10 @@ import (
 
 	// External
 	"github.com/stretchr/testify/assert"
-	// Internal
 
+	// Internal
+	"stamus-ctl/internal/app"
+	"stamus-ctl/internal/stamus"
 	"stamus-ctl/pkg"
 )
 
@@ -32,7 +34,9 @@ func TestComposeInit(t *testing.T) {
 	if t != nil {
 		assert.Equal(t, 200, res.Code)
 		assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
-		compareDirs(t, "./tmp", "../outputs/compose-init")
+		current, err := stamus.GetCurrent()
+		assert.NoError(t, err)
+		compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init")
 	}
 }
 
@@ -49,7 +53,9 @@ func TestComposeInitSet(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 
-	compareDirs(t, "./tmp", "../outputs/compose-init-set")
+	current, err := stamus.GetCurrent()
+	assert.NoError(t, err)
+	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-set")
 }
 
 func TestComposeInitOptional(t *testing.T) {
@@ -64,7 +70,9 @@ func TestComposeInitOptional(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 
-	compareDirs(t, "./tmp", "../outputs/compose-init-optional")
+	current, err := stamus.GetCurrent()
+	assert.NoError(t, err)
+	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-optional")
 }
 
 func TestComposeInitArbitrary(t *testing.T) {
@@ -80,9 +88,11 @@ func TestComposeInitArbitrary(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 
-	compareDirs(t, "./tmp", "../outputs/compose-init-arbitrary")
+	current, err := stamus.GetCurrent()
+	assert.NoError(t, err)
+	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-arbitrary")
 
-	err := os.RemoveAll("./tmp")
+	err := os.RemoveAll(app)
 	assert.NoError(t, err)
 }
 
@@ -99,7 +109,9 @@ func TestConfigSet(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 	// Compare
-	compareDirs(t, "./tmp", "../outputs/compose-init-set")
+	current, err := stamus.GetCurrent()
+	assert.NoError(t, err)
+	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-set")
 }
 
 func TestConfigReload(t *testing.T) {
@@ -119,7 +131,9 @@ func TestConfigReload(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 	// Compare
-	compareDirs(t, "./tmp", "../outputs/compose-init")
+	current, err := stamus.GetCurrent()
+	assert.NoError(t, err)
+	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init")
 }
 
 // func TestUpload(t *testing.T) {
