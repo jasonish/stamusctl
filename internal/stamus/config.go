@@ -54,11 +54,16 @@ func (conf *Config) setStamusConfig() error {
 		return err
 	}
 
-	_, err = file.WriteAt(bytes, 0)
+	// Delete content
+	err = file.Truncate(0)
 	if err != nil {
 		return err
 	}
 
+	_, err = file.WriteAt(bytes, 0)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
