@@ -370,7 +370,7 @@ int compose init:
         - until docker info; do sleep 1; done
     script:
         - ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
-        - cd tmp
+        - cd /root/.config/.stamus/configs/tmp
         - docker compose up -d
         - docker ps -a
         - cd ..
