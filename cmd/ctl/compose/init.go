@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 
 	// Internal
+
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/embeds"
 	flags "stamus-ctl/internal/handlers"
@@ -31,6 +32,7 @@ func initCmd() *cobra.Command {
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	// Commands
 	cmd.AddCommand(SELKSCmd())
 	return cmd
@@ -51,8 +53,8 @@ func SELKSCmd() *cobra.Command {
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
-
 }
 
 // Create SELKS folder if it does not exist
@@ -83,6 +85,10 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	config, err := flags.Config.GetValue()
+	if err != nil {
+		return err
+	}
 
 	// Call handler
 	selksInitParams := handlers.InitHandlerInputs{
@@ -92,6 +98,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		Project:          "selks",
 		Version:          "latest",
 		Values:           values.(string),
+		Config:           config.(string),
 		FromFile:         fromFile.(string),
 	}
 	return handlers.InitHandler(true, selksInitParams)

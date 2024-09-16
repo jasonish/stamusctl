@@ -25,6 +25,7 @@ func testCmd() *cobra.Command {
 	flags.IsDefaultParam.AddAsFlag(cmd, false)
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -41,6 +42,10 @@ func testHandler(cmd *cobra.Command, args []string) error { // Get flags
 	if err != nil {
 		return err
 	}
+	config, err := flags.Config.GetValue()
+	if err != nil {
+		return err
+	}
 
 	// Call handler
 	selksInitParams := handlers.InitHandlerInputs{
@@ -50,6 +55,7 @@ func testHandler(cmd *cobra.Command, args []string) error { // Get flags
 		Project:          "",
 		Version:          "",
 		Values:           values.(string),
+		Config:           config.(string),
 		FromFile:         fromFile.(string),
 	}
 	return handlers.InitHandler(true, selksInitParams)

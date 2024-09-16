@@ -14,6 +14,7 @@ type InitHandlerInputs struct {
 	Version          string
 	Arbitrary        map[string]string
 	Values           string
+	Config           string
 	FromFile         string
 }
 
@@ -57,11 +58,15 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 		return err
 	}
 	// Save the configuration
-	stamusConfig, err := stamus.GetStamusConfig()
-	if err != nil {
-		return err
+	var path string
+	if params.Config == "" {
+		stamusConfig, err := stamus.GetCurrent()
+		if err != nil {
+			return err
+		}
+		path = app.GetConfigsFolder(stamusConfig)
 	}
-	outputFile, err := models.CreateFileInstance(app.GetConfigsFolder(stamusConfig.GetCurrent()), "values.yaml")
+	outputFile, err := models.CreateFileInstance(path, "values.yaml")
 	if err != nil {
 		return err
 	}
