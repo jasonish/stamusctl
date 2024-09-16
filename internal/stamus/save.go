@@ -1,6 +1,9 @@
 package stamus
 
-import "stamus-ctl/internal/models"
+import (
+	"stamus-ctl/internal/app"
+	"stamus-ctl/internal/models"
+)
 
 func SaveLogin(registryInfo models.RegistryInfo) error {
 	// Get config content
@@ -37,4 +40,19 @@ func SetCurrent(name string) error {
 
 	// Save config
 	return Config.setStamusConfig()
+}
+
+func GetCurrent() (string, error) {
+	// Get config content
+	config, err := GetStamusConfig()
+	if err != nil {
+		return "", err
+	}
+	// Check current
+	current := config.Current
+	if current == "" {
+		current = app.DefaultConfigName
+	}
+	// Get current
+	return current, nil
 }
