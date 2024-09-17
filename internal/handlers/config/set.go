@@ -10,6 +10,7 @@ import (
 
 	// Internal
 	"stamus-ctl/internal/app"
+	flags "stamus-ctl/internal/handlers"
 	compose "stamus-ctl/internal/handlers/compose"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
@@ -30,11 +31,11 @@ type SetHandlerInputs struct {
 // func SetHandler(configPath string, args []string, reload bool, apply bool) error {
 func SetHandler(params SetHandlerInputs) error {
 	// Load the config
-	conf, err := stamus.GetCurrent()
+	conf, err := flags.GetConfigFolderPath()
 	if err != nil {
 		return err
 	}
-	file, err := models.CreateFileInstance(app.GetConfigsFolder(conf), "values.yaml")
+	file, err := models.CreateFileInstance(conf, "values.yaml")
 	if err != nil {
 		return err
 	}
@@ -80,7 +81,7 @@ func SetHandler(params SetHandlerInputs) error {
 
 // For each argument, copy the input path to the output path
 func SetContentHandler(args []string) error {
-	conf, err := stamus.GetCurrent()
+	conf, err := flags.GetConfigFolderPath()
 	if err != nil {
 		return err
 	}

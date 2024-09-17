@@ -33,6 +33,8 @@ func UpdateHandler(params UpdateHandlerParams) error {
 			return err
 		}
 		configPath = app.GetConfigsFolder(conf)
+	} else {
+		configPath = params.Config
 	}
 	args := params.Args
 	versionVal := params.Version

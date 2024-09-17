@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
-	"stamus-ctl/internal/app"
+	flags "stamus-ctl/internal/handlers"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
 	"strings"
@@ -13,12 +13,11 @@ import (
 // Essentially, this function reads the config values file and groups the values
 func GetGroupedConfig(args []string, reload bool) (map[string]interface{}, error) {
 	// File instance
-	conf, err := stamus.GetCurrent()
+	conf, err := flags.GetConfigFolderPath()
 	if err != nil {
 		return nil, err
 	}
-	configPath := app.GetConfigsFolder(conf)
-	inputAsFile, err := models.CreateFileInstance(configPath, "values.yaml")
+	inputAsFile, err := models.CreateFileInstance(conf, "values.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -41,13 +40,13 @@ func GetGroupedConfig(args []string, reload bool) (map[string]interface{}, error
 // Get the grouped content
 // Essentially, this function reads the config folder content and groups the folders and files
 func GetGroupedContent(args []string) (map[string]interface{}, error) {
-	// List files
-	conf, err := stamus.GetCurrent()
+	// Get path
+	conf, err := flags.GetConfigFolderPath()
 	if err != nil {
 		return nil, err
 	}
-	configPath := app.GetConfigsFolder(conf)
-	files, err := listFilesInFolder(configPath)
+	// Get files
+	files, err := listFilesInFolder(conf)
 	if err != nil {
 		return nil, err
 	}
