@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"stamus-ctl/internal/app"
+	stamusFlags "stamus-ctl/internal/handlers"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
 	"strings"
@@ -118,12 +119,21 @@ func makeCustomRunner(
 	command string,
 ) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		var configPath string
 		// Get config folder
-		conf, err := stamus.GetCurrent()
-		if err != nil {
-			return err
+		if app.IsCtl() {
+			conf, err := stamusFlags.Config.GetValue()
+			if err != nil {
+				return err
+			}
+			configPath = conf.(string)
+		} else {
+			conf, err := stamus.GetCurrent()
+			if err != nil {
+				return err
+			}
+			configPath = app.GetConfigsFolder(conf)
 		}
-		configPath := app.GetConfigsFolder(conf)
 		// Get folder flag value
 		flagValue := filepath.Join(configPath, "/docker-compose.yaml")
 		// Set file flag
