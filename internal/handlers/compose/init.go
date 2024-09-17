@@ -65,6 +65,8 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 			return err
 		}
 		path = app.GetConfigsFolder(stamusConfig)
+	} else {
+		path = params.Config
 	}
 	outputFile, err := models.CreateFileInstance(path, "values.yaml")
 	if err != nil {
