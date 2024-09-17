@@ -45,6 +45,5 @@ func ConfigCmd() *cobra.Command {
 	// Add Commands
 	cmd.AddCommand(getCmd())
 	cmd.AddCommand(setCmd())
-	cmd.AddCommand(listCmd())
 	return cmd
 }
