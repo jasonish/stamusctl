@@ -20,6 +20,7 @@ var (
 	DefaultSelksPath  = "/"
 	LatestSelksPath   = "/"
 	DefaultConfigName = "tmp"
+	StamusAppName     = ""
 )
 
 // Constants
@@ -49,6 +50,9 @@ func init() {
 	if val := os.Getenv("BUILD_MODE"); val != "" {
 		Mode.set(val)
 	}
+	if val := os.Getenv("STAMUS_APP_NAME"); val != "" {
+		StamusAppName = val
+	}
 
 	// Folders
 	if val := os.Getenv("STAMUS_CONFIG_FOLDER"); val != "" {
@@ -71,4 +75,8 @@ func init() {
 
 func GetConfigsFolder(name string) string {
 	return filepath.Join(ConfigsFolder, name)
+}
+
+func IsCtl() bool {
+	return StamusAppName == CtlName
 }
