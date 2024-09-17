@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	// Internal
-	"stamus-ctl/internal/app"
+
 	flags "stamus-ctl/internal/handlers"
 	compose "stamus-ctl/internal/handlers/compose"
 	"stamus-ctl/internal/models"
@@ -64,7 +64,7 @@ func SetHandler(params SetHandlerInputs) error {
 	}
 
 	// Save the configuration
-	outputAsFile, err := models.CreateFileInstance(app.GetConfigsFolder(conf), "values.yaml")
+	outputAsFile, err := models.CreateFileInstance(conf, "values.yaml")
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,6 @@ func SetContentHandler(args []string) error {
 	if err != nil {
 		return err
 	}
-	path := app.GetConfigsFolder(conf)
 	// For each argument
 	for _, arg := range args {
 		// Split argument
@@ -97,7 +96,7 @@ func SetContentHandler(args []string) error {
 		inputPath := split[0]
 		outputPath := split[1]
 		// Call handler
-		err := copy(inputPath, filepath.Join(path, outputPath))
+		err := copy(inputPath, filepath.Join(conf, outputPath))
 		if err != nil {
 			return err
 		}
