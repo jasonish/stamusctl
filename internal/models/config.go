@@ -130,13 +130,22 @@ func (f *Config) extractParam(parameter string, isDeep bool) (*Parameter, error)
 	case "int":
 		currentParam.Default = CreateVariableInt(f.getIntParamValue(parameter, "default"))
 	}
+	// Get choices
 	choices, err := GetChoices(f.getStringParamValue(parameter, "choices"))
 	if err != nil {
 		return nil, err
 	}
 	currentParam.Choices = choices
+	// Set default
 	if f.getStringParamValue(parameter, "default") == "" {
 		currentParam.Default = Variable{}
+	}
+	if parameter == "suricata.interfaces" {
+		asStrings := []string{}
+		for _, choice := range choices {
+			asStrings = append(asStrings, *choice.String)
+		}
+		currentParam.Default = CreateVariableString(strings.Join(asStrings, ","))
 	}
 	return &currentParam, nil
 }

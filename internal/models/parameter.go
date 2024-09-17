@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -180,10 +181,15 @@ func (p *Parameter) validateChoices() bool {
 	if len(p.Choices) > 0 {
 		switch p.Type {
 		case "string":
+			// Convert choices to strings
 			asStrings := []string{}
 			for _, choice := range p.Choices {
 				asStrings = append(asStrings, *choice.String)
 			}
+			// Add as list
+			def := strings.Join(asStrings, ",")
+			asStrings = append(asStrings, def)
+			// Check
 			isOk := slices.Contains(asStrings, *p.Variable.String)
 			if !isOk {
 				fmt.Println("Error: Must be one of:", asStrings)
