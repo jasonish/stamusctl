@@ -26,7 +26,6 @@ Or, use subcommands to set content or current configuration.`,
 	}
 	// Subcommands
 	cmd.AddCommand(setContentCmd())
-	cmd.AddCommand(setCurrentCmd())
 	// Flags
 	flags.Values.AddAsFlag(cmd, false)
 	flags.Reload.AddAsFlag(cmd, false)
@@ -46,18 +45,6 @@ Example: config content /nginx:/etc/nginx /nginx.conf:/etc/nginx/nginx.conf,
 		`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return setContentHandler(cmd, args)
-		},
-	}
-	return cmd
-}
-
-func setCurrentCmd() *cobra.Command {
-	// Command
-	cmd := &cobra.Command{
-		Use:   "current",
-		Short: "Set the current configuration to use",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return setCurrentHandler(args[0])
 		},
 	}
 	return cmd
