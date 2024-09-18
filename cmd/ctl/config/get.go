@@ -28,6 +28,8 @@ Example: get scirius`,
 	}
 	// Subcommands
 	cmd.AddCommand(getContentCmd())
+	// Flags
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 

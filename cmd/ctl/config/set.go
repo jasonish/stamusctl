@@ -31,6 +31,7 @@ Or, use subcommands to set content or current configuration.`,
 	flags.Reload.AddAsFlag(cmd, false)
 	flags.Apply.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -47,6 +48,8 @@ Example: config content /nginx:/etc/nginx /nginx.conf:/etc/nginx/nginx.conf,
 			return setContentHandler(cmd, args)
 		},
 	}
+	// Flags
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
