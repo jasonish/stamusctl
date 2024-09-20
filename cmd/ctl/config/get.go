@@ -43,6 +43,8 @@ func getContentCmd() *cobra.Command {
 			return getContent(cmd, args)
 		},
 	}
+	// Flags
+	flags.Config.AddAsFlag(cmd, false)
 	return cmd
 }
 
