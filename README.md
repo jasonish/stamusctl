@@ -45,7 +45,7 @@ If not, you can:
 `stamusctl compose` is the command used to manage the containerized Stamus stack deployement.
 
 - `init` is used to initiate configuration files
-  - `--folder ` to select folder to save configuration
+  - `--config ` to select folder to save configuration
   - `--values` to use a `values.yaml` as configuration
   - `--fromFile` to use a file as value for a specific key
   - `--apply` to relaunch the configuration
@@ -59,7 +59,7 @@ If not, you can:
   - `--volumes` to remove named volumes
   - `--remove-orphans` to remove not defined containers
 - `update` to update the configuration
-  - `--folder` to select folder
+  - `--config` to select folder
   - `--registry` to select registry
   - `--user` to input user
   - `--pass` to input password
