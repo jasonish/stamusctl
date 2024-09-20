@@ -4,11 +4,13 @@ import (
 	// Core
 	"os"
 	"path/filepath"
+	"strings"
+
+	// Common
 	"stamus-ctl/internal/app"
 	stamusFlags "stamus-ctl/internal/handlers"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
-	"strings"
 
 	// External
 	"github.com/docker/cli/cli-plugins/plugin"
@@ -106,7 +108,9 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 
 // Modify the file flag to be hidden and add a folder flag
 func modifyFileFlag(c *cobra.Command, command string) {
+	// Modify flags
 	c.Flags().Lookup("file").Hidden = true
+	stamusFlags.Config.AddAsFlag(c, false)
 	// Save the command
 	currentRunE := c.RunE
 	// Modify cmd function
