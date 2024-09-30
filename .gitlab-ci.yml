@@ -352,6 +352,21 @@ compose config reload:
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init
 
+config flag set:
+    image: busybox
+    stage: test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl ./cli compose init --default nginx.exec=nginx --config zgueg
+        - STAMUS_APP_NAME=stamusctl ./cli config set websocket.response=lel --config zgueg
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh zgueg ./outputs/compose-init-set
+
 refresh-app-of-apps:
     stage: deploy
     needs:
