@@ -14,6 +14,7 @@ import (
 var (
 	Name              = ""
 	Mode              = ModeStruct("prod")
+	Embed             = EmbedStruct("false")
 	ConfigFolder      = "/"
 	ConfigsFolder     = "/"
 	TemplatesFolder   = "/"
@@ -49,6 +50,9 @@ func init() {
 	// Mode
 	if val := os.Getenv("BUILD_MODE"); val != "" {
 		Mode.set(val)
+	}
+	if val := os.Getenv("EMBED_MODE"); val != "" {
+		Embed.set(val)
 	}
 	if val := os.Getenv("STAMUS_APP_NAME"); val != "" {
 		StamusAppName = val

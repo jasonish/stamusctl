@@ -13,3 +13,13 @@ func (m *ModeStruct) IsTest() bool {
 func (m *ModeStruct) IsProd() bool {
 	return *m == "prod"
 }
+
+type EmbedStruct string
+
+func (e *EmbedStruct) set(value string) {
+	*e = EmbedStruct(value)
+}
+
+func (e *EmbedStruct) IsTrue() bool {
+	return *e == "true"
+}
