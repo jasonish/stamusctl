@@ -42,7 +42,7 @@ daemon tests:
         - apk add --no-cache gcc musl-dev make
         - go install github.com/swaggo/swag/cmd/swag@latest
         - $(pwd)/scripts/move.sh
-        - STAMUS_APP_NAME=stamusctl go run ./cmd compose init -h
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true go run ./cmd compose init -h
         - make daemon-test
 
 kaniko cli:
