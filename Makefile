@@ -49,6 +49,6 @@ test:
 	go test ./...
 
 daemon-test:
-	go test ./.test/unit
+	BUILD_MODE=test go test ./.test/unit
 
 .PHONY: all cli daemon test
