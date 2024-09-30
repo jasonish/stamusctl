@@ -24,7 +24,7 @@ func initSelksFolder(path string) {
 	if err != nil {
 		panic(err)
 	}
-	if !selksConfigExist {
+	if !selksConfigExist && app.Mode.IsTest() {
 		err = embeds.ExtractEmbedTo("selks", app.TemplatesFolder+"selks/embedded/")
 		if err != nil {
 			panic(err)

@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 
 	// Internal
-
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/embeds"
 	flags "stamus-ctl/internal/handlers"
@@ -63,7 +62,7 @@ func initSelksFolder(path string) {
 	if err != nil {
 		panic(err)
 	}
-	if !selksConfigExist {
+	if !selksConfigExist && app.Mode.IsTest() {
 		err = embeds.ExtractEmbedTo(embed, app.TemplatesFolder+"selks/embedded/")
 		if err != nil {
 			panic(err)
