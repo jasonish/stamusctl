@@ -261,7 +261,7 @@ compose init:
     dependencies:
         - build test
     script:
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli compose init --default nginx.exec=nginx
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init
 
@@ -275,7 +275,7 @@ compose init conf flag:
     dependencies:
         - build test
     script:
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli compose init --default nginx.exec=nginx --config zgueg
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx --config zgueg
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh zgueg ./outputs/compose-init
 
@@ -289,7 +289,7 @@ compose init set:
     dependencies:
         - build test
     script:
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli compose init --default nginx.exec=nginx websocket.response=lel
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx websocket.response=lel
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init-set
 
@@ -303,7 +303,7 @@ compose init optional:
     dependencies:
         - build test
     script:
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli compose init --default nginx=false
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx=false
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init-optional
 
@@ -317,7 +317,7 @@ compose init arbitrary:
     dependencies:
         - build test
     script:
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli compose init --default nginx.exec=nginx websocket.port=6969
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx websocket.port=6969
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init-arbitrary
 
@@ -331,8 +331,8 @@ compose config set:
     dependencies:
         - build test
     script:
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli compose init --default nginx.exec=nginx
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli config set websocket.response=lel
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set websocket.response=lel
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init-set
 
@@ -346,9 +346,9 @@ compose config reload:
     dependencies:
         - build test
     script:
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli compose init --default nginx.exec=nginx
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli config set websocket.port=6969
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli config set --reload
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set websocket.port=6969
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set --reload
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init
 
@@ -362,8 +362,8 @@ config flag set:
     dependencies:
         - build test
     script:
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli compose init --default nginx.exec=nginx --config zgueg
-        - STAMUS_APP_NAME=stamusctl BUILD_MODE=test ./cli config set websocket.response=lel --config zgueg
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx --config zgueg
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set websocket.response=lel --config zgueg
         - chmod +x $(pwd)/scripts/compare.sh
         - $(pwd)/scripts/compare.sh zgueg ./outputs/compose-init-set
 
@@ -398,12 +398,12 @@ int compose init:
     before_script:
         - until docker info; do sleep 1; done
     script:
-        - BUILD_MODE=test ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
+        - EMBED_MODE=true ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
         - cd tmp
         - docker compose up -d
         - docker ps -a
         - cd ..
-        - BUILD_MODE=test ./stamusctl compose ps
+        - EMBED_MODE=true ./stamusctl compose ps
 
 int compose init stmusctl compose up:
     stage: integration
@@ -422,6 +422,6 @@ int compose init stmusctl compose up:
     before_script:
         - until docker info; do sleep 1; done
     script:
-        - BUILD_MODE=test ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
-        - BUILD_MODE=test ./stamusctl compose up -d
+        - EMBED_MODE=true ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
+        - EMBED_MODE=true ./stamusctl compose up -d
         - docker ps -a

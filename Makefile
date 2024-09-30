@@ -49,6 +49,6 @@ test:
 	go test ./...
 
 daemon-test:
-	BUILD_MODE=test go test ./.test/unit
+	EMBED_MODE=true go test ./.test/unit
 
 .PHONY: all cli daemon test
