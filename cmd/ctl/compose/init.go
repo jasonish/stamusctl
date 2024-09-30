@@ -12,13 +12,10 @@ import (
 	"stamus-ctl/internal/utils"
 )
 
-// Constants
-const embed string = "selks"
-
 // Commands
 func initCmd() *cobra.Command {
 	// Setup
-	initSelksFolder(app.DefaultSelksPath)
+	embeds.InitSelksFolder(app.DefaultSelksPath)
 	// Command
 	cmd := &cobra.Command{
 		Use:   "init",
@@ -39,7 +36,7 @@ func initCmd() *cobra.Command {
 
 func SELKSCmd() *cobra.Command {
 	// Setup
-	initSelksFolder(app.DefaultSelksPath)
+	embeds.InitSelksFolder(app.DefaultSelksPath)
 	// Command
 	cmd := &cobra.Command{
 		Use:   "selks",
@@ -54,20 +51,6 @@ func SELKSCmd() *cobra.Command {
 	flags.FromFile.AddAsFlag(cmd, false)
 	flags.Config.AddAsFlag(cmd, false)
 	return cmd
-}
-
-// Create SELKS folder if it does not exist
-func initSelksFolder(path string) {
-	selksConfigExist, err := utils.FolderExists(path)
-	if err != nil {
-		panic(err)
-	}
-	if !selksConfigExist && app.Embed.IsTrue() {
-		err = embeds.ExtractEmbedTo(embed, app.TemplatesFolder+"selks/embedded/")
-		if err != nil {
-			panic(err)
-		}
-	}
 }
 
 func SELKSHandler(cmd *cobra.Command, args []string) error {

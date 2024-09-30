@@ -4,11 +4,27 @@ import (
 	"embed"
 	"log"
 	"os"
+	"stamus-ctl/internal/app"
+	"stamus-ctl/internal/utils"
 	"strings"
 )
 
 //go:embed selks/*
 var AllConf embed.FS
+
+// Create SELKS folder if it does not exist
+func InitSelksFolder(path string) {
+	selksConfigExist, err := utils.FolderExists(path)
+	if err != nil {
+		panic(err)
+	}
+	if !selksConfigExist && app.Embed.IsTrue() {
+		err = ExtractEmbedTo("selks", app.TemplatesFolder+"selks/embedded/")
+		if err != nil {
+			panic(err)
+		}
+	}
+}
 
 func ExtractEmbedTo(embed string, outputFolder string) error {
 	files := getAllFiles(embed)
