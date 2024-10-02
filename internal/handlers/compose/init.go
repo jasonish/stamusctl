@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"path/filepath"
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
@@ -85,6 +86,10 @@ func pullLatestTemplate(destPath string, image string) error {
 	stamusConf, err := stamus.GetStamusConfig()
 	if err != nil {
 		return err
+	}
+	// Verify registries not empty
+	if len(stamusConf.Registries.AsList()) == 0 {
+		return fmt.Errorf("no config registries credentials found")
 	}
 	// Pull latest config
 	for _, registryInfo := range stamusConf.Registries.AsList() {
