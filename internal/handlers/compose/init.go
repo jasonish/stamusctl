@@ -103,10 +103,12 @@ func instanciateConfig(folderPath string, backupFolderPath string) (*models.Conf
 	if err == nil {
 		return config, nil
 	}
-	// Try to instanciate from backup folder
-	config, err = instanciateConfigFromPath(backupFolderPath)
-	if err == nil {
-		return config, nil
+	if app.Embed.IsTrue() {
+		// Try to instanciate from backup folder
+		config, err = instanciateConfigFromPath(backupFolderPath)
+		if err == nil {
+			return config, nil
+		}
 	}
 	// Return error
 	return nil, err
