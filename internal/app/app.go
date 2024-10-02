@@ -64,12 +64,12 @@ func init() {
 	if val := os.Getenv("STAMUS_CONFIG_FOLDER"); val != "" {
 		ConfigFolder = val
 	} else {
-		ConfigFolder = xdg.ConfigHome + "/.stamus/"
+		ConfigFolder = xdg.ConfigHome + "/stamus/"
 	}
 	if val := os.Getenv("STAMUS_TEMPLATES_FOLDER"); val != "" {
 		TemplatesFolder = val
 	} else {
-		TemplatesFolder = xdg.UserDirs.Templates + "/.stamus/"
+		TemplatesFolder = xdg.UserDirs.Templates + "/stamus/"
 	}
 
 	// Derived paths
