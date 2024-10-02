@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 
 	// External
 	"github.com/adrg/xdg"
@@ -34,6 +35,7 @@ func CatchException() {
 	if err := recover(); err != nil {
 		switch err.(type) {
 		case *runtime.Error:
+			debug.PrintStack()
 			panic(err)
 		default:
 		}

@@ -4,6 +4,7 @@ import (
 	"embed"
 	"log"
 	"os"
+	"runtime/debug"
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/utils"
 	"strings"
@@ -16,11 +17,13 @@ var AllConf embed.FS
 func InitSelksFolder(path string) {
 	selksConfigExist, err := utils.FolderExists(path)
 	if err != nil {
+		debug.PrintStack()
 		panic(err)
 	}
 	if !selksConfigExist && app.Embed.IsTrue() {
 		err = ExtractEmbedTo("selks", app.TemplatesFolder+"selks/embedded/")
 		if err != nil {
+			debug.PrintStack()
 			panic(err)
 		}
 	}

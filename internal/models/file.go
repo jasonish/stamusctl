@@ -77,10 +77,10 @@ func (f *File) isValidPath() error {
 	}
 	// Attempt to create it
 	var d []byte
-	if err := os.MkdirAll(f.Path, 0644); err != nil {
+	if err := os.MkdirAll(f.Path, 0755); err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(f.completePath(), d, 0644); err == nil {
+	if err := ioutil.WriteFile(f.completePath(), d, 0755); err == nil {
 		os.Remove(f.completePath()) // And delete it
 		return nil
 	}

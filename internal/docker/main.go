@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"runtime/debug"
 
 	"github.com/docker/docker/client"
 )
@@ -17,6 +18,7 @@ func init() {
 	cli = docker
 
 	if err != nil {
+		debug.PrintStack()
 		panic(err)
 	}
 

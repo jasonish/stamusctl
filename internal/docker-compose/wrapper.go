@@ -4,6 +4,7 @@ import (
 	// Core
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	// Common
@@ -75,6 +76,7 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 	}
 	dockerCli, err := command.NewDockerCli(cliOptions)
 	if err != nil {
+		debug.PrintStack()
 		panic(err)
 	}
 	// Create docker command

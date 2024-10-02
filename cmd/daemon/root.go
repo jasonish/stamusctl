@@ -3,6 +3,7 @@ package daemon
 import (
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"stamus-ctl/cmd/daemon/run"
 	"stamus-ctl/internal/logging"
@@ -21,6 +22,7 @@ func Execute() {
 	// Run
 	if err := rootCmd().Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		debug.PrintStack()
 		panic(err)
 	}
 }
