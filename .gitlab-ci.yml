@@ -425,3 +425,49 @@ int compose init stmusctl compose up:
         - EMBED_MODE=true ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
         - EMBED_MODE=true ./stamusctl compose up -d
         - docker ps -a
+
+
+int compose init without embed:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
+        - cd tmp
+        - docker compose up -d
+        - docker ps -a
+        - cd ..
+        - ./stamusctl compose ps
+
+int compose init stmusctl compose up without embed:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
+        - ./stamusctl compose up -d
+        - docker ps -a
