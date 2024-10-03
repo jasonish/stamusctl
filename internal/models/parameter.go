@@ -20,6 +20,7 @@ type Parameter struct {
 	Default      Variable
 	Choices      []Variable
 	ValidateFunc func(Variable) bool
+	Hidden       bool
 }
 
 // Variable struct is used to store values of different types
@@ -103,6 +104,10 @@ func (p *Parameter) AddAsFlag(cmd *cobra.Command, persistent bool) {
 		p.AddBoolFlag(cmd, persistent)
 	case "int":
 		p.AddIntFlag(cmd, persistent)
+	}
+	// Hide the flag if needed
+	if p.Hidden {
+		cmd.Flags().MarkHidden(p.Name)
 	}
 }
 
