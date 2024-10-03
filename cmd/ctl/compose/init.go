@@ -29,6 +29,7 @@ func initCmd() *cobra.Command {
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
 	flags.Config.AddAsFlag(cmd, false)
+	flags.Template.AddAsFlag(cmd, false)
 	// Commands
 	cmd.AddCommand(SELKSCmd())
 	return cmd
@@ -50,6 +51,7 @@ func SELKSCmd() *cobra.Command {
 	flags.Values.AddAsFlag(cmd, false)
 	flags.FromFile.AddAsFlag(cmd, false)
 	flags.Config.AddAsFlag(cmd, false)
+	flags.Template.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -71,6 +73,10 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	templateFolder, err := flags.Template.GetValue()
+	if err != nil {
+		return err
+	}
 
 	// Call handler
 	selksInitParams := handlers.InitHandlerInputs{
@@ -82,6 +88,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		Values:           values.(string),
 		Config:           config.(string),
 		FromFile:         fromFile.(string),
+		TemplateFolder:   templateFolder.(string),
 	}
 	return handlers.InitHandler(true, selksInitParams)
 }

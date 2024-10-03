@@ -17,6 +17,7 @@ type InitHandlerInputs struct {
 	Values           string
 	Config           string
 	FromFile         string
+	TemplateFolder   string
 }
 
 func InitHandler(isCli bool, params InitHandlerInputs) error {
@@ -30,7 +31,13 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 		return err
 	}
 	// Instanciate config
-	config, err := instanciateConfig(filepath.Join(destPath, params.Version), params.BackupFolderPath)
+	var templatePath string
+	if params.TemplateFolder == "" {
+		templatePath = filepath.Join(destPath, params.Version)
+	} else {
+		templatePath = params.TemplateFolder
+	}
+	config, err := instanciateConfig(templatePath, params.BackupFolderPath)
 	if err != nil {
 		return err
 	}
