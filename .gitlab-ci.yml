@@ -444,6 +444,7 @@ int compose init without embed:
     before_script:
         - until docker info; do sleep 1; done
     script:
+        - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
         - ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
         - cd tmp
         - docker compose up -d
@@ -468,6 +469,7 @@ int compose init stmusctl compose up without embed:
     before_script:
         - until docker info; do sleep 1; done
     script:
+        - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
         - ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
         - ./stamusctl compose up -d
         - docker ps -a
