@@ -26,7 +26,7 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 
 	// Pull latest template
 	err := pullLatestTemplate(destPath, image)
-	if err != nil {
+	if err != nil && !app.Embed.IsTrue() {
 		return err
 	}
 	// Instanciate config
