@@ -30,6 +30,14 @@ var Values = models.Parameter{
 	Default:   models.CreateVariableString(""),
 	Usage:     "Values file to use",
 }
+var Template = models.Parameter{
+	Name:      "template",
+	Shorthand: "t",
+	Type:      "string",
+	Default:   models.CreateVariableString(""),
+	Usage:     "Template folder to use",
+	Hidden:    true,
+}
 
 // Config
 var Format = models.Parameter{
