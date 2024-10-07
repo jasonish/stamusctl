@@ -378,7 +378,7 @@ refresh-app-of-apps:
         PROJECT: $CI_PROJECT_NAME
         NAMESPACE: $CI_PROJECT_NAMESPACE
     trigger:
-        project: lanath/app-of-apps
+        project: devel/devops/app-of-app
         strategy: depend
 
 int compose init:
