@@ -82,7 +82,7 @@ If not, you can:
 
 ### Login
 `stamusctl login` is the command used to login to image registries.
-This way, you can pull images from private registries.
+This way, you can pull images from private registries. It is currently needed while we are in gitlab
 
 - `login` is used to login to image registries
   - `--registry` to select registry
@@ -92,6 +92,9 @@ This way, you can pull images from private registries.
 
 ## Examples
 ```
+// Login to a registry
+stamusctl login --registry git.stamus-networks.com:4567/lanath/configs --user <GITLAB_PAT_TOKEN_NAME> --pass <GITLAB_PAT_TOKEN>
+
 // Init via user prompt
 stamusctl compose init
 
