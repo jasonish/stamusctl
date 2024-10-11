@@ -2,6 +2,9 @@ package compose
 
 import (
 	// External
+
+	"strings"
+
 	"github.com/spf13/cobra"
 
 	// Internal
@@ -52,6 +55,7 @@ func SELKSCmd() *cobra.Command {
 	flags.FromFile.AddAsFlag(cmd, false)
 	flags.Config.AddAsFlag(cmd, false)
 	flags.Template.AddAsFlag(cmd, false)
+	flags.Version.AddAsFlag(cmd, false)
 	return cmd
 }
 
@@ -77,14 +81,27 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	version, err := flags.Version.GetValue()
+	if err != nil {
+		return err
+	}
+
+	project := "selks"
+	if len(args) > 0 {
+		firstArg := args[0]
+		if !strings.Contains(firstArg, "=") {
+			args = args[1:]
+			project = firstArg
+		}
+	}
 
 	// Call handler
 	selksInitParams := handlers.InitHandlerInputs{
 		IsDefault:        isDefault.(bool),
 		BackupFolderPath: app.DefaultSelksPath,
 		Arbitrary:        utils.ExtractArgs(args),
-		Project:          "selks",
-		Version:          "latest",
+		Project:          project,
+		Version:          version.(string),
 		Values:           values.(string),
 		Config:           config.(string),
 		FromFile:         fromFile.(string),

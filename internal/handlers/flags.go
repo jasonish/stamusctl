@@ -67,11 +67,10 @@ var FromFile = models.Parameter{
 
 // Update
 var Version = models.Parameter{
-	Name:      "version",
-	Shorthand: "v",
-	Type:      "string",
-	Usage:     "Target version",
-	Default:   models.CreateVariableString("latest"),
+	Name:    "version",
+	Type:    "string",
+	Usage:   "Target version",
+	Default: models.CreateVariableString("latest"),
 }
 
 // Registry
