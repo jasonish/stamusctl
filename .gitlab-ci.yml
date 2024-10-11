@@ -473,3 +473,30 @@ int compose init stmusctl compose up without embed:
         - ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
         - ./stamusctl compose up -d
         - docker ps -a
+
+
+int compose init stmusctl compose up down set without embed:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
+        - ./stamusctl compose init --default
+        - ./stamusctl compose up -d
+        - docker inspect suricata | jq -e '.[0].HostConfig.RestartPolicy.Name == "unless-stopped"'
+        - ./stamusctl compose down
+        - ./stamusctl config set globals.restartmode=always
+        - ./stamusctl compose up -d
+        - docker inspect suricata | jq -e '.[0].HostConfig.RestartPolicy.Name == "always"'
