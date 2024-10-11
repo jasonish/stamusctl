@@ -492,6 +492,7 @@ int compose init stmusctl compose up down set without embed:
     before_script:
         - until docker info; do sleep 1; done
     script:
+        - apk update && apk add jq
         - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
         - ./stamusctl compose init --default
         - ./stamusctl compose up -d
