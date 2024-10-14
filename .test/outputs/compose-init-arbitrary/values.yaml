@@ -1,7 +1,9 @@
 nginx:
     exec: nginx
     image: nginx:1.14.2-alpine
-stamusconfig: /root/Templates/stamus/selks/embedded/
+stamus:
+    config: /root/Templates/stamus/clearndr/embedded/
+    project: clearndr
 websocket:
     port: 6969
     response: pong
