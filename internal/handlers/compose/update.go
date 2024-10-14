@@ -129,6 +129,7 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	newConfig.GetParams().SetLooseValues(paramsArgs)
 	newConfig.GetArbitrary().SetArbitrary(paramsArgs)
 	newConfig.GetParams().ProcessOptionnalParams(false)
+	newConfig.SetProject(project)
 
 	// Ask for missing parameters
 	err = newConfig.GetParams().AskMissing()
