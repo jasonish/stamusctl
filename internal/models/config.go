@@ -11,22 +11,15 @@ import (
 	// External
 	cp "github.com/otiai10/copy"
 	"github.com/spf13/viper"
-
 	// Custom
-	"stamus-ctl/internal/app"
 )
-
-var defaultConfPath string
-
-func init() {
-	defaultConfPath = app.TemplatesFolder + "selks/embedded/"
-}
 
 // Config is a struct that represents a configuration file
 // It contains the path to the file, the arbitrary values, the parameters values and the viper instnace to interact with the file
 // It can be used to get or set values, validates them etc
 type Config struct {
 	file          File
+	project       string
 	arbitrary     *Arbitrary
 	parameters    *Parameters
 	viperInstance *viper.Viper
@@ -58,12 +51,15 @@ func LoadConfigFrom(path File, reload bool) (*Config, error) {
 	}
 	// Extract config data
 	values := configured.ExtractValues()
-	stamusConfPathPointer := values["stamusconfig"]
+	stamusConfPathPointer := values["stamus.config"]
 	stamusConfPath := *stamusConfPathPointer.String
 	file, err := CreateFileInstance(stamusConfPath, "config.yaml")
 	if err != nil {
 		return nil, err
 	}
+	// Get project
+	project := values["stamus.project"]
+	projectName := *project.String
 	// Load origin config
 	originConf, err := NewConfigFrom(file)
 	if err != nil {
@@ -81,6 +77,7 @@ func LoadConfigFrom(path File, reload bool) (*Config, error) {
 	}
 	// Merge
 	originConf.parameters.SetValues(values)
+	originConf.SetProject(projectName)
 	return originConf, nil
 }
 
@@ -389,11 +386,12 @@ func (f *Config) saveParamsTo(dest File) error {
 	for key, value := range f.arbitrary.AsMap() {
 		conf.viperInstance.Set(key, value)
 	}
-	// conf.viperInstance.Set("stamusconfig", f.file.Path)
 	for key, value := range paramsValues {
 		conf.viperInstance.Set(key, value)
 	}
-	// If latest, set stamusconfig value to version
+	// Project
+	conf.viperInstance.Set("stamus.project", f.project)
+	// If latest, set stamus.config value to version
 	path := removeEmptyStrings(strings.Split(f.file.Path, "/"))
 	if path[len(path)-1] == "latest" {
 		// Get version
@@ -406,9 +404,9 @@ func (f *Config) saveParamsTo(dest File) error {
 		var versionPath []string = append([]string{}, path...)
 		copy(versionPath, path)
 		versionPath[len(versionPath)-1] = string(version)
-		conf.viperInstance.Set("stamusconfig", "/"+filepath.Join(versionPath...))
+		conf.viperInstance.Set("stamus.config", "/"+filepath.Join(versionPath...))
 	} else {
-		conf.viperInstance.Set("stamusconfig", f.file.Path)
+		conf.viperInstance.Set("stamus.config", f.file.Path)
 	}
 
 	// Write the new config file
@@ -419,6 +417,10 @@ func (f *Config) saveParamsTo(dest File) error {
 	}
 
 	return nil
+}
+
+func (f *Config) SetProject(project string) {
+	f.project = project
 }
 
 func removeEmptyStrings(s []string) []string {

@@ -3,7 +3,7 @@ echo "Running move.sh"
 
 # Define source and destination directories
 SOURCE_DIR=$PWD"/.test/config"
-DEST_DIR=$PWD"/internal/embeds/selks"
+DEST_DIR=$PWD"/internal/embeds/clearndr"
 
 
 # Check if the source directory exists

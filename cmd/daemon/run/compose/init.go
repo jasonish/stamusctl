@@ -32,7 +32,7 @@ func initHandler(c *gin.Context) {
 		req.Values = make(map[string]string)
 	}
 	if req.Project == "" {
-		req.Project = "selks"
+		req.Project = "clearndr"
 	}
 	if req.Version == "" {
 		req.Version = "latest"
@@ -47,7 +47,7 @@ func initHandler(c *gin.Context) {
 	// Call handler
 	parameters := handlers.InitHandlerInputs{
 		IsDefault:        req.IsDefault,
-		BackupFolderPath: app.DefaultSelksPath,
+		BackupFolderPath: app.DefaultClearNDRPath,
 		Arbitrary:        req.Values,
 		Project:          req.Project,
 		Version:          req.Version,

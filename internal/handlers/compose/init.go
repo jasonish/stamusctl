@@ -59,6 +59,7 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 	if err != nil {
 		return err
 	}
+	config.SetProject(params.Project)
 
 	// Validate parameters
 	err = config.GetParams().ValidateAll()

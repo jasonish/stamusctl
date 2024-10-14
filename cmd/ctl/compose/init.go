@@ -18,13 +18,13 @@ import (
 // Commands
 func initCmd() *cobra.Command {
 	// Setup
-	embeds.InitSelksFolder(app.DefaultSelksPath)
+	embeds.InitClearNDRFolder(app.DefaultClearNDRPath)
 	// Command
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Init compose config file",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return SELKSHandler(cmd, args)
+			return handler(cmd, args)
 		},
 	}
 	// Flags
@@ -34,19 +34,20 @@ func initCmd() *cobra.Command {
 	flags.Config.AddAsFlag(cmd, false)
 	flags.Template.AddAsFlag(cmd, false)
 	// Commands
-	cmd.AddCommand(SELKSCmd())
+	cmd.AddCommand(ClearNDRCmd())
 	return cmd
 }
 
-func SELKSCmd() *cobra.Command {
+func ClearNDRCmd() *cobra.Command {
 	// Setup
-	embeds.InitSelksFolder(app.DefaultSelksPath)
+	embeds.InitClearNDRFolder(app.DefaultClearNDRPath)
 	// Command
 	cmd := &cobra.Command{
-		Use:   "selks",
-		Short: "Init SELKS container compose file",
+		Use:   "clearndr",
+		Short: "Init ClearNDR container compose file",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return SELKSHandler(cmd, args)
+			args = append([]string{"clearndr"}, args...)
+			return handler(cmd, args)
 		},
 	}
 	// Flags
@@ -59,7 +60,7 @@ func SELKSCmd() *cobra.Command {
 	return cmd
 }
 
-func SELKSHandler(cmd *cobra.Command, args []string) error {
+func handler(cmd *cobra.Command, args []string) error {
 	// Get flags
 	isDefault, err := flags.IsDefaultParam.GetValue()
 	if err != nil {
@@ -86,7 +87,7 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	project := "selks"
+	project := "clearndr"
 	if len(args) > 0 {
 		firstArg := args[0]
 		if !strings.Contains(firstArg, "=") {
@@ -96,9 +97,9 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	// Call handler
-	selksInitParams := handlers.InitHandlerInputs{
+	initParams := handlers.InitHandlerInputs{
 		IsDefault:        isDefault.(bool),
-		BackupFolderPath: app.DefaultSelksPath,
+		BackupFolderPath: app.DefaultClearNDRPath,
 		Arbitrary:        utils.ExtractArgs(args),
 		Project:          project,
 		Version:          version.(string),
@@ -107,5 +108,5 @@ func SELKSHandler(cmd *cobra.Command, args []string) error {
 		FromFile:         fromFile.(string),
 		TemplateFolder:   templateFolder.(string),
 	}
-	return handlers.InitHandler(true, selksInitParams)
+	return handlers.InitHandler(true, initParams)
 }

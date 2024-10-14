@@ -19,7 +19,7 @@ type Containers struct {
 // Init
 type InitRequest struct {
 	IsDefault  bool              `json:"default"`     // Use default settings, default is false
-	Project    string            `json:"project"`     // Project name, default is "selks"
+	Project    string            `json:"project"`     // Project name, default is "clearndr"
 	Values     map[string]string `json:"values"`      // Values to set, key is the name of the value, value is the value
 	Version    string            `json:"version"`     // Target version, default is latest
 	ValuesPath string            `json:"values_path"` // Path to a values.yaml file

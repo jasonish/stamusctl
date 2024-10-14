@@ -14,7 +14,7 @@ import (
 // Init
 func init() {
 	// Setup
-	embeds.InitSelksFolder(app.DefaultSelksPath)
+	embeds.InitClearNDRFolder(app.DefaultClearNDRPath)
 }
 
 // Commands

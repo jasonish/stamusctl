@@ -51,7 +51,7 @@ func GenerateSSLWithDocker(sslPath string) error {
 	_, err = docker.RunContainer("nginx", []string{
 		"openssl",
 		"req", "-new", "-nodes", "-x509",
-		"-subj", "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS",
+		"-subj", "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=ClearNDR",
 		"-days", "3650",
 		"-keyout", "/etc/nginx/ssl/scirius.key",
 		"-out", "/etc/nginx/ssl/scirius.crt",

@@ -16,6 +16,8 @@ import (
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
 	"stamus-ctl/internal/utils"
+
+	"github.com/spf13/viper"
 )
 
 type UpdateHandlerParams struct {
@@ -39,9 +41,26 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	args := params.Args
 	versionVal := params.Version
 
+	// Get project
+	viperInstance := viper.New()
+	// General configuration
+	viperInstance.SetEnvPrefix(app.Name)
+	viperInstance.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	viperInstance.AutomaticEnv()
+	// Specific configuration
+	viperInstance.SetConfigName("values")
+	viperInstance.SetConfigType("yaml")
+	viperInstance.AddConfigPath(configPath)
+	// Read the config file
+	err := viperInstance.ReadInConfig()
+	if err != nil {
+		return fmt.Errorf("cannot read config file: %w", err)
+	}
+	project := viperInstance.GetString("stamus.project")
+
 	// Get registry info
-	image := "/selks:" + versionVal
-	destPath := filepath.Join(app.TemplatesFolder + "selks/")
+	image := "/" + project + ":" + versionVal
+	destPath := filepath.Join(app.TemplatesFolder + project + "/")
 	latestPath := filepath.Join(destPath, "latest/")
 
 	// Get registries infos

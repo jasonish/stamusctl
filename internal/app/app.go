@@ -13,16 +13,16 @@ import (
 
 // Variables
 var (
-	Name              = ""
-	Mode              = ModeStruct("prod")
-	Embed             = EmbedStruct("false")
-	ConfigFolder      = "/"
-	ConfigsFolder     = "/"
-	TemplatesFolder   = "/"
-	DefaultSelksPath  = "/"
-	LatestSelksPath   = "/"
-	DefaultConfigName = "tmp"
-	StamusAppName     = ""
+	Name                = ""
+	Mode                = ModeStruct("prod")
+	Embed               = EmbedStruct("false")
+	ConfigFolder        = "/"
+	ConfigsFolder       = "/"
+	TemplatesFolder     = "/"
+	DefaultClearNDRPath = "/"
+	LatestClearNDRPath  = "/"
+	DefaultConfigName   = "tmp"
+	StamusAppName       = ""
 )
 
 // Constants
@@ -73,8 +73,8 @@ func init() {
 	}
 
 	// Derived paths
-	DefaultSelksPath = TemplatesFolder + "selks/embedded/"
-	LatestSelksPath = TemplatesFolder + "selks/latest/"
+	DefaultClearNDRPath = TemplatesFolder + "clearndr/embedded/"
+	LatestClearNDRPath = TemplatesFolder + "clearndr/latest/"
 	ConfigsFolder = ConfigFolder + "configs/"
 
 }

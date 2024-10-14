@@ -10,18 +10,18 @@ import (
 	"strings"
 )
 
-//go:embed selks/*
+//go:embed clearndr/*
 var AllConf embed.FS
 
-// Create SELKS folder if it does not exist
-func InitSelksFolder(path string) {
-	selksConfigExist, err := utils.FolderExists(path)
+// Create ClearNDR folder if it does not exist
+func InitClearNDRFolder(path string) {
+	clearndrConfigExist, err := utils.FolderExists(path)
 	if err != nil {
 		debug.PrintStack()
 		panic(err)
 	}
-	if !selksConfigExist && app.Embed.IsTrue() {
-		err = ExtractEmbedTo("selks", app.TemplatesFolder+"selks/embedded/")
+	if !clearndrConfigExist && app.Embed.IsTrue() {
+		err = ExtractEmbedTo("clearndr", app.TemplatesFolder+"clearndr/embedded/")
 		if err != nil {
 			debug.PrintStack()
 			panic(err)
