@@ -15,6 +15,14 @@ import (
 	"stamus-ctl/internal/utils"
 )
 
+// Const
+const (
+	InitHelp = `Init compose config file
+	You can set parameters in the config file or pass them as arguments.
+	(ex: parameter.subparameter=value)
+	`
+)
+
 // Commands
 func initCmd() *cobra.Command {
 	// Setup
@@ -23,6 +31,7 @@ func initCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Init compose config file",
+		Long:  InitHelp,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return handler(cmd, args)
 		},
@@ -45,6 +54,7 @@ func ClearNDRCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "clearndr",
 		Short: "Init ClearNDR container compose file",
+		Long:  InitHelp,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			args = append([]string{"clearndr"}, args...)
 			return handler(cmd, args)
