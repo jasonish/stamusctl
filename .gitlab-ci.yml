@@ -263,7 +263,7 @@ compose init:
     script:
         - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init
 
 compose init conf flag:
     image: busybox
@@ -291,7 +291,7 @@ compose init set:
     script:
         - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx websocket.response=lel
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init-set
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init-set
 
 compose init optional:
     image: busybox
@@ -305,7 +305,7 @@ compose init optional:
     script:
         - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx=false
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init-optional
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init-optional
 
 compose init arbitrary:
     image: busybox
@@ -319,7 +319,7 @@ compose init arbitrary:
     script:
         - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx websocket.port=6969
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init-arbitrary
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init-arbitrary
 
 compose config set:
     image: busybox
@@ -334,7 +334,7 @@ compose config set:
         - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx
         - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set websocket.response=lel
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init-set
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init-set
 
 compose config reload:
     image: busybox
@@ -350,7 +350,7 @@ compose config reload:
         - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set websocket.port=6969
         - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set --reload
         - chmod +x $(pwd)/scripts/compare.sh
-        - $(pwd)/scripts/compare.sh tmp ./outputs/compose-init
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init
 
 config flag set:
     image: busybox
@@ -399,7 +399,7 @@ int compose init:
         - until docker info; do sleep 1; done
     script:
         - EMBED_MODE=true ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
-        - cd tmp
+        - cd config
         - docker compose up -d
         - docker ps -a
         - cd ..
@@ -446,7 +446,7 @@ int compose init without embed:
     script:
         - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
         - ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
-        - cd tmp
+        - cd config
         - docker compose up -d
         - docker ps -a
         - cd ..

@@ -2,6 +2,7 @@ dist/
 docker/
 scripts/
 tmp/
+config/
 
 .air.toml
 .dockerignore

@@ -21,7 +21,7 @@ var (
 	TemplatesFolder     = "/"
 	DefaultClearNDRPath = "/"
 	LatestClearNDRPath  = "/"
-	DefaultConfigName   = "tmp"
+	DefaultConfigName   = "config"
 	StamusAppName       = ""
 )
 

@@ -4,7 +4,7 @@ import "github.com/docker/docker/api/types"
 
 // Common
 type Config struct {
-	Value string `json:"config"` // Config name, default is tmp
+	Value string `json:"config"` // Config name, default is config
 }
 type ErrorResponse struct {
 	Error string `json:"error"`
