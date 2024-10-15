@@ -444,6 +444,7 @@ int compose init without embed:
     before_script:
         - until docker info; do sleep 1; done
     script:
+        - docker login -u $GITLAB_REGISTRY_USER -p $GITLAB_REGISTRY_TOKEN git.stamus-networks.com:4567
         - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
         - ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
         - cd config
@@ -469,6 +470,7 @@ int compose init stmusctl compose up without embed:
     before_script:
         - until docker info; do sleep 1; done
     script:
+        - docker login -u $GITLAB_REGISTRY_USER -p $GITLAB_REGISTRY_TOKEN git.stamus-networks.com:4567
         - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
         - ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
         - ./stamusctl compose up -d
@@ -493,6 +495,7 @@ int compose init stmusctl compose up down set without embed:
         - until docker info; do sleep 1; done
     script:
         - apk update && apk add jq
+        - docker login -u $GITLAB_REGISTRY_USER -p $GITLAB_REGISTRY_TOKEN git.stamus-networks.com:4567
         - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
         - ./stamusctl compose init --default
         - ./stamusctl compose up -d
