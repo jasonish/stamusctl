@@ -12,6 +12,8 @@ daemon tests:
     # image: golang:alpine
     # extends: .go-cache
     stage: ut
+    tags:
+        - k8s
     script:
         - $(pwd)/scripts/move.sh
         - make daemon-test
