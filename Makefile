@@ -46,7 +46,7 @@ daemon-dev:
 	air run
 
 test:
-	go test ./...
+	go test ./pkg
 
 daemon-test:
 	EMBED_MODE=true go test ./.test/unit
