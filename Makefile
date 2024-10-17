@@ -48,7 +48,11 @@ daemon-dev:
 test:
 	go test ./pkg
 
-daemon-test:
+daemon-test: init-embeds
 	EMBED_MODE=true go test ./.test/unit
 
-.PHONY: all cli daemon test
+# This step is needed in tests to have embeds loaded in some xdg paths
+init-embeds:
+	STAMUS_APP_NAME=stamusctl EMBED_MODE=true go run ./cmd compose init -h
+
+.PHONY: all cli test-cli daemon daemon-dev test daemon-test init-embeds
