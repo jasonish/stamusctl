@@ -1,23 +1,4 @@
 
-kaniko cli:
-    stage: build
-    before_script: []
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
-    needs:
-        - unit tests
-    script:
-        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-        - /kaniko/executor
-          --context "${CI_PROJECT_DIR}"
-          --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.cli"
-          --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
-          --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}"
-          --cache=true
-          --cache-copy-layers=true
-          --cache-ttl=72h
-
 docker cli:
     stage: build
     image: docker:24.0.5
@@ -41,46 +22,6 @@ docker cli:
         - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
         - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}
 
-kaniko cli main:
-    stage: build
-    before_script: []
-    only:
-        - main
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
-    needs:
-        - unit tests
-    script:
-        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-        - /kaniko/executor
-          --context "${CI_PROJECT_DIR}"
-          --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.cli"
-          --destination "${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_SHORT_SHA}"
-          --destination "${CI_REGISTRY_IMAGE}/cli:latest"
-          --cache=true
-          --cache-copy-layers=true
-          --cache-ttl=72h
-
-kaniko daemon:
-    stage: build
-    before_script: []
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
-    needs:
-        - daemon tests
-    script:
-        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-        - /kaniko/executor
-          --context "${CI_PROJECT_DIR}"
-          --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.daemon"
-          --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}"
-          --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}"
-          --cache=true
-          --cache-copy-layers=true
-          --cache-ttl=72h
-
 docker daemon:
     stage: build
     image: docker:24.0.5
@@ -103,27 +44,6 @@ docker daemon:
           -f "${CI_PROJECT_DIR}/docker/Dockerfile.daemon"
         - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
         - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}
-
-kaniko daemon main:
-    stage: build
-    before_script: []
-    only:
-        - main
-    image:
-        name: gcr.io/kaniko-project/executor:v1.14.0-debug
-        entrypoint: ['']
-    needs:
-        - daemon tests
-    script:
-        - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"},\"$(echo -n $CI_DEPENDENCY_PROXY_SERVER | awk -F[:] '{print $1}')\":{\"auth\":\"$(printf "%s:%s" ${CI_DEPENDENCY_PROXY_USER} "${CI_DEPENDENCY_PROXY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-        - /kaniko/executor
-          --context "${CI_PROJECT_DIR}"
-          --dockerfile "${CI_PROJECT_DIR}/docker/Dockerfile.daemon"
-          --destination "${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_SHORT_SHA}"
-          --destination "${CI_REGISTRY_IMAGE}/daemon:latest"
-          --cache=true
-          --cache-copy-layers=true
-          --cache-ttl=72h
 
 build cli:
     # image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
