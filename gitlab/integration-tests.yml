@@ -1,0 +1,153 @@
+
+int compose init:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - EMBED_MODE=true ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
+        - cd config
+        - docker compose up -d
+        - docker ps -a
+        - cd ..
+        - EMBED_MODE=true ./stamusctl compose ps
+
+int compose init stmusctl compose up:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - EMBED_MODE=true ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
+        - EMBED_MODE=true ./stamusctl compose up -d
+        - docker ps -a
+
+
+int compose init without embed:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - docker login -u $GITLAB_REGISTRY_USER -p $GITLAB_REGISTRY_TOKEN git.stamus-networks.com:4567
+        - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
+        - ./stamusctl compose init --default scirius.token=1234y suricata.interfaces=eth0
+        - cd config
+        - docker compose up -d
+        - docker ps -a
+        - cd ..
+        - ./stamusctl compose ps
+
+int compose init stmusctl compose up without embed:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - docker login -u $GITLAB_REGISTRY_USER -p $GITLAB_REGISTRY_TOKEN git.stamus-networks.com:4567
+        - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
+        - ./stamusctl compose init --default scirius.token=1234 suricata.interfaces=eth0
+        - ./stamusctl compose up -d
+        - docker ps -a
+
+
+int compose init stmusctl compose up down set without embed:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - apk update && apk add jq
+        - docker login -u $GITLAB_REGISTRY_USER -p $GITLAB_REGISTRY_TOKEN git.stamus-networks.com:4567
+        - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
+        - ./stamusctl compose init --default
+        - ./stamusctl compose up -d
+        - docker inspect suricata | jq -e '.[0].HostConfig.RestartPolicy.Name == "unless-stopped"'
+        - ./stamusctl compose down
+        - ./stamusctl config set globals.restartmode=always
+        - ./stamusctl compose up -d
+        - docker inspect suricata | jq -e '.[0].HostConfig.RestartPolicy.Name == "always"'
+
+
+
+compose init tests stmusctl compose up down set without embed:
+    stage: integration
+    image: docker:24.0.5
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    before_script:
+        - until docker info; do sleep 1; done
+    script:
+        - apk update && apk add jq
+        - ./stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
+        - ./stamusctl compose init tests --default
+        - ./stamusctl compose up -d
+        - docker inspect nginx | jq -e '.[0].HostConfig.RestartPolicy.Name == "unless-stopped"'
+        - ./stamusctl compose down
+        - ./stamusctl config set globals.restartmode=always
+        - ./stamusctl compose up -d
+        - docker inspect nginx | jq -e '.[0].HostConfig.RestartPolicy.Name == "always"'

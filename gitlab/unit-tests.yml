@@ -1,0 +1,22 @@
+
+unit tests:
+    # image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
+    image: golang:alpine
+    extends: .go-cache
+    stage: ut
+    script:
+        - apk add --no-cache gcc musl-dev make
+        - go install github.com/swaggo/swag/cmd/swag@latest
+        - make test
+
+daemon tests:
+    # image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
+    image: golang:alpine
+    extends: .go-cache
+    stage: ut
+    script:
+        - apk add --no-cache gcc musl-dev make
+        - go install github.com/swaggo/swag/cmd/swag@latest
+        - $(pwd)/scripts/move.sh
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true go run ./cmd compose init -h
+        - make daemon-test

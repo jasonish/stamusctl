@@ -1,0 +1,13 @@
+refresh-app-of-apps:
+    stage: deploy
+    needs:
+        - test daemon
+    variables:
+        APP: stamusd
+        BRANCH: $CI_COMMIT_BRANCH
+        SHA: $CI_COMMIT_SHORT_SHA
+        PROJECT: $CI_PROJECT_NAME
+        NAMESPACE: $CI_PROJECT_NAMESPACE
+    trigger:
+        project: devel/devops/app-of-app
+        strategy: depend

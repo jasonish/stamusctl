@@ -1,0 +1,140 @@
+
+test cli:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build cli
+    dependencies:
+        - build cli
+    script:
+        - STAMUS_APP_NAME=stamusctl ./stamusctl
+
+test daemon:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build daemon
+    dependencies:
+        - build daemon
+    script:
+        - STAMUS_APP_NAME=stamusd ./stamusd
+
+compose init:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init
+
+compose init conf flag:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx --config zgueg
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh zgueg ./outputs/compose-init
+
+compose init set:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx websocket.response=lel
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init-set
+
+compose init optional:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx=false
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init-optional
+
+compose init arbitrary:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx websocket.port=6969
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init-arbitrary
+
+compose config set:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set websocket.response=lel
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init-set
+
+compose config reload:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set websocket.port=6969
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set --reload
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh config ./outputs/compose-init
+
+config flag set:
+    image: busybox
+    stage: func-test
+    tags:
+        - k8s-small
+    needs:
+        - build test
+    dependencies:
+        - build test
+    script:
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli compose init --default nginx.exec=nginx --config zgueg
+        - STAMUS_APP_NAME=stamusctl EMBED_MODE=true ./cli config set websocket.response=lel --config zgueg
+        - chmod +x $(pwd)/scripts/compare.sh
+        - $(pwd)/scripts/compare.sh zgueg ./outputs/compose-init-set
