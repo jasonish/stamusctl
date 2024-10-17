@@ -46,9 +46,9 @@ docker daemon:
         - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}
 
 build cli:
-    # image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
-    image: golang:alpine
-    extends: .go-cache
+    image: git.stamus-networks.com:4567/devel/devops/images-utils/stamusctl-build-image:latest
+    # image: golang:alpine
+    # extends: .go-cache
     stage: build
     artifacts:
         expire_in: 1 day
@@ -57,15 +57,13 @@ build cli:
     needs:
         - unit tests
     script:
-        - apk add --no-cache gcc musl-dev make
-        - go install github.com/swaggo/swag/cmd/swag@latest
         - make cli
         - mv dist/stamusctl .
 
 build daemon:
-    # image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
-    image: golang:alpine
-    extends: .go-cache
+    image: git.stamus-networks.com:4567/devel/devops/images-utils/stamusctl-build-image:latest
+    # image: golang:alpine
+    # extends: .go-cache
     stage: build
     artifacts:
         expire_in: 1 day
@@ -74,16 +72,13 @@ build daemon:
     needs:
         - daemon tests
     script:
-        - apk add --no-cache gcc musl-dev make
-        - go install github.com/swaggo/swag/cmd/swag@latest
-        # - swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/
         - make daemon
         - mv dist/stamusd .
 
 build test:
-    # image: git.stamus-networks.com:4567/lanath/lab/stamusctl-build-image:latest
-    image: golang:alpine
-    extends: .go-cache
+    image: git.stamus-networks.com:4567/devel/devops/images-utils/stamusctl-build-image:latest
+    # image: golang:alpine
+    # extends: .go-cache
     stage: build
     artifacts:
         expire_in: 1 day
@@ -93,8 +88,6 @@ build test:
     needs:
         - unit tests
     script:
-        - apk add --no-cache gcc musl-dev make
-        - go install github.com/swaggo/swag/cmd/swag@latest
         - chmod +x $(pwd)/scripts/move.sh
         - $(pwd)/scripts/move.sh
         - make test-cli
