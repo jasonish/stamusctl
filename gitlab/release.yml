@@ -11,3 +11,21 @@ refresh-app-of-apps:
     trigger:
         project: devel/devops/app-of-app
         strategy: depend
+
+release-to-github:
+    stage: release
+    image: bitnami/git
+    needs:
+        - full test w test config
+    rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    script:
+        - git config --global user.email $GITLAB_USER_EMAIL
+        - git config --global user.name $GITLAB_USER_NAME
+        - git remote add github "https://$GITHUB_USERNAME:$GITHUB_PAT@github.com/StamusNetworks/stamusctl.git"
+        - git fetch github
+        - git checkout -b github-trunk
+        - git branch --set-upstream-to github/trunk
+        - git pull --rebase
+        - git push github HEAD:trunk

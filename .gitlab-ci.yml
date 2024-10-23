@@ -8,6 +8,7 @@ stages:
     - func-test
     - deploy
     - integration
+    - release
 
 .go-cache:
     variables:
