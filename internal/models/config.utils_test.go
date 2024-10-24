@@ -6,18 +6,18 @@ import (
 	"github.com/go-playground/assert/v2"
 )
 
-// func TestNestMap(t *testing.T) {
-// 	result := nestMap(map[string]interface{}{
-// 		"Release.truc":   "test",
-// 		"Release.machin": "test",
-// 	})
-// 	assert.Equal(t, map[string]interface{}{
-// 		"Release": map[string]interface{}{
-// 			"truc":   "test",
-// 			"machin": "test",
-// 		},
-// 	}, result)
-// }
+func TestNestMap(t *testing.T) {
+	result := nestMap(map[string]interface{}{
+		"Release.truc":   "test",
+		"Release.machin": "test",
+	})
+	assert.Equal(t, map[string]interface{}{
+		"Release": map[string]interface{}{
+			"truc":   "test",
+			"machin": "test",
+		},
+	}, result)
+}
 
 func TestNestMapWithMoreNesting(t *testing.T) {
 	result := nestMap(map[string]interface{}{

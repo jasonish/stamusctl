@@ -90,22 +90,23 @@ func getAllFiles(folderPath string, extension string) ([]string, error) {
 // Nests a flat map into a nested map
 func nestMap(input map[string]interface{}) map[string]interface{} {
 	output := make(map[string]interface{})
-	// (Impressive) Reccursive stuff happening here
+
 	for key, value := range input {
 		parts := strings.Split(key, ".")
+		currentMap := output
 
-		if len(parts) > 1 {
-			subMap := nestMap(map[string]interface{}{strings.Join(parts[1:], "."): value})
-
-			if existingMap, ok := output[parts[0]].(map[string]interface{}); ok {
-				for k, v := range subMap {
-					existingMap[k] = v
-				}
+		for i, part := range parts {
+			if i == len(parts)-1 {
+				// Last part, set the value
+				currentMap[part] = value
 			} else {
-				output[parts[0]] = subMap
+				// Intermediate part, ensure the map exists
+				if _, ok := currentMap[part]; !ok {
+					currentMap[part] = make(map[string]interface{})
+				}
+				// Move to the next level in the map
+				currentMap = currentMap[part].(map[string]interface{})
 			}
-		} else {
-			output[key] = value
 		}
 	}
 
