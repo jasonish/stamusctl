@@ -3,5 +3,5 @@ package app
 var (
 	Arch    = ""
 	Commit  = ""
-	Version = ""
+	Version = "0.1"
 )

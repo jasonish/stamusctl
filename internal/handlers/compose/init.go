@@ -81,7 +81,7 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 	if err != nil {
 		return err
 	}
-	err = config.SaveConfigTo(outputFile)
+	err = config.SaveConfigTo(outputFile, false, true)
 	if err != nil {
 		return err
 	}

@@ -68,7 +68,10 @@ func SetHandler(params SetHandlerInputs) error {
 	if err != nil {
 		return err
 	}
-	config.SaveConfigTo(outputAsFile)
+	err = config.SaveConfigTo(outputAsFile, false, false)
+	if err != nil {
+		return err
+	}
 	// Apply the configuration
 	if params.Apply {
 		err = compose.HandleUp()

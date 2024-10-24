@@ -229,8 +229,12 @@ func (f *Config) CopyToPath(dest string) error {
 	return cp.Copy(f.file.Path, dest)
 }
 
+func addValuePrefix(key string) string {
+	return fmt.Sprintf("Values.%s", key)
+}
+
 // Save the config to a folder
-func (f *Config) SaveConfigTo(dest File) error {
+func (f *Config) SaveConfigTo(dest File, isUpgrade, isInstall bool) error {
 	// Create config value map
 	var data = map[string]any{}
 	var configData = map[string]any{}
@@ -245,14 +249,30 @@ func (f *Config) SaveConfigTo(dest File) error {
 	}
 	// Merge with arbitrary config values and cerate a nested map
 	for key, value := range f.arbitrary.AsMap() {
-		data[key] = value
+		data[addValuePrefix(key)] = value
 	}
 	for key, value := range configData {
+		data[addValuePrefix(key)] = value
+	}
+	// Release
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	configDir := filepath.Join(currentDir, dest.Path)
+	release := *NewRelease(f.project, configDir, isUpgrade, isInstall)
+	for key, value := range release.AsMap() {
 		data[key] = value
 	}
+	// Template
+	templateObject := *NewTemplate(f.file.Path)
+	for key, value := range templateObject.AsMap() {
+		data[key] = value
+	}
+
 	data = nestMap(data)
 	// Process templates
-	err := processTemplates(f.file.Path, dest.Path, data)
+	err = processTemplates(f.file.Path, dest.Path, data)
 	if err != nil {
 		log.Println("Error processing templates", err)
 		return err
@@ -408,7 +428,6 @@ func (f *Config) saveParamsTo(dest File) error {
 	} else {
 		conf.viperInstance.Set("stamus.config", f.file.Path)
 	}
-
 	// Write the new config file
 	err = conf.viperInstance.WriteConfig()
 	if err != nil {

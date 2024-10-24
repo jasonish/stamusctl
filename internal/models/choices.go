@@ -76,7 +76,7 @@ func getInterfacesBusybox() ([]Variable, error) {
 
 	s := logging.NewSpinner(
 		"Identifying interfaces",
-		"Did identify interfaces\n",
+		"",
 	)
 
 	_, err := docker.PullImageIfNotExisted("docker.io/library/", "busybox")

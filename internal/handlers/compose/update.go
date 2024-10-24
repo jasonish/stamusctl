@@ -138,7 +138,7 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	}
 
 	// Save the configuration
-	err = newConfig.SaveConfigTo(confFile)
+	err = newConfig.SaveConfigTo(confFile, false, true)
 	if err != nil {
 		return err
 	}
