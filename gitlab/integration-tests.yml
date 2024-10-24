@@ -26,3 +26,28 @@ full test w test config:
         - ./stamusctl config set globals.restartmode=always
         - ./stamusctl compose up -d
         - docker inspect nginx | jq -e '.[0].HostConfig.RestartPolicy.Name == "always"'
+
+full test w debug image:
+    stage: integration
+    image: git.stamus-networks.com:4567/devel/stamus-ctl/cli:$CI_COMMIT_BRANCH
+    tags:
+      - k8s-small
+    variables:
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_TLS_CERTDIR: '/certs'
+        DOCKER_TLS_VERIFY: 1
+        DOCKER_CERT_PATH: '$DOCKER_TLS_CERTDIR/client'
+    services:
+        - docker:24.0.5-dind
+    needs:
+        - docker cli
+    script:
+        - apk update && apk add jq
+        - stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
+        - stamusctl compose init tests --default
+        - stamusctl compose up -d
+        - docker inspect nginx | jq -e '.[0].HostConfig.RestartPolicy.Name == "unless-stopped"'
+        - stamusctl compose down
+        - stamusctl config set globals.restartmode=always
+        - stamusctl compose up -d
+        - docker inspect nginx | jq -e '.[0].HostConfig.RestartPolicy.Name == "always"'
