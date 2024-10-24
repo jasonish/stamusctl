@@ -1,3 +1,3 @@
 {{- define "websocketport"}}
-{{- .websocket.port | default 8080}}
+{{- .Values.websocket.port | default 8080}}
 {{- end}}
