@@ -265,7 +265,7 @@ func (f *Config) SaveConfigTo(dest File, isUpgrade, isInstall bool) error {
 		data[key] = value
 	}
 	// Template
-	templateObject := *NewTemplate(f.file.Path)
+	templateObject := *NewTemplate(f.project, f.file.Path)
 	for key, value := range templateObject.AsMap() {
 		data[key] = value
 	}
