@@ -46,7 +46,7 @@ daemon-dev:
 	air run
 
 test:
-	go test ./pkg
+	go test ./internal/models
 
 daemon-test: init-embeds
 	EMBED_MODE=true go test ./.test/unit
