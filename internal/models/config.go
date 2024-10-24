@@ -254,6 +254,7 @@ func (f *Config) SaveConfigTo(dest File, isUpgrade, isInstall bool) error {
 	for key, value := range configData {
 		data[addValuePrefix(key)] = value
 	}
+
 	// Release
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -270,7 +271,12 @@ func (f *Config) SaveConfigTo(dest File, isUpgrade, isInstall bool) error {
 		data[key] = value
 	}
 
+	for key, value := range data {
+		log.Println("Data before nesting", key, value)
+	}
+
 	data = nestMap(data)
+	log.Println("Data after nesting", data)
 	// Process templates
 	err = processTemplates(f.file.Path, dest.Path, data)
 	if err != nil {
