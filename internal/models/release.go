@@ -77,12 +77,11 @@ type Template struct {
 	templateVersion string
 }
 
-func NewTemplate(name string) *Template {
-	splitted := strings.Split(name, "/")
-	version := strings.Join(splitted[len(splitted)-2:], "/")
+func NewTemplate(name string, templatePath string) *Template {
+	splitted := strings.Split(templatePath, "/")
 	return &Template{
 		templateName:    name,
-		templateVersion: version,
+		templateVersion: splitted[len(splitted)-1],
 	}
 }
 

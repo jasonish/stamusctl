@@ -260,7 +260,7 @@ func (f *Config) SaveConfigTo(dest File, isUpgrade, isInstall bool) error {
 		return err
 	}
 	configDir := filepath.Join(currentDir, dest.Path)
-	release := *NewRelease(f.project, configDir, isUpgrade, isInstall)
+	release := *NewRelease(dest.Path, configDir, isUpgrade, isInstall)
 	for key, value := range release.AsMap() {
 		data[key] = value
 	}
