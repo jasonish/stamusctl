@@ -1,27 +1,27 @@
 services:
-  {{- if .nginx}}
+  {{- if .Values.nginx}}
   nginx:
-    image: {{.nginx.image}}
+    image: {{.Values.nginx.image}}
     container_name: nginx
     restart: always
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d/
     ports:
       - 80:80
-  {{- if .websocket}}
+  {{- if .Values.websocket}}
     depends_on:
       - websocket
   {{- end}}
   {{- end}}
 
-  {{- if .websocket}}
+  {{- if .Values.websocket}}
   websocket:
     container_name: websocket
     environment:
       - WEBSOCKET_PORT={{- template "websocketport" .}}
-      - RESPONSE={{- .websocket.response}}
+      - RESPONSE={{- .Values.websocket.response}}
     restart: always
-    {{- if not .nginx}}
+    {{- if not .Values.nginx}}
     ports:
       - 80:{{- template "websocketport" .}}
     {{- end}}
