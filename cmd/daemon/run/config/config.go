@@ -12,7 +12,7 @@ import (
 // setHandler godoc
 // @Summary Set configuration
 // @Description Sets configuration with provided parameters.
-// @Tags set
+// @Tags config
 // @Accept json
 // @Produce json
 // @Param set body pkg.SetRequest true "Set parameters"
@@ -62,7 +62,7 @@ func setHandler(c *gin.Context) {
 // setCurrentHandler godoc
 // @Summary Set current configuration
 // @Description Sets configuration with provided parameters.
-// @Tags set
+// @Tags config
 // @Accept json
 // @Produce json
 // @Param set body pkg.Config true "Configuration name to use"
@@ -91,10 +91,10 @@ func setCurrentHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "ok"})
 }
 
-// setCurrentHandler godoc
+// getConfigListHandler godoc
 // @Summary Set current configuration
 // @Description Sets configuration with provided parameters.
-// @Tags set
+// @Tags config
 // @Accept json
 // @Produce json
 // @Success 200 {object} pkg.GetListResponse "Configuration list"
@@ -116,9 +116,9 @@ type GetResponse map[string]interface{}
 // getHandler godoc
 // @Summary Get configuration
 // @Description Retrieves configuration for a given project.
-// @Tags get
+// @Tags config
 // @Produce json
-// @Param set body pkg.GetRequest true "Get parameters"
+// @Param get query pkg.GetRequest true "Get parameters"
 // @Success 200 {object} GetResponse "Configuration retrieved successfully"
 // @Failure 404 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
@@ -126,7 +126,7 @@ type GetResponse map[string]interface{}
 func getHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.GetRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.BindQuery(&req); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
