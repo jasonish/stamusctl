@@ -17,6 +17,7 @@ func ComposeCmd() *cobra.Command {
 	// Custom commands
 	cmd.AddCommand(initCmd())
 	cmd.AddCommand(updateCmd())
+	cmd.AddCommand(readPcapCmd())
 	// Docker commands
 	wrappedCmds, _ := wrappedCmd()
 	cmd.AddCommand(wrappedCmds...)
