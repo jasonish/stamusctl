@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	// Internal
 	"stamus-ctl/internal/models"
@@ -35,7 +36,8 @@ func PcapHandler(params ReadPcapParams) error {
 	asString := value.AsString()
 
 	// Copy pcap file to the host path
-	err = CopyFile(params.PcapPath, filepath.Join(params.Config, asString))
+	splitted := strings.Split(params.PcapPath, "/")
+	err = CopyFile(params.PcapPath, filepath.Join(params.Config, asString, splitted[len(splitted)-1]))
 	if err != nil {
 		return err
 	}
