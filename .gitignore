@@ -5,3 +5,4 @@ dist/
 .configs/
 tmp/
 config/
+.token
