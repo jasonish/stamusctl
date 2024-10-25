@@ -109,11 +109,11 @@ func (p *Parameters) GetValues(keys ...string) map[string]string {
 		if len(keys) > 0 {
 			for _, k := range keys {
 				if strings.HasPrefix(key, k) {
-					values[key] = param.Variable.asString()
+					values[key] = param.Variable.AsString()
 				}
 			}
 		} else {
-			values[key] = param.Variable.asString()
+			values[key] = param.Variable.AsString()
 		}
 	}
 	return values

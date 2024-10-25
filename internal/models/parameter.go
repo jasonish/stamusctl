@@ -47,7 +47,7 @@ func (v *Variable) IsNil() bool {
 }
 
 // Return the value of the variable as a string
-func (v *Variable) asString() string {
+func (v *Variable) AsString() string {
 	if v.String != nil {
 		return *v.String
 	}

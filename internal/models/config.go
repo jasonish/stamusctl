@@ -72,7 +72,7 @@ func LoadConfigFrom(path File, reload bool) (*Config, error) {
 	// Set arbitrary
 	if !reload {
 		for key, value := range values {
-			originConf.arbitrary.SetArbitrary(map[string]string{key: value.asString()})
+			originConf.arbitrary.SetArbitrary(map[string]string{key: value.AsString()})
 		}
 	}
 	// Merge
