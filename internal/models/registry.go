@@ -56,20 +56,24 @@ func (r *RegistryInfo) PullConfig(destPath string, imageName string) error {
 	defer cli.Close()
 
 	// Create auth config
-	authConfig := registry.AuthConfig{
-		Username: r.Username,
-		Password: r.Password,
+	pullOptions := image.PullOptions{}
+	if r.Username != "" && r.Password != "" {
+		authConfig := registry.AuthConfig{
+			Username: r.Username,
+			Password: r.Password,
+		}
+		encodedJSON, err := json.Marshal(authConfig)
+		if err != nil {
+			return err
+		}
+		authStr := base64.URLEncoding.EncodeToString(encodedJSON)
+		pullOptions = image.PullOptions{
+			RegistryAuth: authStr,
+		}
 	}
-	encodedJSON, err := json.Marshal(authConfig)
-	if err != nil {
-		return err
-	}
-	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 
 	// Pull image
-	out, err := cli.ImagePull(ctx, imageUrl, image.PullOptions{
-		RegistryAuth: authStr,
-	})
+	out, err := cli.ImagePull(ctx, imageUrl, pullOptions)
 	if err != nil {
 		return err
 	}

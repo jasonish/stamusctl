@@ -23,6 +23,7 @@ var (
 	LatestClearNDRPath  = "/"
 	DefaultConfigName   = "config"
 	StamusAppName       = ""
+	DefaultRegistry     = "ghcr.io/stamusnetworks/stamusctl-templates/"
 )
 
 // Constants

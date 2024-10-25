@@ -95,16 +95,25 @@ func pullLatestTemplate(destPath string, image string) error {
 	if err != nil {
 		return err
 	}
-	// Verify registries not empty
-	if len(stamusConf.Registries.AsList()) == 0 {
-		return fmt.Errorf("no config registries credentials found")
-	}
 	// Pull latest config
-	for _, registryInfo := range stamusConf.Registries.AsList() {
-		err = registryInfo.PullConfig(destPath, image)
-		if err == nil {
-			break
+	if len(stamusConf.Registries.AsList()) != 0 {
+		//Logged in
+		for _, registryInfo := range stamusConf.Registries.AsList() {
+			err = registryInfo.PullConfig(destPath, image)
+			if err == nil {
+				return nil
+			} else {
+				fmt.Println(err)
+			}
 		}
+	}
+	// Not logged in
+	infos := models.RegistryInfo{
+		Registry: app.DefaultRegistry,
+	}
+	err = infos.PullConfig(destPath, image)
+	if err != nil {
+		return err
 	}
 	return err
 }
