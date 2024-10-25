@@ -3,6 +3,7 @@ package run
 import (
 	// Common
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 
@@ -11,11 +12,14 @@ import (
 	"stamus-ctl/cmd/daemon/run/compose"
 	"stamus-ctl/cmd/daemon/run/config"
 	"stamus-ctl/cmd/daemon/run/troubleshoot"
+	"stamus-ctl/internal/auth"
 	"stamus-ctl/internal/logging"
 
 	// External
+
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	ginprometheus "github.com/zsais/go-gin-prometheus"
@@ -42,6 +46,7 @@ func NewPrometheusServer(ctx context.Context) {
 // @Produce json
 // @Success 200 {string} Helloworld
 // @Router /ping [get]
+// @Security BasicAuth
 func ping(c *gin.Context) {
 	logging.LoggerWithRequest(c.Request).Info("Ping")
 
@@ -56,6 +61,11 @@ func RunCmd() *cobra.Command {
 
 	logging.NewTraceProvider()
 
+	viper.SetDefault("tokenpath", ".token")
+
+	viper.SetEnvPrefix("stamusd")
+	viper.BindEnv("tokenpath")
+
 	cmd := &cobra.Command{
 		Use:   "run",
 		Short: "Run daemon",
@@ -68,6 +78,8 @@ func RunCmd() *cobra.Command {
 			return nil
 		},
 	}
+
+	fmt.Println("token-path: ", viper.GetString("tokenpath"))
 
 	return cmd
 }
@@ -92,9 +104,12 @@ func SetupRouter(logger func(string)) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
+	go auth.WatchForToken(".token")
+
 	// Middleware
 	r.Use(gin.Recovery())
 	r.Use(otelgin.Middleware("stamusd", otelgin.WithTracerProvider(logging.TracerProvider)))
+	r.Use(auth.AuthMiddleware())
 
 	// Routes
 	logger("Setup routes")
