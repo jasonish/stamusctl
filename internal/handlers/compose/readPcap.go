@@ -35,11 +35,11 @@ func PcapHandler(params ReadPcapParams) error {
 	asString := value.AsString()
 
 	// Copy pcap file to the host path
-	err = CopyFile(params.PcapPath, asString)
+	err = CopyFile(params.PcapPath, filepath.Join(params.Config, asString))
 	if err != nil {
 		return err
 	}
-	fmt.Println("Pcap file is being read by the configuration")
+	fmt.Println("Pcap file is being read by the suricata container")
 
 	return nil
 }
