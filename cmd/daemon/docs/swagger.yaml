@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   config.GetResponse:
     additionalProperties: true
@@ -97,7 +98,7 @@ definitions:
   pkg.Config:
     properties:
       config:
-        description: Config name, default is tmp
+        description: Config name, default is config
         type: string
     type: object
   pkg.ContainerLogs:
@@ -165,25 +166,16 @@ definitions:
       error:
         type: string
     type: object
-  pkg.GetRequest:
+  pkg.GetListResponse:
     properties:
-      config:
-        description: Config name, default is tmp
-        type: string
-      content:
-        description: Get content or values, default is false
-        type: boolean
-      values:
-        description: Values to retrieve, default is all
+      configs:
+        description: List of available configurations on the system
         items:
           type: string
         type: array
     type: object
   pkg.InitRequest:
     properties:
-      config:
-        description: Config name, default is tmp
-        type: string
       default:
         description: Use default settings, default is false
         type: boolean
@@ -194,7 +186,7 @@ definitions:
           value
         type: object
       project:
-        description: Project name, default is "selks"
+        description: Project name, default is "clearndr"
         type: string
       values:
         additionalProperties:
@@ -249,9 +241,6 @@ definitions:
       apply:
         description: Apply the new configuration, relaunch it, default is false
         type: boolean
-      config:
-        description: Config name, default is tmp
-        type: string
       from_file:
         additionalProperties:
           type: string
@@ -277,9 +266,6 @@ definitions:
     type: object
   pkg.UpdateRequest:
     properties:
-      config:
-        description: Config name, default is tmp
-        type: string
       values:
         additionalProperties:
           type: string
@@ -417,20 +403,15 @@ definitions:
     type: object
 info:
   contact: {}
+  description: Stamus daemon server.
+  title: Swagger Stamusd API
+  version: "1.0"
 paths:
   /compose/down:
     post:
       consumes:
       - application/json
-      description: Given a configuration, it will stop the services defined in the
-        configuration.
-      parameters:
-      - description: Configuration to stop
-        in: body
-        name: arbitraries
-        required: true
-        schema:
-          $ref: '#/definitions/pkg.Config'
+      description: Stops the services defined in the current configuration.
       produces:
       - application/json
       responses:
@@ -492,14 +473,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Will restart the containers defined
-      parameters:
-      - description: Configuration to restart
-        in: body
-        name: arbitraries
-        required: true
-        schema:
-          $ref: '#/definitions/pkg.Config'
+      description: Will restart the containers defined in the current configuration
       produces:
       - application/json
       responses:
@@ -544,15 +518,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Given a configuration, it will start the services defined in the
-        configuration.
-      parameters:
-      - description: Configuration to start
-        in: body
-        name: arbitraries
-        required: true
-        schema:
-          $ref: '#/definitions/pkg.Config'
+      description: Starts the services defined in the current configuration.
       produces:
       - application/json
       responses:
@@ -597,12 +563,17 @@ paths:
     get:
       description: Retrieves configuration for a given project.
       parameters:
-      - description: Get parameters
-        in: body
-        name: set
-        required: true
-        schema:
-          $ref: '#/definitions/pkg.GetRequest'
+      - description: Get content or values, default is false
+        in: query
+        name: content
+        type: boolean
+      - collectionFormat: csv
+        description: Values to retrieve, default is all
+        in: query
+        items:
+          type: string
+        name: values
+        type: array
       produces:
       - application/json
       responses:
@@ -620,36 +591,25 @@ paths:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Get configuration
       tags:
-      - get
+      - config
     post:
       consumes:
       - application/json
       description: Sets configuration with provided parameters.
-      parameters:
-      - description: Set parameters
-        in: body
-        name: set
-        required: true
-        schema:
-          $ref: '#/definitions/pkg.SetRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: Configuration set successfully
+          description: Configuration list
           schema:
-            $ref: '#/definitions/pkg.SuccessResponse'
-        "400":
-          description: Bad request with explanation
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
+            $ref: '#/definitions/pkg.GetListResponse'
         "500":
           description: Internal server error with explanation
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Set configuration
+      summary: Set current configuration
       tags:
-      - set
+      - config
   /ping:
     get:
       consumes:
@@ -662,9 +622,70 @@ paths:
           description: OK
           schema:
             type: string
+      security:
+      - BasicAuth: []
       summary: ping example
       tags:
       - example
+  /troubleshoot/containers:
+    post:
+      consumes:
+      - application/json
+      description: Will return the logs of the containers specified in the request,
+        or all the containers if none are specified.
+      parameters:
+      - description: Logs parameters
+        in: body
+        name: set
+        required: true
+        schema:
+          $ref: '#/definitions/pkg.LogsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Containers logs
+          schema:
+            $ref: '#/definitions/pkg.LogsResponse'
+        "400":
+          description: Bad request with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+        "500":
+          description: Internal server error with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Logs of the containers
+      tags:
+      - logs
+  /troubleshoot/kernel:
+    post:
+      description: Will return the logs of the kernel
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Kernel logs
+          schema:
+            $ref: '#/definitions/pkg.SuccessResponse'
+        "500":
+          description: Internal server error with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Logs of the kernel
+      tags:
+      - logs
+  /troubleshoot/reboot:
+    post:
+      description: Will reboot the system
+      responses:
+        "500":
+          description: Internal server error with explanation
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Reboots the system
+      tags:
+      - reboot
   /upload:
     post:
       consumes:
@@ -703,4 +724,7 @@ paths:
       summary: Upload file example
       tags:
       - example
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"

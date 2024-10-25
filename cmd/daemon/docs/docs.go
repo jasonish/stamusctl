@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/compose/down": {
             "post": {
-                "description": "Given a configuration, it will stop the services defined in the configuration.",
+                "description": "Stops the services defined in the current configuration.",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,17 +28,6 @@ const docTemplate = `{
                     "compose"
                 ],
                 "summary": "Similar to docker compose down",
-                "parameters": [
-                    {
-                        "description": "Configuration to stop",
-                        "name": "arbitraries",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Config"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Down successful",
@@ -123,7 +112,7 @@ const docTemplate = `{
         },
         "/compose/restart/config": {
             "post": {
-                "description": "Will restart the containers defined",
+                "description": "Will restart the containers defined in the current configuration",
                 "consumes": [
                     "application/json"
                 ],
@@ -134,17 +123,6 @@ const docTemplate = `{
                     "compose"
                 ],
                 "summary": "Similar to docker restart",
-                "parameters": [
-                    {
-                        "description": "Configuration to restart",
-                        "name": "arbitraries",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Config"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Success message",
@@ -203,7 +181,7 @@ const docTemplate = `{
         },
         "/compose/up": {
             "post": {
-                "description": "Given a configuration, it will start the services defined in the configuration.",
+                "description": "Starts the services defined in the current configuration.",
                 "consumes": [
                     "application/json"
                 ],
@@ -214,17 +192,6 @@ const docTemplate = `{
                     "compose"
                 ],
                 "summary": "Similar to docker compose up",
-                "parameters": [
-                    {
-                        "description": "Configuration to start",
-                        "name": "arbitraries",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Config"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Up successful",
@@ -288,18 +255,25 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "get"
+                    "config"
                 ],
                 "summary": "Get configuration",
                 "parameters": [
                     {
-                        "description": "Get parameters",
-                        "name": "set",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/pkg.GetRequest"
-                        }
+                        "type": "boolean",
+                        "description": "Get content or values, default is false",
+                        "name": "content",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Values to retrieve, default is all",
+                        "name": "values",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -332,25 +306,82 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "set"
+                    "config"
                 ],
-                "summary": "Set configuration",
+                "summary": "Set current configuration",
+                "responses": {
+                    "200": {
+                        "description": "Configuration list",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.GetListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "do ping",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "example"
+                ],
+                "summary": "ping example",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/troubleshoot/containers": {
+            "post": {
+                "description": "Will return the logs of the containers specified in the request, or all the containers if none are specified.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Logs of the containers",
                 "parameters": [
                     {
-                        "description": "Set parameters",
+                        "description": "Logs parameters",
                         "name": "set",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/pkg.SetRequest"
+                            "$ref": "#/definitions/pkg.LogsRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Configuration set successfully",
+                        "description": "Containers logs",
                         "schema": {
-                            "$ref": "#/definitions/pkg.SuccessResponse"
+                            "$ref": "#/definitions/pkg.LogsResponse"
                         }
                     },
                     "400": {
@@ -368,24 +399,44 @@ const docTemplate = `{
                 }
             }
         },
-        "/ping": {
-            "get": {
-                "description": "do ping",
-                "consumes": [
-                    "application/json"
-                ],
+        "/troubleshoot/kernel": {
+            "post": {
+                "description": "Will return the logs of the kernel",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "example"
+                    "logs"
                 ],
-                "summary": "ping example",
+                "summary": "Logs of the kernel",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Kernel logs",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.SuccessResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/troubleshoot/reboot": {
+            "post": {
+                "description": "Will reboot the system",
+                "tags": [
+                    "reboot"
+                ],
+                "summary": "Reboots the system",
+                "responses": {
+                    "500": {
+                        "description": "Internal server error with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
                         }
                     }
                 }
@@ -579,7 +630,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "config": {
-                    "description": "Config name, default is tmp",
+                    "description": "Config name, default is config",
                     "type": "string"
                 }
             }
@@ -683,19 +734,11 @@ const docTemplate = `{
                 }
             }
         },
-        "pkg.GetRequest": {
+        "pkg.GetListResponse": {
             "type": "object",
             "properties": {
-                "config": {
-                    "description": "Config name, default is tmp",
-                    "type": "string"
-                },
-                "content": {
-                    "description": "Get content or values, default is false",
-                    "type": "boolean"
-                },
-                "values": {
-                    "description": "Values to retrieve, default is all",
+                "configs": {
+                    "description": "List of available configurations on the system",
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -706,10 +749,6 @@ const docTemplate = `{
         "pkg.InitRequest": {
             "type": "object",
             "properties": {
-                "config": {
-                    "description": "Config name, default is tmp",
-                    "type": "string"
-                },
                 "default": {
                     "description": "Use default settings, default is false",
                     "type": "boolean"
@@ -722,7 +761,7 @@ const docTemplate = `{
                     }
                 },
                 "project": {
-                    "description": "Project name, default is \"selks\"",
+                    "description": "Project name, default is \"clearndr\"",
                     "type": "string"
                 },
                 "values": {
@@ -799,10 +838,6 @@ const docTemplate = `{
                     "description": "Apply the new configuration, relaunch it, default is false",
                     "type": "boolean"
                 },
-                "config": {
-                    "description": "Config name, default is tmp",
-                    "type": "string"
-                },
                 "from_file": {
                     "description": "Values keys and paths to files containing the content used as value",
                     "type": "object",
@@ -838,10 +873,6 @@ const docTemplate = `{
         "pkg.UpdateRequest": {
             "type": "object",
             "properties": {
-                "config": {
-                    "description": "Config name, default is tmp",
-                    "type": "string"
-                },
                 "values": {
                     "description": "Values to set, key is the name of the value, value is the value",
                     "type": "object",
@@ -1005,17 +1036,22 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Swagger Stamusd API",
+	Description:      "Stamus daemon server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
