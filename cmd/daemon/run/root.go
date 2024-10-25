@@ -50,11 +50,6 @@ func ping(c *gin.Context) {
 	})
 }
 
-// @title           Swagger Stamusd API
-// @version         1.0
-// @description     Stamus daemon server.
-
-// @BasePath /api/v1
 func RunCmd() *cobra.Command {
 	_, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()

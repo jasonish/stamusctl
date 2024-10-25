@@ -13,6 +13,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+// @securityDefinitions.basic  BasicAuth
+
+// @title           Swagger Stamusd API
+// @version         1.0
+// @description     Stamus daemon server.
+
+// @BasePath /api/v1
+
 // Entry point
 func Execute() {
 	// Setup
