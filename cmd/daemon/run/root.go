@@ -3,7 +3,6 @@ package run
 import (
 	// Common
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 
@@ -61,7 +60,7 @@ func RunCmd() *cobra.Command {
 
 	logging.NewTraceProvider()
 
-	viper.SetDefault("tokenpath", ".token")
+	viper.SetDefault("tokenpath", "")
 
 	viper.SetEnvPrefix("stamusd")
 	viper.BindEnv("tokenpath")
@@ -78,8 +77,6 @@ func RunCmd() *cobra.Command {
 			return nil
 		},
 	}
-
-	fmt.Println("token-path: ", viper.GetString("tokenpath"))
 
 	return cmd
 }
@@ -104,11 +101,15 @@ func SetupRouter(logger func(string)) *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
-	go auth.WatchForToken(".token")
+	if viper.GetString("tokenpath") != "" {
+		go auth.WatchForToken(viper.GetString("tokenpath"))
+	}
 
 	// Middleware
 	r.Use(gin.Recovery())
-	r.Use(otelgin.Middleware("stamusd", otelgin.WithTracerProvider(logging.TracerProvider)))
+	if viper.GetString("tokenpath") != "" {
+		r.Use(otelgin.Middleware("stamusd", otelgin.WithTracerProvider(logging.TracerProvider)))
+	}
 	r.Use(auth.AuthMiddleware())
 
 	// Routes

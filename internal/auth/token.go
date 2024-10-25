@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"encoding/base64"
-	"log"
 	"os"
 	"stamus-ctl/internal/logging"
 	"strings"
@@ -20,7 +19,7 @@ func WatchForToken(pathToWatch string) {
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		logging.LoggerWithContextToSpanContext(ctx).Sugar().Fatal(err)
 	}
 	defer watcher.Close()
 
@@ -50,7 +49,7 @@ func WatchForToken(pathToWatch string) {
 	}()
 	err = watcher.Add(pathToWatch)
 	if err != nil {
-		log.Fatal(err)
+		logging.LoggerWithContextToSpanContext(ctx).Sugar().Fatal(err)
 	}
 
 	<-make(chan struct{})
