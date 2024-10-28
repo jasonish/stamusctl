@@ -20,12 +20,12 @@ import (
 func readPcapCmd() *cobra.Command {
 	// Create cmd
 	cmd := &cobra.Command{
-		Use:     "readpcap",
-		Short:   "Sends a pcap file to be read by suricata",
-		Example: "stamus-ctl compose readpcap /path/to/pcap [flags]",
+		Use:   "readpcap <pcap file>",
+		Short: "Sends a pcap file to be read by suricata",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return readPcap(cmd, args)
 		},
+		Args: cobra.ExactArgs(1),
 	}
 	// Add flags
 	flags.Config.AddAsFlag(cmd, false)

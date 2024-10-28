@@ -4,6 +4,7 @@ import (
 	// Core
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"runtime/debug"
@@ -140,6 +141,14 @@ func runContainer(configName, pcap string) (string, error) {
 }
 
 func PcapHandler(params ReadPcapParams) error {
+
+	if _, err := os.Stat(params.Config); os.IsNotExist(err) {
+		return errors.New("instance '" + params.Config + "' don't exist")
+	}
+	if _, err := os.Stat(params.Config + "/containers-data/suricata/etc"); os.IsNotExist(err) {
+		return errors.New("instance '" + params.Config + "' seems do not have been started.")
+	}
+
 	output, _ := runContainer(params.Config, params.PcapPath)
 
 	fmt.Println(output)
