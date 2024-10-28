@@ -64,6 +64,8 @@ If not, you can:
   - `--user` to input user
   - `--pass` to input password
   - `--version` to input version
+- `readpcap` to read a pcap file
+  - `--config` to select folder
 
 ### Config
 `stamusctl config` is the command used to manage the configuration files.
@@ -109,6 +111,9 @@ stamusctl config set scirius.token=AnotherAwesomeToken
 
 // Start current configuration
 stamusctl compose up -d
+
+// Read a pcap file
+stamusctl compose readpcap /path/to/pcap
 ```
 
 ## Contributing
