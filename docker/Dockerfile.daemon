@@ -16,7 +16,7 @@ COPY . /src/stamus-ctl
 RUN swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/
 RUN CGO_ENABLED=1 make daemon
 
-FROM scratch
+FROM docker
 COPY --from=Builder /src/stamus-ctl/dist /bin/
 
 ENTRYPOINT [ "stamusd" ]
