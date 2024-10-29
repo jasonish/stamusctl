@@ -16,6 +16,13 @@ import (
 	"stamus-ctl/internal/stamus"
 )
 
+var noVerif = models.Parameter{
+	Name:    "verif",
+	Type:    "bool",
+	Usage:   "Verify registry connectivity",
+	Default: models.CreateVariableBool(true),
+}
+
 func loginCmd() *cobra.Command {
 	// Create command
 	cmd := &cobra.Command{
@@ -27,6 +34,9 @@ func loginCmd() *cobra.Command {
 	flags.Registry.AddAsFlag(cmd, false)
 	flags.Username.AddAsFlag(cmd, false)
 	flags.Password.AddAsFlag(cmd, false)
+
+	noVerif.AddAsFlag(cmd, false)
+
 	return cmd
 }
 
@@ -45,11 +55,17 @@ func loginHandler(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	verif, err := noVerif.GetValue()
+	if err != nil {
+		return err
+	}
+
 	// Call handler
 	params := models.RegistryInfo{
 		Registry: registry.(string),
 		Username: username.(string),
 		Password: password.(string),
+		Verif:    verif.(bool),
 	}
 	return LoginHandler(params)
 }
@@ -74,9 +90,12 @@ func LoginHandler(registryInfo models.RegistryInfo) error {
 		Username:      registryInfo.Username,
 		Password:      registryInfo.Password,
 	}
-	_, err = cli.RegistryLogin(context.Background(), authConfig)
-	if err != nil {
-		return err
+
+	if registryInfo.Verif {
+		_, err = cli.RegistryLogin(context.Background(), authConfig)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Save credentials

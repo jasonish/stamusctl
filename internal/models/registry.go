@@ -22,6 +22,7 @@ type RegistryInfo struct {
 	Registry string `json:"registry"`
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Verif    bool   `json:"verif"`
 }
 
 func (r *RegistryInfo) ValidateRegistry() error {
