@@ -15,7 +15,7 @@ import (
 // @Summary Upload file example
 // @Schemes
 // @Description Handles file uploads
-// @Tags example
+// @Tags upload
 // @Accept multipart/form-data
 // @Produce json
 // @Param path query string true "Path to save file"
