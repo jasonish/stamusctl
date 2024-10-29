@@ -12,21 +12,17 @@ import (
 func main() {
 	// var err error
 
+	if exec := os.Getenv("STAMUS_APP_NAME"); exec != "" {
+		app.Name = exec
+	}
+
 	switch app.Name {
 	case "stamusctl":
 		ctl.Execute()
 	case "stamusd":
 		daemon.Execute()
 	default:
-		exec := os.Getenv("STAMUS_APP_NAME")
-		switch exec {
-		case "stamusctl":
-			ctl.Execute()
-		case "stamusd":
-			daemon.Execute()
-		default:
-			daemon.Execute()
-		}
+		daemon.Execute()
 	}
 
 	// if err != nil {
