@@ -21,6 +21,9 @@ type File struct {
 func CreateFileInstanceFromPath(path string) (File, error) {
 	// Extract the file properties
 	pathSplited := strings.Split(path, "/")
+	if len(pathSplited) < 2 {
+		pathSplited = []string{".", pathSplited[0]}
+	}
 	nameSplited := strings.Split(pathSplited[len(pathSplited)-1], ".")
 	// Validate name
 	if len(nameSplited) < 2 {

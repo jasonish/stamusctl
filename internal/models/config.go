@@ -293,7 +293,7 @@ func (f *Config) SaveConfigTo(dest File, isUpgrade, isInstall bool) error {
 // Set values from a file (values.yaml)
 func (f *Config) SetValuesFromFile(valuesPath string) error {
 	if valuesPath != "" {
-		log.Println("Loading values from", valuesPath)
+		fmt.Println("Loading values from", valuesPath)
 		file, err := CreateFileInstanceFromPath(valuesPath)
 		if err != nil {
 			return err
