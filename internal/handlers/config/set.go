@@ -10,6 +10,7 @@ import (
 
 	// Internal
 
+	"stamus-ctl/internal/app"
 	flags "stamus-ctl/internal/handlers"
 	wrapper "stamus-ctl/internal/handlers/wrapper"
 	"stamus-ctl/internal/models"
@@ -88,8 +89,12 @@ func SetContentHandler(args []string) error {
 	if err != nil {
 		return err
 	}
+
 	// For each argument
 	for _, arg := range args {
+		if arg == "" {
+			continue
+		}
 		// Split argument
 		split := strings.Split(arg, ":")
 		if len(split) != 2 {
@@ -98,6 +103,15 @@ func SetContentHandler(args []string) error {
 		// Get paths
 		inputPath := split[0]
 		outputPath := split[1]
+		// Deamon specific, concatenate the config path
+		if !app.IsCtl() {
+			conf, err := stamus.GetCurrent()
+			if err != nil {
+				return err
+			}
+			configPath := app.GetConfigsFolder(conf)
+			outputPath = filepath.Join(configPath, outputPath)
+		}
 		// Call handler
 		err := copy(inputPath, filepath.Join(conf, outputPath))
 		if err != nil {

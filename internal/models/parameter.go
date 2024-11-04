@@ -75,10 +75,10 @@ func (p *Parameter) GetValue() (any, error) {
 			return *p.Variable.Int, nil
 		}
 	}
-	if !p.Variable.IsNil() {
+	if !p.Default.IsNil() {
 		switch p.Type {
 		case "string":
-			return *&p.Default.String, nil
+			return *p.Default.String, nil
 		case "bool", "optional":
 			return *p.Default.Bool, nil
 		case "int":
