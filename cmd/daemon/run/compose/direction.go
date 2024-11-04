@@ -2,7 +2,7 @@ package compose
 
 import (
 	// Internal
-	handlers "stamus-ctl/internal/handlers/compose"
+	handlers "stamus-ctl/internal/handlers/wrapper"
 
 	// External
 	"github.com/gin-gonic/gin"

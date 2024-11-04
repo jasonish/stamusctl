@@ -38,6 +38,13 @@ var Template = models.Parameter{
 	Usage:     "Template folder to use",
 	Hidden:    true,
 }
+var Bind = models.Parameter{
+	Name:      "bind",
+	Shorthand: "b",
+	Type:      "string",
+	Default:   models.CreateVariableString(""),
+	Usage:     "Bind local files to config folder ones (ex: --bind /nginx:/etc/nginx,/nginx.conf:/etc/nginx/nginx.conf)",
+}
 
 // Config
 var Format = models.Parameter{

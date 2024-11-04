@@ -11,7 +11,7 @@ import (
 	// Internal
 
 	flags "stamus-ctl/internal/handlers"
-	compose "stamus-ctl/internal/handlers/compose"
+	wrapper "stamus-ctl/internal/handlers/wrapper"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
 	"stamus-ctl/internal/utils"
@@ -74,7 +74,7 @@ func SetHandler(params SetHandlerInputs) error {
 	}
 	// Apply the configuration
 	if params.Apply {
-		err = compose.HandleUp()
+		err = wrapper.HandleUp()
 		if err != nil {
 			return err
 		}

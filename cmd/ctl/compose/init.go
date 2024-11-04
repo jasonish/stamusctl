@@ -96,6 +96,11 @@ func handler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	bind, err := flags.Bind.GetValue()
+	if err != nil {
+		return err
+	}
+	toBind := strings.Split(bind.(string), ",")
 
 	project := "clearndr"
 	if len(args) > 0 {
@@ -117,6 +122,7 @@ func handler(cmd *cobra.Command, args []string) error {
 		Config:           config.(string),
 		FromFile:         fromFile.(string),
 		TemplateFolder:   templateFolder.(string),
+		Bind:             toBind,
 	}
 	return handlers.InitHandler(true, initParams)
 }

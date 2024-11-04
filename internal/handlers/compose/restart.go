@@ -9,6 +9,7 @@ import (
 	// Internal
 
 	"stamus-ctl/internal/app"
+	"stamus-ctl/internal/handlers/wrapper"
 	"stamus-ctl/internal/stamus"
 	"stamus-ctl/pkg/mocker"
 
@@ -30,11 +31,11 @@ func HandleConfigRestart() error {
 
 // HandleConfigRestart restarts the containers defined in the container composition file
 func handleConfigRestart() error {
-	err := HandleDown(false, false)
+	err := wrapper.HandleDown(false, false)
 	if err != nil {
 		return err
 	}
-	return HandleUp()
+	return wrapper.HandleUp()
 }
 
 func HandleContainersRestart(containers []string) error {

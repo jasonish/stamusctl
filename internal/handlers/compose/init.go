@@ -6,6 +6,8 @@ import (
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
 	"stamus-ctl/internal/stamus"
+
+	confHandler "stamus-ctl/internal/handlers/config"
 )
 
 type InitHandlerInputs struct {
@@ -18,6 +20,7 @@ type InitHandlerInputs struct {
 	Config           string
 	FromFile         string
 	TemplateFolder   string
+	Bind             []string
 }
 
 func InitHandler(isCli bool, params InitHandlerInputs) error {
@@ -82,6 +85,11 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 		return err
 	}
 	err = config.SaveConfigTo(outputFile, false, true)
+	if err != nil {
+		return err
+	}
+	// Bind files
+	err = confHandler.SetContentHandler(params.Bind)
 	if err != nil {
 		return err
 	}
