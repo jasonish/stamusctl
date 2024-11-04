@@ -63,6 +63,11 @@ func createConfig(configName, pcap string) (container.Config, container.HostConf
 			},
 			{
 				Type:   mount.TypeBind,
+				Source: dir + "/" + configName + "/containers-data/suricata/rules",
+				Target: "/etc/suricata/rules",
+			},
+			{
+				Type:   mount.TypeBind,
 				Source: dir + "/" + configName + "/containers-data/suricata/logs",
 				Target: "/var/log/suricata",
 			},
