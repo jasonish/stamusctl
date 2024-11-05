@@ -43,6 +43,7 @@ func initCmd() *cobra.Command {
 	flags.Config.AddAsFlag(cmd, false)
 	flags.Template.AddAsFlag(cmd, false)
 	flags.Bind.AddAsFlag(cmd, false)
+	flags.Version.AddAsFlag(cmd, false)
 
 	// Commands
 	cmd.AddCommand(ClearNDRCmd())
@@ -73,7 +74,7 @@ func ClearNDRCmd() *cobra.Command {
 	return cmd
 }
 
-func handler(cmd *cobra.Command, args []string) error {
+func handler(_ *cobra.Command, args []string) error {
 	// Get flags
 	isDefault, err := flags.IsDefaultParam.GetValue()
 	if err != nil {
