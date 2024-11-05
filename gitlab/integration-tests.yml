@@ -42,7 +42,7 @@ full test w debug image:
     needs:
         - docker cli
     script:
-        - apk update && apk add jq
+        - apk update && apk add jq docker
         - stamusctl login --registry $GITLAB_REGISTRY_PATH --user $GITLAB_REGISTRY_USER --pass $GITLAB_REGISTRY_TOKEN
         - stamusctl compose init tests --default
         - stamusctl compose up -d
