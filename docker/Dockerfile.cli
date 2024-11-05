@@ -1,10 +1,10 @@
-FROM golang:alpine AS Builder
+FROM golang:1.22-alpine3.19 AS Builder
 
 ARG var_version=devel
 ENV VERSION=$var_version
 
 RUN mkdir -p /src
-RUN apk update && apk add --no-cache gcc musl-dev make
+RUN apk update && apk add --no-cache gcc=13.2.1_git20231014-r0 musl-dev=1.2.4_git20230717-r4 make=4.4.1-r2
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 
 COPY ./go.mod /src/stamus-ctl/go.mod
@@ -13,8 +13,20 @@ WORKDIR /src/stamus-ctl
 RUN go mod download
 
 COPY . /src/stamus-ctl
-RUN swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/
-RUN CGO_ENABLED=1 make cli
+RUN swag init --pd -g root.go -o cmd/docs -d cmd/daemon/run/ \
+    && CGO_ENABLED=1 make cli
 
-FROM docker
+
+FROM docker:27.3.1-alpine3.20 AS docker
+
+RUN /usr/local/bin/dockerd-entrypoint.sh || exit 0
+
+FROM alpine:3.20
+
+COPY --from=docker /certs /certs
+
+RUN apk update && apk add --no-cache bash=5.2.26-r0 bash-completion=2.12.0-r0
+
 COPY --from=Builder /src/stamus-ctl/dist /bin/
+
+RUN stamusctl completion bash > /etc/profile.d/stamusctl_completion.sh &&  echo "source /etc/profile.d/stamusctl_completion.sh" >> ~/.bashrc
