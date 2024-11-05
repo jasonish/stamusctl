@@ -42,6 +42,8 @@ func initCmd() *cobra.Command {
 	flags.FromFile.AddAsFlag(cmd, false)
 	flags.Config.AddAsFlag(cmd, false)
 	flags.Template.AddAsFlag(cmd, false)
+	flags.Bind.AddAsFlag(cmd, false)
+
 	// Commands
 	cmd.AddCommand(ClearNDRCmd())
 	return cmd
@@ -67,6 +69,7 @@ func ClearNDRCmd() *cobra.Command {
 	flags.Config.AddAsFlag(cmd, false)
 	flags.Template.AddAsFlag(cmd, false)
 	flags.Version.AddAsFlag(cmd, false)
+	flags.Bind.AddAsFlag(cmd, false)
 	return cmd
 }
 

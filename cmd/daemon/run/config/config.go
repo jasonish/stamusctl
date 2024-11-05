@@ -69,7 +69,7 @@ func setHandler(c *gin.Context) {
 // @Success 200 {object} pkg.SuccessResponse "Configuration set successfully"
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
-// @Router /config [post]
+// @Router /config/current [post]
 func setCurrentHandler(c *gin.Context) {
 	// Extract request body
 	var req pkg.Config
@@ -99,7 +99,7 @@ func setCurrentHandler(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} pkg.GetListResponse "Configuration list"
 // @Failure 500 {object} pkg.ErrorResponse "Internal server error with explanation"
-// @Router /config [post]
+// @Router /config/list [post]
 func getConfigListHandler(c *gin.Context) {
 	// Call handler
 	list, err := handlers.GetConfigsList()

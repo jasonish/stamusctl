@@ -308,6 +308,98 @@ const docTemplate = `{
                 "tags": [
                     "config"
                 ],
+                "summary": "Set configuration",
+                "parameters": [
+                    {
+                        "description": "Set parameters",
+                        "name": "set",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.SetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Configuration set successfully",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/config/current": {
+            "post": {
+                "description": "Sets configuration with provided parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
+                "summary": "Set current configuration",
+                "parameters": [
+                    {
+                        "description": "Configuration name to use",
+                        "name": "set",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/pkg.Config"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Configuration set successfully",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error with explanation",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/config/list": {
+            "post": {
+                "description": "Sets configuration with provided parameters.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "config"
+                ],
                 "summary": "Set current configuration",
                 "responses": {
                     "200": {
@@ -452,7 +544,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "example"
+                    "upload"
                 ],
                 "summary": "Upload file example",
                 "parameters": [
