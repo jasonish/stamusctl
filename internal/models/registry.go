@@ -15,7 +15,6 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
-	cp "github.com/otiai10/copy"
 )
 
 type RegistryInfo struct {
@@ -45,7 +44,8 @@ func (r *RegistryInfo) ValidateAllRegistry() error {
 	return nil
 }
 
-func (r *RegistryInfo) PullConfig(destPath string, imageName string) error {
+func (r *RegistryInfo) PullConfig(destPath string, project, version string) error {
+	imageName := "/" + project + ":" + version
 	imageUrl := r.Registry + imageName
 
 	// Create docker client
@@ -124,7 +124,7 @@ func (r *RegistryInfo) PullConfig(destPath string, imageName string) error {
 	// Extract conf from container
 	srcPaths := []string{"/data", "/sbin"} // Source path inside the container
 	// Remove existing configuration
-	if err := os.RemoveAll(filepath.Join(destPath, "latest")); err != nil {
+	if err := os.RemoveAll(filepath.Join(destPath, version)); err != nil {
 		return err
 	}
 	// Copy files from container
@@ -135,19 +135,19 @@ func (r *RegistryInfo) PullConfig(destPath string, imageName string) error {
 	}
 	// Move files to correct locations
 	originPath := filepath.Join(destPath, "data/")
-	latestPath := filepath.Join(destPath, "latest/")
-	if err := os.Rename(originPath, latestPath); err != nil {
+	versionPath := filepath.Join(destPath, version+"/")
+	if err := os.Rename(originPath, versionPath); err != nil {
 		return err
 	}
-	// Copy templates latest to templates version
-	version, err := os.ReadFile(filepath.Join(latestPath, "version"))
-	if err != nil {
-		return err
-	}
-	err = cp.Copy(latestPath, filepath.Join(destPath, string(version)))
-	if err != nil {
-		return err
-	}
+	// // Copy templates latest to templates version
+	// version, err := os.ReadFile(filepath.Join(latestPath, "version"))
+	// if err != nil {
+	// 	return err
+	// }
+	// err = cp.Copy(latestPath, filepath.Join(destPath, string(version)))
+	// if err != nil {
+	// 	return err
+	// }
 	fmt.Println("Configuration extracted")
 
 	return nil
