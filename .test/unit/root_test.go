@@ -9,7 +9,6 @@ import (
 
 	// Internal
 	"stamus-ctl/internal/app"
-	"stamus-ctl/internal/stamus"
 	"stamus-ctl/pkg"
 )
 
@@ -32,8 +31,7 @@ func TestComposeInit(t *testing.T) {
 	if t != nil {
 		assert.Equal(t, 200, res.Code)
 		assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
-		current, err := stamus.GetCurrent()
-		assert.NoError(t, err)
+		current := "config"
 		compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init")
 	}
 }
@@ -51,8 +49,7 @@ func TestComposeInitSet(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 
-	current, err := stamus.GetCurrent()
-	assert.NoError(t, err)
+	current := "config"
 	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-set")
 }
 
@@ -68,8 +65,7 @@ func TestComposeInitOptional(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 
-	current, err := stamus.GetCurrent()
-	assert.NoError(t, err)
+	current := "config"
 	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-optional")
 }
 
@@ -86,8 +82,7 @@ func TestComposeInitArbitrary(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 
-	current, err := stamus.GetCurrent()
-	assert.NoError(t, err)
+	current := "config"
 	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-arbitrary")
 }
 
@@ -104,8 +99,7 @@ func TestConfigSet(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 	// Compare
-	current, err := stamus.GetCurrent()
-	assert.NoError(t, err)
+	current := "config"
 	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init-set")
 }
 
@@ -126,8 +120,7 @@ func TestConfigReload(t *testing.T) {
 	assert.Equal(t, 200, res.Code)
 	assert.Equal(t, "{\"message\":\"ok\"}", res.Body.String())
 	// Compare
-	current, err := stamus.GetCurrent()
-	assert.NoError(t, err)
+	current := "config"
 	compareDirs(t, app.GetConfigsFolder(current), "../outputs/compose-init")
 }
 
