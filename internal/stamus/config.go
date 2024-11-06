@@ -2,9 +2,7 @@ package stamus
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
-	"slices"
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
 )
@@ -18,7 +16,6 @@ type Logins map[User]Token
 
 type Config struct {
 	Registries Registries `json:"registries"`
-	Current    string     `json:"current"`
 }
 
 func (r *Registries) AsList() []models.RegistryInfo {
@@ -78,27 +75,6 @@ func (c *Config) SetRegistry(registry Registry, user User, token Token) {
 	}
 
 	c.Registries[Registry(registry)][User(user)] = Token(token)
-}
-
-func (c *Config) GetCurrent() string {
-	if c.Current == "" {
-		return app.DefaultConfigName
-	}
-	return c.Current
-}
-func (c *Config) SetCurrent(config string) error {
-	// Get configs
-	configs, err := GetConfigsList()
-	if err != nil {
-		return err
-	}
-	// Check if config exists
-	if !slices.Contains(configs, config) {
-		return fmt.Errorf("config %s does not exist in %s", config, configs)
-	}
-	// Set current config
-	c.Current = config
-	return nil
 }
 
 func GetConfigsList() ([]string, error) {
