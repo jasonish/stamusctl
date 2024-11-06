@@ -5,6 +5,7 @@ import (
 
 	"os"
 	"path/filepath"
+	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/logging"
 
 	// External
@@ -46,15 +47,19 @@ func uploadHandler(c *gin.Context) {
 		return
 	}
 
+	// Extract path
+	completePath := filepath.Join(app.GetConfigsFolder(project), c.Query("path"))
+	folderPath := filepath.Dir(completePath)
+
 	// Create directory if it doesn't exist
-	err = os.MkdirAll(filepath.Join(project, c.Query("path")), 0755)
+	err = os.MkdirAll(folderPath, 0755)
 	if err != nil {
 		c.String(500, "Directory creation error: "+err.Error())
 		return
 	}
 
 	// Save file to path
-	err = c.SaveUploadedFile(file, filepath.Join(project, c.Query("path"), file.Filename))
+	err = c.SaveUploadedFile(file, completePath)
 	if err != nil {
 		c.String(500, "File save error: "+err.Error())
 		return
