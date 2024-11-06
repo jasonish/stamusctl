@@ -3,6 +3,7 @@ package compose
 import (
 	// External
 	"github.com/gin-gonic/gin"
+
 	// Custom
 	"stamus-ctl/internal/app"
 	handlers "stamus-ctl/internal/handlers/compose"
@@ -31,6 +32,9 @@ func initHandler(c *gin.Context) {
 	if req.Values == nil {
 		req.Values = make(map[string]string)
 	}
+	if req.Config == "" {
+		req.Config = "config"
+	}
 	if req.Project == "" {
 		req.Project = "clearndr"
 	}
@@ -53,6 +57,7 @@ func initHandler(c *gin.Context) {
 		Version:          req.Version,
 		Values:           req.ValuesPath,
 		FromFile:         fromFile,
+		Config:           app.GetConfigsFolder(req.Config),
 	}
 	if err := handlers.InitHandler(false, parameters); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

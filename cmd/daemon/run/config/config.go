@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	// Internal
+	"stamus-ctl/internal/app"
 	handlers "stamus-ctl/internal/handlers/config"
 	"stamus-ctl/pkg"
 )
@@ -29,6 +30,9 @@ func setHandler(c *gin.Context) {
 	}
 
 	// Validate request
+	if req.Config == "" {
+		req.Config = "config"
+	}
 	if req.Values == nil {
 		req.Values = make(map[string]string)
 	}
@@ -50,7 +54,7 @@ func setHandler(c *gin.Context) {
 		Args:     valuesAsStrings,
 		Values:   req.ValuesPath,
 		FromFile: fromFile,
-		Config:   req.Config,
+		Config:   app.GetConfigsFolder(req.Config),
 	}
 	if err := handlers.SetHandler(params); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})

@@ -15,6 +15,7 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/client"
+	cp "github.com/otiai10/copy"
 )
 
 type RegistryInfo struct {
@@ -139,15 +140,15 @@ func (r *RegistryInfo) PullConfig(destPath string, project, version string) erro
 	if err := os.Rename(originPath, versionPath); err != nil {
 		return err
 	}
-	// // Copy templates latest to templates version
-	// version, err := os.ReadFile(filepath.Join(latestPath, "version"))
-	// if err != nil {
-	// 	return err
-	// }
-	// err = cp.Copy(latestPath, filepath.Join(destPath, string(version)))
-	// if err != nil {
-	// 	return err
-	// }
+	// Copy templates latest to templates version
+	versionFromTemplate, err := os.ReadFile(versionPath + "/version")
+	if err != nil {
+		return err
+	}
+	err = cp.Copy(versionPath, filepath.Join(destPath, string(versionFromTemplate)))
+	if err != nil {
+		return err
+	}
 	fmt.Println("Configuration extracted")
 
 	return nil

@@ -18,6 +18,7 @@ type Containers struct {
 
 // Init
 type InitRequest struct {
+	Config     string            `json:"config"`      // Config name, default is config
 	IsDefault  bool              `json:"default"`     // Use default settings, default is false
 	Project    string            `json:"project"`     // Project name, default is "clearndr"
 	Values     map[string]string `json:"values"`      // Values to set, key is the name of the value, value is the value

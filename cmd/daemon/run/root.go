@@ -73,7 +73,11 @@ func RunCmd() *cobra.Command {
 			logger := getLogger(span)
 			r := SetupRouter(logger)
 			logger("Starting daemon")
-			r.Run(":8080")
+			err := r.Run(":8080")
+			if err != nil {
+				logger(err.Error())
+				return err
+			}
 			return nil
 		},
 	}

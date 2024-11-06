@@ -30,9 +30,6 @@ type SetHandlerInputs struct {
 
 // func SetHandler(configPath string, args []string, reload bool, apply bool) error {
 func SetHandler(params SetHandlerInputs) error {
-	if !app.IsCtl() {
-		params.Config = app.GetConfigsFolder(params.Config)
-	}
 	// Load the config
 	file, err := models.CreateFileInstance(params.Config, "values.yaml")
 	if err != nil {

@@ -4,7 +4,6 @@ import (
 	// Common
 
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	// External
@@ -78,15 +77,15 @@ func (f *File) isValidPath() error {
 	if _, err := os.Stat(f.completePath()); err == nil {
 		return nil
 	}
-	// Attempt to create it
-	var d []byte
-	if err := os.MkdirAll(f.Path, 0755); err != nil {
-		return err
+
+	// Check parts
+	if f.Path == "" {
+		f.Path = "."
 	}
-	if err := ioutil.WriteFile(f.completePath(), d, 0755); err == nil {
-		os.Remove(f.completePath()) // And delete it
-		return nil
+	if f.Name == "" || f.Type == "" {
+		return fmt.Errorf("type %s is not valid", f.Type)
 	}
+
 	// Return error if not possible
-	return fmt.Errorf("path %s is not valid", f.Path)
+	return nil
 }
