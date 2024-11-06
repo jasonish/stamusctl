@@ -2,6 +2,7 @@ package compose
 
 import (
 	// Internal
+	"stamus-ctl/internal/app"
 	handlers "stamus-ctl/internal/handlers/wrapper"
 
 	// External
@@ -18,8 +19,13 @@ import (
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Router /compose/up [post]
 func upHandler(c *gin.Context) {
+	// Extract params
+	conf := c.Query("config")
+	if conf == "" {
+		conf = app.DefaultConfigName
+	}
 	// Call handler
-	err := handlers.HandleUp()
+	err := handlers.HandleUp(conf)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -37,8 +43,13 @@ func upHandler(c *gin.Context) {
 // @Failure 400 {object} pkg.ErrorResponse "Bad request with explanation"
 // @Router /compose/down [post]
 func downHandler(c *gin.Context) {
+	// Extract params
+	conf := c.Query("config")
+	if conf == "" {
+		conf = app.DefaultConfigName
+	}
 	// Call handler
-	err := handlers.HandleDown(false, false)
+	err := handlers.HandleDown(conf, false, false)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

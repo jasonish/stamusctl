@@ -33,10 +33,12 @@ type SetRequest struct {
 	Apply      bool              `json:"apply"`       // Apply the new configuration, relaunch it, default is false
 	ValuesPath string            `json:"values_path"` // Path to a values.yaml file
 	FromFile   map[string]string `json:"from_file"`   // Values keys and paths to files containing the content used as value
+	Config     string            `json:"config"`      // Config name, default is config
 }
 type GetRequest struct {
 	Values  []string `json:"values"`  // Values to retrieve, default is all
 	Content bool     `json:"content"` // Get content or values, default is false
+	Config  string   `json:"config"`  // Config name, default is config
 }
 type GetListResponse struct {
 	Configs []string `json:"configs"` // List of available configurations on the system

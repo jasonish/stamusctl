@@ -20,7 +20,7 @@ import (
 // @Router /compose/restart/config [post]
 func restartConfigHandler(c *gin.Context) {
 	// Call handler
-	err := handlers.HandleConfigRestart()
+	err := handlers.HandleConfigRestart(c.Query("config"))
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
