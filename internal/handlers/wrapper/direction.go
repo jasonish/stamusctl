@@ -11,14 +11,12 @@ import (
 	// Internal
 	"stamus-ctl/internal/app"
 	compose "stamus-ctl/internal/docker-compose"
-	"stamus-ctl/internal/stamus"
 	"stamus-ctl/pkg/mocker"
 )
 
-func HandleUp() error {
-	conf, err := stamus.GetCurrent()
-	if err != nil {
-		return err
+func HandleUp(conf string) error {
+	if !app.IsCtl() {
+		conf = app.GetConfigsFolder(conf)
 	}
 	if app.Mode.IsTest() {
 		return mocker.Mocked.Up(conf)
@@ -43,10 +41,9 @@ func handleUp(configName string) error {
 	return cmd.Execute()
 }
 
-func HandleDown(removeOrphans bool, volumes bool) error {
-	conf, err := stamus.GetCurrent()
-	if err != nil {
-		return err
+func HandleDown(conf string, removeOrphans bool, volumes bool) error {
+	if !app.IsCtl() {
+		conf = app.GetConfigsFolder(conf)
 	}
 	if app.Mode.IsTest() {
 		return mocker.Mocked.Down(conf)

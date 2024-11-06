@@ -10,7 +10,6 @@ import (
 
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/handlers/wrapper"
-	"stamus-ctl/internal/stamus"
 	"stamus-ctl/pkg/mocker"
 
 	// External
@@ -18,24 +17,23 @@ import (
 	"github.com/docker/docker/client"
 )
 
-func HandleConfigRestart() error {
+func HandleConfigRestart(conf string) error {
 	if app.Mode.IsTest() {
-		conf, err := stamus.GetCurrent()
-		if err != nil {
-			return err
-		}
 		return mocker.Mocked.Restart(conf)
 	}
-	return handleConfigRestart()
+	return handleConfigRestart(conf)
 }
 
 // HandleConfigRestart restarts the containers defined in the container composition file
-func handleConfigRestart() error {
-	err := wrapper.HandleDown(false, false)
+func handleConfigRestart(conf string) error {
+	if !app.IsCtl() {
+		conf = app.GetConfigsFolder(conf)
+	}
+	err := wrapper.HandleDown(conf, false, false)
 	if err != nil {
 		return err
 	}
-	return wrapper.HandleUp()
+	return wrapper.HandleUp(conf)
 }
 
 func HandleContainersRestart(containers []string) error {

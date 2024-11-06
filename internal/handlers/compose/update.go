@@ -28,16 +28,7 @@ type UpdateHandlerParams struct {
 
 func UpdateHandler(params UpdateHandlerParams) error {
 	// Unpack params
-	var configPath string
-	if params.Config == "" {
-		conf, err := stamus.GetCurrent()
-		if err != nil {
-			return err
-		}
-		configPath = app.GetConfigsFolder(conf)
-	} else {
-		configPath = params.Config
-	}
+	configPath := params.Config
 	args := params.Args
 	versionVal := params.Version
 
@@ -50,7 +41,7 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	// Specific configuration
 	viperInstance.SetConfigName("values")
 	viperInstance.SetConfigType("yaml")
-	viperInstance.AddConfigPath(configPath)
+	viperInstance.AddConfigPath(params.Config)
 	// Read the config file
 	err := viperInstance.ReadInConfig()
 	if err != nil {
@@ -59,7 +50,6 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	project := viperInstance.GetString("stamus.project")
 
 	// Get registry info
-	image := "/" + project + ":" + versionVal
 	destPath := filepath.Join(app.TemplatesFolder + project + "/")
 	latestPath := filepath.Join(destPath, "latest/")
 
@@ -72,7 +62,7 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	// Pull config
 	fmt.Println("Getting configuration")
 	for _, registryInfo := range stamusConf.Registries.AsList() {
-		err = registryInfo.PullConfig(destPath, image)
+		err = registryInfo.PullConfig(destPath, project, versionVal)
 		if err == nil {
 			break
 		}

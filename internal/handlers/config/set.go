@@ -11,10 +11,8 @@ import (
 	// Internal
 
 	"stamus-ctl/internal/app"
-	flags "stamus-ctl/internal/handlers"
 	wrapper "stamus-ctl/internal/handlers/wrapper"
 	"stamus-ctl/internal/models"
-	"stamus-ctl/internal/stamus"
 	"stamus-ctl/internal/utils"
 
 	// External
@@ -27,16 +25,16 @@ type SetHandlerInputs struct {
 	Apply    bool     // Apply the new configuration, reload the services
 	Args     []string // Cmd arguments
 	FromFile string   // Path to the file containing the values
+	Config   string   // Config name
 }
 
 // func SetHandler(configPath string, args []string, reload bool, apply bool) error {
 func SetHandler(params SetHandlerInputs) error {
-	// Load the config
-	conf, err := flags.GetConfigFolderPath()
-	if err != nil {
-		return err
+	if !app.IsCtl() {
+		params.Config = app.GetConfigsFolder(params.Config)
 	}
-	file, err := models.CreateFileInstance(conf, "values.yaml")
+	// Load the config
+	file, err := models.CreateFileInstance(params.Config, "values.yaml")
 	if err != nil {
 		return err
 	}
@@ -65,7 +63,7 @@ func SetHandler(params SetHandlerInputs) error {
 	}
 
 	// Save the configuration
-	outputAsFile, err := models.CreateFileInstance(conf, "values.yaml")
+	outputAsFile, err := models.CreateFileInstance(params.Config, "values.yaml")
 	if err != nil {
 		return err
 	}
@@ -75,7 +73,7 @@ func SetHandler(params SetHandlerInputs) error {
 	}
 	// Apply the configuration
 	if params.Apply {
-		err = wrapper.HandleUp()
+		err = wrapper.HandleUp(params.Config)
 		if err != nil {
 			return err
 		}
@@ -84,12 +82,7 @@ func SetHandler(params SetHandlerInputs) error {
 }
 
 // For each argument, copy the input path to the output path
-func SetContentHandler(args []string) error {
-	conf, err := flags.GetConfigFolderPath()
-	if err != nil {
-		return err
-	}
-
+func SetContentHandler(conf string, args []string) error {
 	// For each argument
 	for _, arg := range args {
 		if arg == "" {
@@ -105,10 +98,6 @@ func SetContentHandler(args []string) error {
 		outputPath := split[1]
 		// Deamon specific, concatenate the config path
 		if !app.IsCtl() {
-			conf, err := stamus.GetCurrent()
-			if err != nil {
-				return err
-			}
 			configPath := app.GetConfigsFolder(conf)
 			outputPath = filepath.Join(configPath, outputPath)
 		}
@@ -117,25 +106,6 @@ func SetContentHandler(args []string) error {
 		if err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-func SetCurrent(name string) error {
-	// Get the configuration
-	config, err := stamus.GetStamusConfig()
-	if err != nil {
-		return err
-	}
-	// Set the current
-	err = config.SetCurrent(name)
-	if err != nil {
-		return err
-	}
-	// Save
-	err = config.Save()
-	if err != nil {
-		return err
 	}
 	return nil
 }

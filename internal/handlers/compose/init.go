@@ -25,11 +25,10 @@ type InitHandlerInputs struct {
 
 func InitHandler(isCli bool, params InitHandlerInputs) error {
 	// Get registry info
-	image := "/" + params.Project + ":" + params.Version
 	destPath := filepath.Join(app.TemplatesFolder, params.Project)
 
 	// Pull latest template
-	err := pullLatestTemplate(destPath, image)
+	err := pullLatestTemplate(destPath, params.Project, params.Version)
 	if err != nil && !app.Embed.IsTrue() {
 		return err
 	}
@@ -70,17 +69,7 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 		return err
 	}
 	// Save the configuration
-	var path string
-	if params.Config == "" {
-		stamusConfig, err := stamus.GetCurrent()
-		if err != nil {
-			return err
-		}
-		path = app.GetConfigsFolder(stamusConfig)
-	} else {
-		path = params.Config
-	}
-	outputFile, err := models.CreateFileInstance(path, "values.yaml")
+	outputFile, err := models.CreateFileInstance(params.Config, "values.yaml")
 	if err != nil {
 		return err
 	}
@@ -89,7 +78,7 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 		return err
 	}
 	// Bind files
-	err = confHandler.SetContentHandler(params.Bind)
+	err = confHandler.SetContentHandler(params.Config, params.Bind)
 	if err != nil {
 		return err
 	}
@@ -97,7 +86,7 @@ func InitHandler(isCli bool, params InitHandlerInputs) error {
 }
 
 // Pull latest template from saved registries
-func pullLatestTemplate(destPath string, image string) error {
+func pullLatestTemplate(destPath string, project, version string) error {
 	// Get registries infos
 	stamusConf, err := stamus.GetStamusConfig()
 	if err != nil {
@@ -107,7 +96,7 @@ func pullLatestTemplate(destPath string, image string) error {
 	if len(stamusConf.Registries.AsList()) != 0 {
 		//Logged in
 		for _, registryInfo := range stamusConf.Registries.AsList() {
-			err = registryInfo.PullConfig(destPath, image)
+			err = registryInfo.PullConfig(destPath, project, version)
 			if err == nil {
 				return nil
 			} else {
@@ -119,7 +108,7 @@ func pullLatestTemplate(destPath string, image string) error {
 	infos := models.RegistryInfo{
 		Registry: app.DefaultRegistry,
 	}
-	err = infos.PullConfig(destPath, image)
+	err = infos.PullConfig(destPath, project, version)
 	if err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package compose
 
 import (
 	// Core
+	"log"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -11,7 +12,6 @@ import (
 	"stamus-ctl/internal/app"
 	stamusFlags "stamus-ctl/internal/handlers"
 	"stamus-ctl/internal/models"
-	"stamus-ctl/internal/stamus"
 
 	// External
 	"github.com/docker/cli/cli-plugins/plugin"
@@ -45,11 +45,11 @@ var ComposeFlags = models.ComposeFlags{
 }
 
 // Variables
-var ComposeCmds map[string]*cobra.Command = make(map[string]*cobra.Command)
+// var ComposeCmds map[string]*cobra.Command = make(map[string]*cobra.Command)
 
 func GetComposeCmd(cmd string) *cobra.Command {
-	WrappedCmd(ComposeFlags)
-	return ComposeCmds[cmd]
+	_, cmds := WrappedCmd(ComposeFlags)
+	return cmds[cmd]
 }
 
 // Handlers
@@ -90,15 +90,14 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 	// Filter commands
 	for _, c := range cmdDocker.Commands() {
 		command := strings.Split(c.Use, " ")[0]
-		if composeFlags.Contains(command) && ComposeCmds[command] == nil {
-			ComposeCmds[command] = c
+		if composeFlags.Contains(command) {
 			// Filter flags
 			flags := composeFlags[command].ExtractFlags(cmdDocker.Flags(), c.Flags())
 			c.ResetFlags()
 			c.Flags().AddFlagSet(flags)
 			// Modify file flag
 			if c.Flags().Lookup("file") != nil {
-				modifyFileFlag(c, command)
+				modifyFileFlag(c)
 			}
 			// Save command
 			cmds = append(cmds, c)
@@ -109,38 +108,29 @@ func WrappedCmd(composeFlags models.ComposeFlags) ([]*cobra.Command, map[string]
 }
 
 // Modify the file flag to be hidden and add a folder flag
-func modifyFileFlag(c *cobra.Command, command string) {
+func modifyFileFlag(c *cobra.Command) {
 	// Modify flags
 	c.Flags().Lookup("file").Hidden = true
 	stamusFlags.Config.AddAsFlag(c, false)
 	// Save the command
 	currentRunE := c.RunE
 	// Modify cmd function
-	c.RunE = makeCustomRunner(currentRunE, command)
+	c.RunE = makeCustomRunner(currentRunE)
 }
 
 // Return a custom runner for the command, that sets the file flag to the folder flag
 func makeCustomRunner(
 	runE func(cmd *cobra.Command, args []string) error,
-	command string,
 ) func(cmd *cobra.Command, args []string) error {
+
 	return func(cmd *cobra.Command, args []string) error {
-		var configPath string
-		// Get config folder
-		if app.IsCtl() {
-			conf, err := stamusFlags.Config.GetValue()
-			if err != nil {
-				return err
-			}
-			configPath = conf.(string)
-		} else {
-			conf, err := stamus.GetCurrent()
-			if err != nil {
-				return err
-			}
-			configPath = app.GetConfigsFolder(conf)
-		}
 		// Get folder flag value
+		configFlag := cmd.Flags().Lookup("config")
+		conf := configFlag.Value.String()
+		if !app.IsCtl() {
+			conf = app.GetConfigsFolder(conf)
+		}
+		log.Println("Config flag value: ", configFlag.Value.String())
 		possibleComposeFiles := []string{
 			"docker-compose.yaml",
 			"docker-compose.yml",
@@ -149,14 +139,14 @@ func makeCustomRunner(
 		}
 		composeFile := ""
 		for _, file := range possibleComposeFiles {
-			filePath := filepath.Join(configPath, file)
+			filePath := filepath.Join(conf, file)
 			if _, err := os.Stat(filePath); err == nil {
 				composeFile = filePath
 				break
 			}
 		}
 		// Set file flag
-		fileFlag := GetComposeCmd(command).Flags().Lookup("file")
+		fileFlag := cmd.Flags().Lookup("file")
 		fileFlag.Value.Set(composeFile)
 		fileFlag.DefValue = composeFile
 		// Run existing command

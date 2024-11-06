@@ -3,7 +3,6 @@ package handlers
 import (
 	"stamus-ctl/internal/app"
 	"stamus-ctl/internal/models"
-	"stamus-ctl/internal/stamus"
 	"stamus-ctl/internal/utils"
 )
 
@@ -97,22 +96,4 @@ var Password = models.Parameter{
 	Name:  "pass",
 	Type:  "string",
 	Usage: "Registry password",
-}
-
-func GetConfigFolderPath() (string, error) {
-	var configPath string
-	if app.IsCtl() {
-		val, err := Config.GetValue()
-		if err != nil {
-			return "", err
-		}
-		configPath = val.(string)
-	} else {
-		conf, err := stamus.GetCurrent()
-		if err != nil {
-			return "", err
-		}
-		configPath = app.GetConfigsFolder(conf)
-	}
-	return configPath, nil
 }
