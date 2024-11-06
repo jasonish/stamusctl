@@ -55,8 +55,12 @@ func getHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	conf, err := flags.Config.GetValue()
+	if err != nil {
+		return err
+	}
 	// Load the config values
-	groupedValues, err := config.GetGroupedConfig(args, reload.(bool))
+	groupedValues, err := config.GetGroupedConfig(conf.(string), args, reload.(bool))
 	if err != nil {
 		return err
 	}
@@ -66,8 +70,13 @@ func getHandler(cmd *cobra.Command, args []string) error {
 }
 
 func getContent(cmd *cobra.Command, args []string) error {
+	// Get properties
+	conf, err := flags.Config.GetValue()
+	if err != nil {
+		return err
+	}
 	// Call handler
-	groupedContent, err := config.GetGroupedContent(args)
+	groupedContent, err := config.GetGroupedContent(conf.(string), args)
 	if err != nil {
 		return err
 	}

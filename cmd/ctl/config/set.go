@@ -5,7 +5,6 @@ import (
 
 	flags "stamus-ctl/internal/handlers"
 	config "stamus-ctl/internal/handlers/config"
-	"stamus-ctl/internal/stamus"
 
 	// External
 	"github.com/spf13/cobra"
@@ -72,6 +71,10 @@ func setHandler(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	conf, err := flags.Config.GetValue()
+	if err != nil {
+		return err
+	}
 
 	// Set the values
 	params := config.SetHandlerInputs{
@@ -80,6 +83,7 @@ func setHandler(cmd *cobra.Command, args []string) error {
 		Apply:    apply.(bool),
 		Values:   values.(string),
 		FromFile: fromFile.(string),
+		Config:   conf.(string),
 	}
 	err = config.SetHandler(params)
 	if err != nil {
@@ -89,10 +93,12 @@ func setHandler(cmd *cobra.Command, args []string) error {
 }
 
 func setContentHandler(cmd *cobra.Command, args []string) error {
-	// Call handler
-	return config.SetContentHandler(args)
-}
+	// Get properties
+	conf, err := flags.Config.GetValue()
+	if err != nil {
+		return err
+	}
 
-func setCurrentHandler(name string) error {
-	return stamus.SetCurrent(name)
+	// Call handler
+	return config.SetContentHandler(conf.(string), args)
 }
