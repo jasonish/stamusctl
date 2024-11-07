@@ -253,6 +253,12 @@
                 "summary": "Get configuration",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Config name, default is config",
+                        "name": "config",
+                        "in": "query"
+                    },
+                    {
                         "type": "boolean",
                         "description": "Get content or values, default is false",
                         "name": "content",
@@ -310,52 +316,6 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/pkg.SetRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Configuration set successfully",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.SuccessResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request with explanation",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error with explanation",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/config/current": {
-            "post": {
-                "description": "Sets configuration with provided parameters.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "config"
-                ],
-                "summary": "Set current configuration",
-                "parameters": [
-                    {
-                        "description": "Configuration name to use",
-                        "name": "set",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/pkg.Config"
                         }
                     }
                 ],
@@ -711,15 +671,6 @@
                 }
             }
         },
-        "pkg.Config": {
-            "type": "object",
-            "properties": {
-                "config": {
-                    "description": "Config name, default is config",
-                    "type": "string"
-                }
-            }
-        },
         "pkg.ContainerLogs": {
             "type": "object",
             "properties": {
@@ -834,6 +785,10 @@
         "pkg.InitRequest": {
             "type": "object",
             "properties": {
+                "config": {
+                    "description": "Config name, default is config",
+                    "type": "string"
+                },
                 "default": {
                     "description": "Use default settings, default is false",
                     "type": "boolean"
@@ -922,6 +877,10 @@
                 "apply": {
                     "description": "Apply the new configuration, relaunch it, default is false",
                     "type": "boolean"
+                },
+                "config": {
+                    "description": "Config name, default is config",
+                    "type": "string"
                 },
                 "from_file": {
                     "description": "Values keys and paths to files containing the content used as value",

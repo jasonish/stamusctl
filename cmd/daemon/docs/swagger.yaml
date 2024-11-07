@@ -95,12 +95,6 @@ definitions:
         description: Operational data
         type: string
     type: object
-  pkg.Config:
-    properties:
-      config:
-        description: Config name, default is config
-        type: string
-    type: object
   pkg.ContainerLogs:
     properties:
       Id:
@@ -176,6 +170,9 @@ definitions:
     type: object
   pkg.InitRequest:
     properties:
+      config:
+        description: Config name, default is config
+        type: string
       default:
         description: Use default settings, default is false
         type: boolean
@@ -241,6 +238,9 @@ definitions:
       apply:
         description: Apply the new configuration, relaunch it, default is false
         type: boolean
+      config:
+        description: Config name, default is config
+        type: string
       from_file:
         additionalProperties:
           type: string
@@ -563,6 +563,10 @@ paths:
     get:
       description: Retrieves configuration for a given project.
       parameters:
+      - description: Config name, default is config
+        in: query
+        name: config
+        type: string
       - description: Get content or values, default is false
         in: query
         name: content
@@ -619,36 +623,6 @@ paths:
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Set configuration
-      tags:
-      - config
-  /config/current:
-    post:
-      consumes:
-      - application/json
-      description: Sets configuration with provided parameters.
-      parameters:
-      - description: Configuration name to use
-        in: body
-        name: set
-        required: true
-        schema:
-          $ref: '#/definitions/pkg.Config'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Configuration set successfully
-          schema:
-            $ref: '#/definitions/pkg.SuccessResponse'
-        "400":
-          description: Bad request with explanation
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-        "500":
-          description: Internal server error with explanation
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Set current configuration
       tags:
       - config
   /config/list:
