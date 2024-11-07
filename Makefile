@@ -39,20 +39,26 @@ cli:
 test-cli:
 	CGO_ENABLED=0 GODEBUG="tarinsecurepath=0,zipinsecurepath=0" BUILD_MODE=test STAMUS_APP_NAME=stamusctl go build -v -ldflags '${LDFLAGS}' -ldflags="-extldflags=-static" -o ${DIST_DIR}/${CLI_NAME} ./cmd
 
+test:
+	go test ./internal/models
+
 daemon:
 	CGO_ENABLED=0 GODEBUG="tarinsecurepath=0,zipinsecurepath=0" go build -v -ldflags '${LDFLAGS}' -ldflags="-extldflags=-static" -o ${DIST_DIR}/${DAEMON_NAME} ./cmd
 
 daemon-dev:
 	air run
 
-test:
-	go test ./internal/models
-
 daemon-test: init-embeds
 	EMBED_MODE=true go test ./.test/unit
+
+build-swaggo-image:
+	docker build . -t swag-daemon -f docker/Dockerfile.swag
+
+update-swagger: build-swaggo-image
+	docker run --rm -it -v .:/code swag-daemon:latest
 
 # This step is needed in tests to have embeds loaded in some xdg paths
 init-embeds:
 	STAMUS_APP_NAME=stamusctl EMBED_MODE=true go run ./cmd compose init -h
 
-.PHONY: all cli test-cli daemon daemon-dev test daemon-test init-embeds
+.PHONY: all cli test-cli test daemon daemon-dev daemon-test build-swaggo-image update-swagger init-embeds
