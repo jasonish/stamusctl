@@ -24,8 +24,8 @@ services:
         volumes:
             - docker-certs-ca:/certs
             - docker-certs-client:/certs/client
-            - ~/.docker/config.json:/root/.docker/config.json:ro
             - downloaded-configs:/src/stamus-ctl/config/configs
+            - ~/.docker/config.json:/root/.docker/config.json:ro
         networks:
             - docker
         ports:
