@@ -19,7 +19,7 @@ func getOrCreateStamusConfigFile() (*os.File, error) {
 	}
 
 	// Open or create ~/stamus/config.json
-	f, err := os.OpenFile(filepath.Join(app.ConfigFolder, "config.json"), os.O_RDWR|os.O_CREATE, 0755)
+	f, err := os.OpenFile(filepath.Join(app.ConfigFolder, "config.json"), os.O_RDONLY, 0755)
 	if err != nil {
 		return nil, err
 	}
