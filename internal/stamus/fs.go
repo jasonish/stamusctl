@@ -19,6 +19,16 @@ func getOrCreateStamusConfigFile() (*os.File, error) {
 	}
 
 	// Open or create ~/stamus/config.json
+	f, err := os.OpenFile(filepath.Join(app.ConfigFolder, "config.json"), os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		return nil, err
+	}
+
+	return f, nil
+}
+
+func tryGetStamusConfigFile() (*os.File, error) {
+	// Open or create ~/stamus/config.json
 	f, err := os.OpenFile(filepath.Join(app.ConfigFolder, "config.json"), os.O_RDONLY, 0755)
 	if err != nil {
 		return nil, err
@@ -29,23 +39,23 @@ func getOrCreateStamusConfigFile() (*os.File, error) {
 
 func GetStamusConfig() (*Config, error) {
 	// Open or create ~/stamus/config.json
-	file, err := getOrCreateStamusConfigFile()
+	file, err := tryGetStamusConfigFile()
 	if err != nil {
-		return nil, err
+		return &Config{}, nil
 	}
 	// Read the file contents
 	bytes, err := io.ReadAll(file)
 	if err != nil {
-		return nil, err
+		return &Config{}, nil
 	}
 	// Unmarshal the file contents
-	Config := &Config{}
+	config := &Config{}
 	if len(bytes) != 0 {
-		err = json.Unmarshal(bytes, &Config)
+		err = json.Unmarshal(bytes, &config)
 		if err != nil {
-			return nil, err
+			return &Config{}, nil
 		}
 	}
 
-	return Config, nil
+	return config, nil
 }
