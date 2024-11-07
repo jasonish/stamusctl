@@ -3,11 +3,17 @@ docker/
 scripts/
 tmp/
 config/
+compose.yaml
 
 .air.toml
 .dockerignore
 .envrc
+.git
 .gitignore
 .gitlab-*
+.vscode/
+.direnv
+
+gitlab/
 default.nix
 README.md

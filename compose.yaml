@@ -1,0 +1,56 @@
+volumes:
+    docker-certs-ca:
+    docker-certs-client:
+    downloaded-configs:
+
+networks:
+    docker:
+
+configs:
+    stamus-config:
+        file: ~/.config/stamus/config.json
+
+services:
+    dind:
+        image: docker:27-dind
+        privileged: true
+        environment:
+            DOCKER_TLS_CERTDIR: ''
+        healthcheck:
+            test: ['CMD', 'docker', 'info']
+            interval: 10s
+            timeout: 10s
+            retries: 5
+        volumes:
+            - docker-certs-ca:/certs
+            - docker-certs-client:/certs/client
+            - ~/.docker/config.json:/root/.docker/config.json:ro
+            - downloaded-configs:/src/stamus-ctl/config/configs
+        networks:
+            - docker
+        ports:
+            - 443:443
+        restart: always
+
+    stamusctl:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile.local
+        entrypoint: [sh, -c, 'while sleep 1; do :; done']
+        networks:
+            - docker
+        volumes:
+            - docker-certs-ca:/certs
+            - docker-certs-client:/certs/client
+            - downloaded-configs:/src/stamus-ctl/config/configs
+            - ~/.docker/config.json:/root/.docker/config.json:ro
+            - ./:/src/stamus-ctl
+        configs:
+            - source: stamus-config
+              target: /root/.config/stamus/config.json
+        environment:
+            DOCKER_HOST: tcp://dind:2375
+            DOCKER_TLS_CERTDIR: /certs
+        restart: always
+        depends_on:
+            - dind
