@@ -15,7 +15,7 @@ To install stamusctl, you can:
 
 #### Build from source
 ```
-git clone https://git.stamus-networks.com/devel/stamus-ctl
+git clone https://github.com/StamusNetworks/stamusctl.git
 ```
 and follow [golang documentation](https://go.dev/doc/tutorial/compile-install).
 
@@ -84,7 +84,7 @@ If not, you can:
 
 ### Login
 `stamusctl login` is the command used to login to image registries.
-This way, you can pull images from private registries. It is currently needed while we are in gitlab
+This way, you can pull images from private registries.
 
 - `login` is used to login to image registries
   - `--registry` to select registry
@@ -95,7 +95,7 @@ This way, you can pull images from private registries. It is currently needed wh
 ## Examples
 ```
 // Login to a registry
-stamusctl login --registry git.stamus-networks.com:4567/lanath/configs --user <GITLAB_PAT_TOKEN_NAME> --pass <GITLAB_PAT_TOKEN>
+stamusctl login --registry <REGISTRY_URL> --user <REGISTRY_TOKEN_NAME> --pass <REGISTRY_TOKEN>
 
 // Init via user prompt
 stamusctl compose init

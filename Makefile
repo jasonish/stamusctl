@@ -1,5 +1,5 @@
-PACKAGE=git.stamus-networks.com/lanath/stamus-ctl/internal/app
-LOGGER=git.stamus-networks.com/lanath/stamus-ctl/internal/logging
+PACKAGE=github.com/StamusNetworks/stamusctl/internal/app
+LOGGER=github.com/StamusNetworks/stamusctl/internal/logging
 
 CURRENT_DIR=$(shell pwd)
 DIST_DIR=${CURRENT_DIR}/dist
