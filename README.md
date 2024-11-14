@@ -94,7 +94,7 @@ This way, you can pull images from private registries.
 
 ## Examples
 ```
-// Login to a registry
+// Login to a registry. optional
 stamusctl login --registry <REGISTRY_URL> --user <REGISTRY_TOKEN_NAME> --pass <REGISTRY_TOKEN>
 
 // Init via user prompt
