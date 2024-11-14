@@ -44,4 +44,4 @@ create-tags:
         - git config --global user.name $GITLAB_USER_NAME
         - tag=$(cat VERSION)
         - git tag "$tag"
-        - git push --tags http://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:main
+        - git push --tags https://repo-token:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:main
