@@ -16,11 +16,11 @@ docker cli:
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker build "${CI_PROJECT_DIR}"
-          -t ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
-          -t ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}
+          -t ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
+          -t ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_REF_NAME}
           -f "${CI_PROJECT_DIR}/docker/Dockerfile.cli"
-        - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
-        - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_BRANCH}
+        - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
+        - docker push ${CI_REGISTRY_IMAGE}/cli:${CI_COMMIT_REF_NAME}
 
 docker daemon:
     stage: build
@@ -39,11 +39,11 @@ docker daemon:
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker build "${CI_PROJECT_DIR}"
-          -t ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
-          -t ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}
+          -t ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
+          -t ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_REF_NAME}
           -f "${CI_PROJECT_DIR}/docker/Dockerfile.daemon"
-        - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
-        - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_BRANCH}
+        - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
+        - docker push ${CI_REGISTRY_IMAGE}/daemon:${CI_COMMIT_REF_NAME}
 
 build cli:
     image: git.stamus-networks.com:4567/devel/devops/images-utils/stamusctl-build-image:latest

@@ -4,7 +4,7 @@ refresh-app-of-apps:
         - test daemon
     variables:
         APP: stamusd
-        BRANCH: $CI_COMMIT_BRANCH
+        BRANCH: $CI_COMMIT_REF_NAME
         SHA: $CI_COMMIT_SHORT_SHA
         PROJECT: $CI_PROJECT_NAME
         NAMESPACE: $CI_PROJECT_NAMESPACE

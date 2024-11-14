@@ -29,7 +29,7 @@ full test w test config:
 
 full test w debug image:
     stage: integration
-    image: git.stamus-networks.com:4567/devel/stamus-ctl/cli:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
+    image: git.stamus-networks.com:4567/devel/stamus-ctl/cli:$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
     tags:
       - k8s-small
     variables:
