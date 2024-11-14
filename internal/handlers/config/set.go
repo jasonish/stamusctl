@@ -64,10 +64,7 @@ func SetHandler(params SetHandlerInputs) error {
 	if err != nil {
 		return err
 	}
-	err = config.SaveConfigTo(outputAsFile, false, false)
-	if err != nil {
-		return err
-	}
+	config.SaveConfigTo(outputAsFile, false, false)
 	// Apply the configuration
 	if params.Apply {
 		err = wrapper.HandleUp(params.Config)

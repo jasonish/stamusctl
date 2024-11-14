@@ -362,12 +362,10 @@ func (f *Config) Clean(folder File) error {
 	// Clean destination folder
 	err = deleteEmptyFiles(folder.Path)
 	if err != nil {
-		log.Println("Error deleting empty files", err)
 		return err
 	}
 	err = deleteEmptyFolders(folder.Path)
 	if err != nil {
-		log.Println("Error deleting empty folders", err)
 		return err
 	}
 	return nil

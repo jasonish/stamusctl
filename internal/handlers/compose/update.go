@@ -128,10 +128,7 @@ func UpdateHandler(params UpdateHandlerParams) error {
 	}
 
 	// Save the configuration
-	err = newConfig.SaveConfigTo(confFile, false, true)
-	if err != nil {
-		return err
-	}
+	newConfig.SaveConfigTo(confFile, false, true)
 
 	// Run post-run script
 	_, err = runArbitraryScript(postrunPath)
