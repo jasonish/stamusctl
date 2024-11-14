@@ -4,6 +4,9 @@ test cli:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build cli
     dependencies:
@@ -28,6 +31,9 @@ compose init:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build test
     dependencies:
@@ -42,6 +48,9 @@ compose init conf flag:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build test
     dependencies:
@@ -56,6 +65,9 @@ compose init set:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build test
     dependencies:
@@ -70,6 +82,9 @@ compose init optional:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build test
     dependencies:
@@ -84,6 +99,9 @@ compose init arbitrary:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build test
     dependencies:
@@ -98,6 +116,9 @@ compose config set:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build test
     dependencies:
@@ -113,6 +134,9 @@ compose config reload:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build test
     dependencies:
@@ -129,6 +153,9 @@ config flag set:
     stage: func-test
     tags:
         - k8s-small
+    rules:
+    - if: $CI_COMMIT_TAG
+      when: never
     needs:
         - build test
     dependencies:

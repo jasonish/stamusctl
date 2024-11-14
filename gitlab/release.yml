@@ -55,6 +55,8 @@ upload stamusctl:
     - if: $CI_COMMIT_TAG
   script:
     - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file stamusctl "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/stamusctl/$CI_COMMIT_TAG/stamusctl"'
+  needs:
+    - build cli
 
 upload stamusd:
   stage: release
@@ -65,3 +67,27 @@ upload stamusd:
     - if: $CI_COMMIT_TAG
   script:
     - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file stamusd "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/stamusctl/$CI_COMMIT_TAG/stamusd"'
+  needs:
+    - build daemon
+
+create release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - echo "running release_job"
+  release:
+    tag_name: '$CI_COMMIT_TAG'
+    description: '$CI_COMMIT_TAG'
+    assets:
+        links:
+        - name: 'stamusctl'
+          url: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/stamusctl/$CI_COMMIT_TAG/stamusctl'
+          link_type: 'package'
+        - name: 'stamusd'
+          url: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/stamusctl/$CI_COMMIT_TAG/stamusd'
+          link_type: 'package'
+  needs:
+    - upload stamusctl
+    - upload stamusd

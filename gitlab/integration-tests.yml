@@ -3,6 +3,9 @@ full test w test config:
     image: docker:24.0.5
     tags:
       - k8s-small
+    rules:
+    - if: $CI_COMMIT_BRANCH
+      when: on_success
     variables:
         DOCKER_HOST: tcp://docker:2376
         DOCKER_TLS_CERTDIR: '/certs'
@@ -32,6 +35,9 @@ full test w debug image:
     image: git.stamus-networks.com:4567/devel/stamus-ctl/cli:$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
     tags:
       - k8s-small
+    rules:
+    - if: $CI_COMMIT_BRANCH
+      when: on_success
     variables:
         DOCKER_HOST: tcp://docker:2376
         DOCKER_TLS_CERTDIR: '/certs'
